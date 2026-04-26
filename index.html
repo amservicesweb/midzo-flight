@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midzo Flight · Votre agence de voyage IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --blue:#0A74FF; --blue-dark:#003FBB; --navy:#06133A;
+            --surface:#F4F7FF; --glow:rgba(10,116,255,0.18); --text:#111827;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html{scroll-behavior:smooth;}
+        body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);-webkit-font-smoothing:antialiased;}
+        h1,h2,h3,h4,.syne{font-family:'Syne',sans-serif;}
+
+        /* ── HEADER ── */
+        .site-header{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.97);backdrop-filter:blur(24px);border-bottom:1px solid rgba(10,116,255,0.07);transition:box-shadow .3s;}
+        .site-header.scrolled{box-shadow:0 4px 30px rgba(0,0,0,0.06);}
+        .header-inner{max-width:1280px;margin:0 auto;padding:0 2rem;height:68px;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;}
+        .logo-wrap{display:inline-flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0;}
+        .logo-icon{width:34px;height:34px;min-width:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-dark));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px var(--glow);}
+        .logo-wordmark{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:-.03em;background:linear-gradient(135deg,var(--blue),var(--blue-dark));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;}
+        .logo-tag{font-size:.57rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);background:rgba(10,116,255,0.08);border:1px solid rgba(10,116,255,0.2);border-radius:4px;padding:2px 5px;flex-shrink:0;}
+        .ai-badge{display:flex;align-items:center;gap:6px;background:#f0f7ff;border:1px solid rgba(10,116,255,0.2);border-radius:100px;padding:5px 12px 5px 8px;font-size:.72rem;font-weight:600;color:var(--blue);white-space:nowrap;}
+        .ai-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:ping 2s infinite;flex-shrink:0;}
+        @keyframes ping{0%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+        nav a{font-size:.875rem;font-weight:500;color:#374151;text-decoration:none;transition:color .2s;position:relative;white-space:nowrap;}
+        nav a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--blue);border-radius:2px;transform:scaleX(0);transition:transform .2s;}
+        nav a:hover{color:var(--blue);}
+        nav a:hover::after{transform:scaleX(1);}
+        .badge-soon{font-size:.6rem;font-weight:700;text-transform:uppercase;background:#f3f4f6;color:#9ca3af;border-radius:100px;padding:2px 7px;}
+        .btn-main{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;font-weight:700;font-size:.85rem;padding:10px 22px;border-radius:100px;text-decoration:none;box-shadow:0 4px 18px rgba(10,116,255,.28);transition:all .2s;white-space:nowrap;font-family:'Syne',sans-serif;border:none;cursor:pointer;}
+        .btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(10,116,255,.38);}
+        .btn-outline{background:transparent;color:var(--blue);border:1.5px solid rgba(10,116,255,.4);box-shadow:none;}
+        .btn-outline:hover{background:rgba(10,116,255,.05);}
+        .lang-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#f3f4f6;border:1px solid #e5e7eb;cursor:pointer;font-size:1.2rem;transition:all .2s;}
+        .lang-btn:hover{background:#e9f0ff;border-color:rgba(10,116,255,.3);}
+
+        /* ── PROVIDER STRIP ── */
+        .strip{background:#fafbff;border-top:1px solid rgba(10,116,255,.06);overflow-x:auto;scrollbar-width:none;}
+        .strip::-webkit-scrollbar{display:none;}
+        .strip-inner{display:flex;align-items:center;max-width:1280px;margin:0 auto;padding:0 2rem;}
+        .strip-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b0b8c9;padding:0 14px 0 0;border-right:1px solid #e8eaf0;flex-shrink:0;}
+        .strip-item{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-right:1px solid #eef0f5;font-size:.72rem;font-weight:600;color:#4b5563;white-space:nowrap;flex-shrink:0;}
+        .strip-item:last-child{border-right:none;}
+
+        /* ── HERO ── */
+        .hero-section{position:relative;min-height:700px;display:flex;align-items:center;overflow:hidden;}
+        .hero-bg{position:absolute;inset:0;background:url('https://images.pexels.com/photos/1004584/pexels-photo-1004584.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;transform:scale(1.04);transition:transform 8s ease-out;}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(120deg,rgba(6,19,58,.78) 0%,rgba(6,19,58,.5) 50%,rgba(6,19,58,.2) 100%);}
+        .hero-content{position:relative;max-width:1280px;margin:0 auto;padding:5rem 2rem;width:100%;}
+        .hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:5px 14px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-bottom:1.4rem;}
+
+        /* ── SEARCH BAR ── */
+        .search-panel{background:rgba(255,255,255,.93);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:14px;box-shadow:0 25px 60px rgba(0,0,0,.22);margin-top:2.5rem;}
+        .search-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 140px;gap:8px;align-items:stretch;}
+        @media(max-width:960px){.search-grid{grid-template-columns:1fr 1fr;}}
+        @media(max-width:540px){.search-grid{grid-template-columns:1fr;}}
+        .sf{background:#fff;border-radius:12px;padding:9px 14px;height:58px;display:flex;flex-direction:column;justify-content:center;box-shadow:inset 0 1px 3px rgba(0,0,0,.05);position:relative;transition:box-shadow .2s;}
+        .sf:focus-within{box-shadow:inset 0 0 0 2px rgba(10,116,255,.3);}
+        .sf label{font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:3px;display:flex;align-items:center;gap:4px;}
+        .sf input{border:none;background:transparent;font-size:.88rem;font-weight:600;color:#1e293b;outline:none;width:100%;font-family:'DM Sans',sans-serif;}
+        .sf input::placeholder{color:#cbd5e1;font-weight:400;}
+
+        /* Autocomplete */
+        .autocomplete-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.1);z-index:300;overflow:hidden;max-height:220px;overflow-y:auto;}
+        .autocomplete-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s;font-size:.85rem;}
+        .autocomplete-item:hover,.autocomplete-item.active{background:#f0f7ff;}
+        .autocomplete-item .iata{font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:5px;padding:2px 6px;flex-shrink:0;}
+        .autocomplete-item .city{font-weight:600;color:#1e293b;}
+        .autocomplete-item .country{font-size:.75rem;color:#6b7280;}
+
+        /* ── DATE PICKER ── */
+        .date-picker-wrap{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:400;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);border:1px solid #e5e7eb;overflow:hidden;min-width:320px;}
+        .cal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #f0f2f5;}
+        .cal-header .month-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:#111827;}
+        .cal-nav{width:30px;height:30px;border-radius:50%;background:#f3f4f6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;font-size:1rem;}
+        .cal-nav:hover{background:#e0e8ff;}
+        .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:10px 12px 14px;}
+        .cal-day-name{font-size:.65rem;font-weight:700;text-align:center;color:#9ca3af;padding:4px 0;}
+        .cal-day{height:36px;width:100%;display:flex;align-items:center;justify-content:center;font-size:.82rem;border-radius:9px;cursor:pointer;transition:all .15s;font-weight:500;color:#374151;}
+        .cal-day:hover:not(.disabled):not(.empty){background:#e8f0ff;color:var(--blue);}
+        .cal-day.selected{background:var(--blue);color:#fff;font-weight:700;}
+        .cal-day.in-range{background:rgba(10,116,255,.1);color:var(--blue);border-radius:0;}
+        .cal-day.range-start{background:var(--blue);color:#fff;border-radius:9px 0 0 9px;}
+        .cal-day.range-end{background:var(--blue);color:#fff;border-radius:0 9px 9px 0;}
+        .cal-day.today{font-weight:700;color:var(--blue);}
+        .cal-day.disabled,.cal-day.empty{color:#d1d5db;cursor:default;}
+        .cal-footer{padding:10px 14px;border-top:1px solid #f0f2f5;display:flex;gap:8px;}
+        .cal-clear{flex:1;padding:8px;background:#f3f4f6;border:none;border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:#6b7280;}
+        .cal-apply{flex:1;padding:8px;background:var(--blue);border:none;border-radius:9px;font-size:.8rem;font-weight:700;cursor:pointer;color:#fff;}
+
+        /* ── CHAT SECTION — Travel Agent style ── */
+        .agent-section{padding:5rem 1.25rem;max-width:860px;margin:0 auto;}
+        .agent-header-card{background:linear-gradient(135deg,var(--navy) 0%,#0d2260 100%);border-radius:24px;padding:2rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.5rem;overflow:hidden;position:relative;}
+        .agent-header-card::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;}
+        .agent-avatar{width:64px;height:64px;min-width:64px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.06));border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
+        .agent-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;margin-bottom:2px;}
+        .agent-title{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:500;}
+        .agent-online{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:600;color:#4ade80;margin-top:4px;}
+        .agent-badges{margin-left:auto;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+        .agent-badge{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:3px 9px;color:rgba(255,255,255,.7);}
+
+        .chat-box{background:#fff;border-radius:20px;border:1px solid #eef2f6;overflow:hidden;box-shadow:0 8px 40px rgba(10,116,255,.06);}
+        #chat-messages{padding:1.5rem;min-height:340px;max-height:440px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,#fafcff 0%,#fff 100%);}
+        #chat-messages::-webkit-scrollbar{width:4px;}
+        #chat-messages::-webkit-scrollbar-track{background:transparent;}
+        #chat-messages::-webkit-scrollbar-thumb{background:#e0e8ff;border-radius:4px;}
+        .bubble-bot{background:#fff;border:1px solid #eef2f6;color:#1e293b;border-radius:18px 18px 18px 4px;padding:.75rem 1.1rem;max-width:82%;font-size:.875rem;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+        .bubble-user{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border-radius:18px 18px 4px 18px;padding:.75rem 1.1rem;max-width:75%;font-size:.875rem;line-height:1.55;box-shadow:0 4px 14px rgba(10,116,255,.2);}
+        .bubble-row-bot{display:flex;align-items:flex-end;gap:8px;}
+        .bubble-row-user{display:flex;justify-content:flex-end;}
+        .bot-icon{width:28px;height:28px;min-width:28px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--blue-dark));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .typing-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue);margin:0 2px;animation:dot-bounce .8s infinite;}
+        .typing-dots span:nth-child(2){animation-delay:.15s;}
+        .typing-dots span:nth-child(3){animation-delay:.3s;}
+        @keyframes dot-bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+        .typing-cursor::after{content:'▋';animation:blink 1.2s infinite;color:var(--blue);}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+        /* Suggestion chips */
+        .chips-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+        .chip{background:#f0f7ff;border:1px solid rgba(10,116,255,.15);color:var(--blue);font-size:.78rem;font-weight:600;border-radius:100px;padding:5px 13px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+        .chip:hover{background:var(--blue);color:#fff;}
+
+        /* Chat input */
+        .chat-input-row{padding:14px;border-top:1px solid #f0f2f5;background:#fff;display:flex;gap:10px;align-items:center;}
+        #chat-input{flex:1;border:1.5px solid #e5e7eb;border-radius:100px;padding:11px 20px;font-size:.875rem;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;background:#fafbff;}
+        #chat-input:focus{border-color:var(--blue);background:#fff;}
+        #chat-send{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border:none;border-radius:100px;padding:11px 24px;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+        #chat-send:hover{transform:scale(1.04);}
+        #chat-send:disabled{opacity:.4;cursor:default;transform:none;}
+
+        /* WhatsApp button */
+        .whatsapp-btn{display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#fff;font-weight:700;font-size:.875rem;padding:14px 24px;border-radius:100px;text-decoration:none;box-shadow:0 6px 20px rgba(37,211,102,.3);transition:all .2s;font-family:'Syne',sans-serif;}
+        .whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(37,211,102,.4);}
+        .whatsapp-btn svg{flex-shrink:0;}
+
+        /* Result CTA */
+        .result-cta{padding:1rem 1.25rem;background:linear-gradient(135deg,#f0f7ff,#e8f3ff);border-top:1px solid rgba(10,116,255,.1);display:none;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+        .result-cta.show{display:flex;}
+
+        /* ── FLASH DEALS ── */
+        .deal-card{background:#fff;border-radius:16px;padding:1.1rem;border:1px solid #eef2f6;transition:all .2s;cursor:pointer;}
+        .deal-card:hover{border-color:var(--blue);box-shadow:0 10px 24px rgba(10,116,255,.1);transform:translateY(-2px);}
+        .deal-tag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 7px;}
+
+        /* ── DESTINATIONS ── */
+        .dest-img{height:168px;width:100%;object-fit:cover;display:block;background:linear-gradient(135deg,#1e3a5f,#0a74ff);}
+        .card-lift{transition:all .25s cubic-bezier(.2,0,0,1);}
+        .card-lift:hover{transform:translateY(-5px);box-shadow:0 20px 30px -12px rgba(10,116,255,.14);border-color:rgba(10,116,255,.2)!important;}
+
+        /* ── MODALS ── */
+        .modal-overlay{position:fixed;inset:0;background:rgba(6,19,58,.55);backdrop-filter:blur(5px);z-index:600;display:none;align-items:center;justify-content:center;padding:1rem;}
+        .modal-overlay.open{display:flex;}
+        .modal-box{background:#fff;border-radius:22px;max-width:540px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.2);}
+        .modal-hd{padding:1.3rem 1.8rem 1rem;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:22px 22px 0 0;}
+        .modal-body{padding:1.3rem 1.8rem 2rem;font-size:.875rem;color:#4b5563;line-height:1.7;}
+        .modal-body h4{font-family:'Syne',sans-serif;font-weight:700;color:#111827;margin:1.1rem 0 .3rem;font-size:.92rem;}
+        .modal-close{width:30px;height:30px;border-radius:50%;background:#f3f4f6;border:none;cursor:pointer;font-size:.9rem;color:#6b7280;display:flex;align-items:center;justify-content:center;}
+        .modal-close:hover{background:#e5e7eb;}
+        .faq-item{border-bottom:1px solid #f0f2f5;padding:.85rem 0;}
+        .faq-item:last-child{border-bottom:none;}
+        .faq-q{font-weight:700;color:#111827;font-size:.88rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+        .faq-a{font-size:.83rem;color:#6b7280;line-height:1.65;margin-top:.5rem;display:none;}
+        .faq-item.open .faq-a{display:block;}
+        .faq-icon{transition:transform .2s;color:var(--blue);font-size:1rem;flex-shrink:0;}
+        .faq-item.open .faq-icon{transform:rotate(45deg);}
+
+        /* ── FOOTER ── */
+        .site-footer{background:var(--navy);color:rgba(255,255,255,.6);}
+        .foot-link{color:rgba(255,255,255,.5);font-size:.875rem;text-decoration:none;transition:color .2s;display:block;}
+        .foot-link:hover{color:#fff;}
+        .soc-btn{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;transition:all .2s;text-decoration:none;flex-shrink:0;}
+        .soc-btn:hover{background:rgba(10,116,255,.3);}
+        .nl-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-right:none;color:#fff;font-size:.85rem;padding:11px 14px;border-radius:9px 0 0 9px;outline:none;flex:1;min-width:0;font-family:'DM Sans',sans-serif;}
+        .nl-input::placeholder{color:rgba(255,255,255,.28);}
+        .nl-input:focus{border-color:rgba(10,116,255,.5);}
+        .nl-btn{background:var(--blue);color:#fff;font-weight:700;font-size:.78rem;padding:11px 16px;border-radius:0 9px 9px 0;white-space:nowrap;cursor:pointer;font-family:'Syne',sans-serif;border:none;}
+        .nl-btn:hover{background:var(--blue-dark);}
+
+        @media(max-width:1023px){.header-inner{padding:0 1.25rem;}.logo-tag{display:none;}}
+        @media(max-width:768px){.agent-badges{display:none;}.agent-header-card{padding:1.5rem;}}
+    </style>
+</head>
+<body>
+
+<!-- ══ MODALS ══ -->
+<div id="modal-newsletter" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-newsletter')">
+    <div class="modal-box">
+        <div class="modal-hd"><h3 class="syne font-bold text-lg text-gray-900">✈️ Recevez les meilleures offres</h3><button class="modal-close" onclick="closeModal('modal-newsletter')">✕</button></div>
+        <div class="modal-body">
+            <p class="mb-4">Inscrivez-vous pour recevoir des offres flash et des promotions exclusives.</p>
+            <input type="text" id="sub-name" placeholder="Votre prénom" class="w-full border border-gray-200 rounded-xl px-4 py-3 mb-3 text-sm outline-none focus:border-blue-400">
+            <input type="email" id="sub-email" placeholder="Votre adresse email" class="w-full border border-gray-200 rounded-xl px-4 py-3 mb-4 text-sm outline-none focus:border-blue-400">
+            <button onclick="subscribeNewsletter()" class="btn-main w-full py-3" style="border-radius:12px;">S'inscrire gratuitement</button>
+            <p class="text-xs text-gray-400 mt-3 text-center">Pas de spam. Désinscription en 1 clic.</p>
+        </div>
+    </div>
+</div>
+<div id="modal-about" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-about')">
+    <div class="modal-box">
+        <div class="modal-hd"><h3 class="syne font-bold text-lg">À propos de Midzo</h3><button class="modal-close" onclick="closeModal('modal-about')">✕</button></div>
+        <div class="modal-body">
+            <p><strong class="text-gray-900">Midzo</strong> est le premier site d'achat de billets d'avion assisté par une IA conversationnelle. Notre agent de voyage virtuel vous accompagne comme un vrai agent humain — en posant les bonnes questions, en comprenant vos préférences, et en trouvant les meilleures offres.</p>
+            <h4>Notre technologie</h4>
+            <p>Nous utilisons des APIs de recherche de vols en temps réel couplées à une IA. Les clés API sont sécurisées côté serveur.</p>
+            <h4>Contact</h4>
+            <p>📧 <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+            <p>✈️ <a href="https://t.me/midzoflight_bot" target="_blank" style="color:var(--blue)">@midzoflight_bot</a></p>
+        </div>
+    </div>
+</div>
+<div id="modal-faq" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-faq')">
+    <div class="modal-box">
+        <div class="modal-hd"><h3 class="syne font-bold text-lg">FAQ</h3><button class="modal-close" onclick="closeModal('modal-faq')">✕</button></div>
+        <div class="modal-body" id="faq-content"></div>
+    </div>
+</div>
+<div id="modal-privacy" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-privacy')">
+    <div class="modal-box">
+        <div class="modal-hd"><h3 class="syne font-bold text-lg">Confidentialité</h3><button class="modal-close" onclick="closeModal('modal-privacy')">✕</button></div>
+        <div class="modal-body">
+            <p style="font-size:.78rem;color:#9ca3af;">Dernière mise à jour : avril 2026</p>
+            <h4>Données collectées</h4><p>Midzo collecte uniquement les informations saisies dans le chat : ville de départ, destination, dates, passagers, budget optionnel.</p>
+            <h4>Utilisation</h4><p>Ces données sont transmises à nos partenaires API (Kiwi Tequila, Aviasales) pour générer les résultats en temps réel. Elles ne sont pas stockées au-delà de la session ni revendues.</p>
+            <h4>Sécurité</h4><p>Les clés API sont gérées côté serveur uniquement, jamais exposées dans le code client.</p>
+            <h4>Droits (RGPD)</h4><p>Contact : <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── I18N ──────────────────────────────────────────────────────────────────────
+const i18n = {
+    fr:{
+        nav_flights:"Vols", nav_hotels:"Hôtels", nav_ai:"Votre agent", nav_contact:"Contact",
+        cta_start:"Rechercher", newsletter_btn:"Recevoir les offres",
+        hero_badge:"Votre agence de voyage IA · disponible 24h/24",
+        hero_title:"Votre agent de voyage\npersonnel, propulsé par l'IA",
+        hero_sub:"Parlez à Midzo comme à un vrai agent de voyage. Il comprend, conseille, et trouve les meilleures offres pour vous — en quelques secondes.",
+        from_label:"Départ", to_label:"Destination", date_label:"Dates", pax_label:"Passagers",
+        search_btn:"Rechercher", ai_status:"Agent disponible",
+        agent_title:"Sofia — Votre Agente Midzo",
+        agent_subtitle:"Agente de voyage IA · Midzo Flight",
+        agent_q1:"Bonjour ! 👋 Je suis Sofia, votre agente de voyage Midzo. Parlez-moi de votre projet — d'où partez-vous ?",
+        view_deals:"Voir les meilleures offres",
+        features_title:"Pourquoi voyager avec Midzo",
+        feat1_title:"Un vrai agent IA", feat1_desc:"Sofia vous accompagne comme un agent humain — elle comprend vos envies, pas juste vos dates.",
+        feat2_title:"Prix imbattables", feat2_desc:"+700 compagnies comparées en temps réel pour vous garantir le tarif le plus bas.",
+        feat3_title:"Disponible 24h/24", feat3_desc:"Votre agente ne dort jamais. Planifiez votre voyage à n'importe quelle heure.",
+        destinations_title:"Destinations populaires", dest_cta:"Voir les offres →",
+        flash_title:"🔥 Offres Flash", flash_sub:"Expire bientôt",
+        trust_title:"La confiance de +10 000 voyageurs",
+        cta_final_title:"Prêt à voyager ? Sofia vous attend.", cta_final_btn:"Parler à mon agent",
+        whatsapp_text:"Discuter avec un agent sur WhatsApp",
+        footer_desc:"Votre agence de voyage propulsée par l'IA. Disponible 24h/24.",
+        footer_col1:"Navigation", footer_col2:"Légal",
+        hotels_badge:"bientôt",
+        ai_result_prefix:"✈️ Voici les meilleures offres pour votre voyage"
+    },
+    en:{
+        nav_flights:"Flights", nav_hotels:"Hotels", nav_ai:"Your agent", nav_contact:"Contact",
+        cta_start:"Search", newsletter_btn:"Get deals",
+        hero_badge:"Your AI travel agency · available 24/7",
+        hero_title:"Your personal travel agent,\npowered by AI",
+        hero_sub:"Talk to Midzo like a real travel agent. It understands, advises, and finds the best deals for you — in seconds.",
+        from_label:"From", to_label:"To", date_label:"Dates", pax_label:"Passengers",
+        search_btn:"Search", ai_status:"Agent available",
+        agent_title:"Sofia — Your Midzo Agent",
+        agent_subtitle:"AI Travel Agent · Midzo Flight",
+        agent_q1:"Hello! 👋 I'm Sofia, your Midzo travel agent. Tell me about your trip — where are you flying from?",
+        view_deals:"View Best Deals",
+        features_title:"Why travel with Midzo",
+        feat1_title:"A real AI agent", feat1_desc:"Sofia accompanies you like a human agent — she understands your wishes, not just your dates.",
+        feat2_title:"Unbeatable prices", feat2_desc:"700+ airlines compared in real time to guarantee the lowest fare.",
+        feat3_title:"Available 24/7", feat3_desc:"Your agent never sleeps. Plan your trip at any time.",
+        destinations_title:"Popular destinations", dest_cta:"Explore deals →",
+        flash_title:"🔥 Flash Deals", flash_sub:"Expiring soon",
+        trust_title:"Trusted by 10,000+ travelers",
+        cta_final_title:"Ready to travel? Sofia is waiting.", cta_final_btn:"Talk to my agent",
+        whatsapp_text:"Chat with an agent on WhatsApp",
+        footer_desc:"Your AI-powered travel agency. Available 24/7.",
+        footer_col1:"Navigate", footer_col2:"Legal",
+        hotels_badge:"soon",
+        ai_result_prefix:"✈️ Here are the best available flights for your trip"
+    }
+};
+
+let currentLang = localStorage.getItem('midzo_lang') || 'fr';
+
+function t(key){ return i18n[currentLang]?.[key] || key; }
+
+function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('midzo_lang', lang);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (!i18n[lang]?.[k]) return;
+        if (el.tagName==='INPUT' && el.type!=='button') el.placeholder = i18n[lang][k];
+        else el.innerHTML = i18n[lang][k].replace(/\n/g,'<br>');
+    });
+    const lf = document.getElementById('lang-flag');
+    if (lf) lf.textContent = lang==='en' ? '🇬🇧' : '🇫🇷';
+    document.querySelectorAll('.badge-soon').forEach(b => b.textContent = t('hotels_badge'));
+    rebuildFaq(lang);
+    updateAgentHeader(lang);
+}
+
+function updateAgentHeader(lang){
+    const el = document.getElementById('agent-name-display');
+    if(el) el.textContent = lang==='fr' ? 'Sofia — Votre Agente Midzo' : 'Sofia — Your Midzo Agent';
+    const st = document.getElementById('agent-status-display');
+    if(st) st.textContent = t('ai_status');
+}
+
+// ── FAQ ──────────────────────────────────────────────────────────────────────
+const faqData = {
+    fr:[
+        ["Comment fonctionne l'agent Sofia ?","Sofia est une IA entraînée pour se comporter comme un vrai agent de voyage. Elle vous pose des questions, comprend vos préférences, et recherche en temps réel les meilleures offres parmi 700+ compagnies aériennes."],
+        ["Midzo est-il gratuit ?","Oui, entièrement gratuit. Nous sommes rémunérés via un système d'affiliation qui ne change pas le prix que vous payez."],
+        ["Puis-je réserver directement sur Midzo ?","Sofia identifie les meilleures offres, puis vous redirige vers nos partenaires sécurisés (Aviasales, Kiwi) pour finaliser la réservation."],
+        ["Quelles compagnies sont couvertes ?","728+ compagnies — Air France, Emirates, Turkish Airlines, EasyJet, Ryanair, et les compagnies africaines régionales."],
+        ["Comment contacter un agent humain ?","Utilisez le bouton WhatsApp visible sur le site pour discuter avec notre équipe en direct."],
+        ["Mes données sont-elles sécurisées ?","Oui. Vos données de recherche ne sont utilisées que pour générer votre résultat et ne sont jamais revendues."]
+    ],
+    en:[
+        ["How does agent Sofia work?","Sofia is an AI trained to behave like a real travel agent. She asks questions, understands your preferences, and searches 700+ airlines in real time."],
+        ["Is Midzo free?","Yes, completely free. We earn via an affiliate model that doesn't affect the price you pay."],
+        ["Can I book directly on Midzo?","Sofia finds the best deals, then redirects you to our secure partners (Aviasales, Kiwi) to complete your booking."],
+        ["Which airlines are covered?","728+ airlines — Air France, Emirates, Turkish Airlines, EasyJet, Ryanair, and African regional carriers."],
+        ["How to contact a human agent?","Use the WhatsApp button on the site to chat with our team directly."],
+        ["Is my data secure?","Yes. Your search data is only used to generate your results and is never sold."]
+    ]
+};
+function rebuildFaq(lang){
+    const el = document.getElementById('faq-content');
+    if(!el) return;
+    el.innerHTML = faqData[lang].map(([q,a])=>`
+        <div class="faq-item">
+            <div class="faq-q" onclick="this.closest('.faq-item').classList.toggle('open')">
+                <span>${q}</span><span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">${a}</div>
+        </div>`).join('');
+}
+
+// ── IATA MAP ─────────────────────────────────────────────────────────────────
+// ── Cache local pour éviter les appels répétés ──────────────────────────────
+const cityCache = {};
+// Mémorise le code IATA de la ville sélectionnée dans le champ
+const selectedIata = { from: '', to: '' };
+
+// Fallback statique utilisé hors ligne ou si l'API n'est pas dispo
+const FALLBACK_CITIES = [
+    {city:"Paris",country:"France",iata:"CDG",flag:"🇫🇷"},
+    {city:"Lyon",country:"France",iata:"LYS",flag:"🇫🇷"},
+    {city:"Marseille",country:"France",iata:"MRS",flag:"🇫🇷"},
+    {city:"Nice",country:"France",iata:"NCE",flag:"🇫🇷"},
+    {city:"Londres",country:"Royaume-Uni",iata:"LHR",flag:"🇬🇧"},
+    {city:"New York",country:"États-Unis",iata:"JFK",flag:"🇺🇸"},
+    {city:"Miami",country:"États-Unis",iata:"MIA",flag:"🇺🇸"},
+    {city:"Los Angeles",country:"États-Unis",iata:"LAX",flag:"🇺🇸"},
+    {city:"Dubai",country:"Émirats Arabes Unis",iata:"DXB",flag:"🇦🇪"},
+    {city:"Istanbul",country:"Turquie",iata:"IST",flag:"🇹🇷"},
+    {city:"Rome",country:"Italie",iata:"FCO",flag:"🇮🇹"},
+    {city:"Barcelone",country:"Espagne",iata:"BCN",flag:"🇪🇸"},
+    {city:"Amsterdam",country:"Pays-Bas",iata:"AMS",flag:"🇳🇱"},
+    {city:"Bangkok",country:"Thaïlande",iata:"BKK",flag:"🇹🇭"},
+    {city:"Tokyo",country:"Japon",iata:"HND",flag:"🇯🇵"},
+    {city:"Abidjan",country:"Côte d'Ivoire",iata:"ABJ",flag:"🇨🇮"},
+    {city:"Dakar",country:"Sénégal",iata:"DSS",flag:"🇸🇳"},
+    {city:"Lomé",country:"Togo",iata:"LFW",flag:"🇹🇬"},
+    {city:"Accra",country:"Ghana",iata:"ACC",flag:"🇬🇭"},
+    {city:"Lagos",country:"Nigeria",iata:"LOS",flag:"🇳🇬"},
+    {city:"Nairobi",country:"Kenya",iata:"NBO",flag:"🇰🇪"},
+    {city:"Casablanca",country:"Maroc",iata:"CMN",flag:"🇲🇦"},
+    {city:"Tunis",country:"Tunisie",iata:"TUN",flag:"🇹🇳"},
+    {city:"Alger",country:"Algérie",iata:"ALG",flag:"🇩🇿"},
+    {city:"Douala",country:"Cameroun",iata:"DLA",flag:"🇨🇲"},
+    {city:"Kinshasa",country:"Congo",iata:"FIH",flag:"🇨🇩"},
+    {city:"Montréal",country:"Canada",iata:"YUL",flag:"🇨🇦"},
+    {city:"Madrid",country:"Espagne",iata:"MAD",flag:"🇪🇸"},
+    {city:"Berlin",country:"Allemagne",iata:"BER",flag:"🇩🇪"},
+    {city:"Singapour",country:"Singapour",iata:"SIN",flag:"🇸🇬"},
+];
+
+// Recherche dans le fallback local
+function searchFallback(query) {
+    const q = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    return FALLBACK_CITIES.filter(c => {
+        const city = c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+        return city.startsWith(q) || c.iata.toLowerCase().startsWith(q) || city.includes(q);
+    }).slice(0, 8);
+}
+
+// Appel API backend → Kiwi Tequila (toutes les villes du monde)
+async function fetchCitiesFromAPI(query) {
+    const cacheKey = query.toLowerCase();
+    if (cityCache[cacheKey]) return cityCache[cacheKey];
+    try {
+        const r = await fetch(`/api/cities?q=${encodeURIComponent(query)}&lang=${currentLang}`);
+        if (!r.ok) throw new Error('API error');
+        const data = await r.json();
+        if (data.locations && data.locations.length > 0) {
+            cityCache[cacheKey] = data.locations;
+            return data.locations;
+        }
+    } catch(e) { /* Silently fall through to fallback */ }
+    return null;
+}
+
+// Résout le code IATA depuis le champ ou le fallback
+function getIataCode(cityName) {
+    if (!cityName) return 'XXX';
+    const q = cityName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    const found = FALLBACK_CITIES.find(c => {
+        const cn = c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+        return cn === q || c.iata.toLowerCase() === q;
+    });
+    return found ? found.iata : cityName.substring(0,3).toUpperCase();
+}
+
+// ── AUTOCOMPLETE — API temps réel + fallback local ────────────────────────────
+let acDebounceTimer = null;
+
+function renderAutocompleteList(list, results, input, fieldKey) {
+    if (!results.length) { list.classList.add('hidden'); return; }
+    list.innerHTML = results.map(c => `
+        <div class="autocomplete-item" data-city="${c.city}" data-iata="${c.iata}">
+            <span class="iata">${c.iata}</span>
+            <span>${c.flag || '🌍'}</span>
+            <div>
+                <div class="city">${c.city}</div>
+                <div class="country">${c.country}</div>
+            </div>
+        </div>`).join('');
+    list.classList.remove('hidden');
+    list.querySelectorAll('.autocomplete-item').forEach(item => {
+        item.addEventListener('mousedown', e => {
+            e.preventDefault();
+            input.value = item.dataset.city;
+            // Mémorise le IATA exact de la sélection
+            if (fieldKey) selectedIata[fieldKey] = item.dataset.iata;
+            list.classList.add('hidden');
+            input.blur();
+        });
+    });
+}
+
+function setupAutocomplete(inputId, listId, fieldKey) {
+    const input = document.getElementById(inputId);
+    const list  = document.getElementById(listId);
+    let activeIdx = -1;
+
+    input.addEventListener('input', () => {
+        const q = input.value.trim();
+        if (!q) { list.classList.add('hidden'); return; }
+
+        // 1. Affiche immédiatement le fallback local (résultat instantané)
+        const localResults = searchFallback(q);
+        renderAutocompleteList(list, localResults, input, fieldKey);
+
+        // 2. Appel API avec debounce 300ms pour les vraies villes du monde
+        clearTimeout(acDebounceTimer);
+        acDebounceTimer = setTimeout(async () => {
+            const apiResults = await fetchCitiesFromAPI(q);
+            if (apiResults && apiResults.length) {
+                renderAutocompleteList(list, apiResults, input, fieldKey);
+            }
+        }, 300);
+    });
+
+    input.addEventListener('keydown', e => {
+        const items = list.querySelectorAll('.autocomplete-item');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIdx = Math.min(activeIdx+1, items.length-1);
+            items.forEach((it,i) => it.classList.toggle('active', i===activeIdx));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIdx = Math.max(activeIdx-1, 0);
+            items.forEach((it,i) => it.classList.toggle('active', i===activeIdx));
+        } else if (e.key === 'Enter' && activeIdx >= 0) {
+            const sel = items[activeIdx];
+            input.value = sel.dataset.city;
+            if (fieldKey) selectedIata[fieldKey] = sel.dataset.iata;
+            list.classList.add('hidden');
+        } else if (e.key === 'Escape') {
+            list.classList.add('hidden');
+        }
+    });
+
+    input.addEventListener('blur', () => setTimeout(() => list.classList.add('hidden'), 150));
+}
+
+// ── DATE PICKER ──────────────────────────────────────────────────────────────
+let dpStart = null, dpEnd = null, dpSelecting = 'start', dpMonth, dpYear;
+
+function initDatePicker() {
+    const today = new Date();
+    dpMonth = today.getMonth();
+    dpYear  = today.getFullYear();
+    renderCal();
+    document.getElementById('dp-prev').onclick = () => { dpMonth--; if(dpMonth<0){dpMonth=11;dpYear--;} renderCal(); };
+    document.getElementById('dp-next').onclick = () => { dpMonth++; if(dpMonth>11){dpMonth=0;dpYear++;} renderCal(); };
+    document.getElementById('dp-clear').onclick = () => { dpStart=null; dpEnd=null; dpSelecting='start'; renderCal(); document.getElementById('search-dates').value=''; };
+    document.getElementById('dp-apply').onclick = () => { applyDates(); closeDatePicker(); };
+}
+
+const MONTH_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MONTH_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_FR  = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+const DAY_EN  = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+
+function renderCal() {
+    const months = currentLang==='en' ? MONTH_EN : MONTH_FR;
+    const days   = currentLang==='en' ? DAY_EN : DAY_FR;
+    document.getElementById('dp-month-title').textContent = `${months[dpMonth]} ${dpYear}`;
+    const grid = document.getElementById('dp-grid');
+    const dayNames = days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+    const firstDay = new Date(dpYear,dpMonth,1).getDay();
+    const offset = firstDay===0 ? 6 : firstDay-1;
+    const daysInMonth = new Date(dpYear,dpMonth+1,0).getDate();
+    const today = new Date(); today.setHours(0,0,0,0);
+    let cells = Array(offset).fill(`<div class="cal-day empty"></div>`);
+    for(let d=1;d<=daysInMonth;d++){
+        const date = new Date(dpYear,dpMonth,d);
+        const isPast = date < today;
+        const isStart = dpStart && sameDay(date,dpStart);
+        const isEnd   = dpEnd   && sameDay(date,dpEnd);
+        const isToday = sameDay(date,today);
+        const inRange = dpStart && dpEnd && date>dpStart && date<dpEnd;
+        let cls = 'cal-day';
+        if(isPast) cls+=' disabled';
+        else if(isStart && dpEnd) cls+=' range-start';
+        else if(isEnd) cls+=' range-end';
+        else if(isStart) cls+=' selected';
+        else if(inRange) cls+=' in-range';
+        else if(isToday) cls+=' today';
+        cells.push(`<div class="${cls}" data-d="${dpYear}-${String(dpMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}">${d}</div>`);
+    }
+    grid.innerHTML = dayNames + cells.join('');
+    grid.querySelectorAll('.cal-day:not(.disabled):not(.empty)').forEach(el => {
+        el.addEventListener('click', () => {
+            const [y,m,d] = el.dataset.d.split('-').map(Number);
+            const clicked = new Date(y,m-1,d);
+            if(dpSelecting==='start'||!dpStart||(dpEnd&&clicked<=dpStart)){ dpStart=clicked; dpEnd=null; dpSelecting='end'; }
+            else { if(clicked<dpStart){dpEnd=dpStart;dpStart=clicked;}else{dpEnd=clicked;} dpSelecting='start'; }
+            renderCal();
+            applyDates();
+        });
+    });
+}
+
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+
+function applyDates(){
+    if(!dpStart) return;
+    const fmt = d => `${d.getDate()} ${(currentLang==='en'?['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']:['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'])[d.getMonth()]}`;
+    const val = dpEnd ? `${fmt(dpStart)} – ${fmt(dpEnd)} ${dpEnd.getFullYear()}` : `${fmt(dpStart)} ${dpStart.getFullYear()}`;
+    document.getElementById('search-dates').value = val;
+}
+
+function openDatePicker(){ document.getElementById('date-picker-container').classList.remove('hidden'); }
+function closeDatePicker(){ document.getElementById('date-picker-container').classList.add('hidden'); }
+
+// ── AI BACKEND ───────────────────────────────────────────────────────────────
+const AI_BACKEND_URL = '/api/chat';
+
+async function askAI(message, context=[]) {
+    try {
+        const r = await fetch(AI_BACKEND_URL, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ message, context, lang: currentLang })
+        });
+        if(!r.ok) return null;
+        const d = await r.json();
+        return d.reply || null;
+    } catch(e){ return null; }
+}
+
+// ── MODALS / UTILS ───────────────────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+function subscribeNewsletter(){
+    const name=document.getElementById('sub-name').value;
+    const email=document.getElementById('sub-email').value;
+    if(!email) return;
+    alert(`Merci ${name||''} ! Vous recevrez nos meilleures offres sur ${email} ✈️`);
+    closeModal('modal-newsletter');
+}
+
+function generateAviasalesLink(fromIata, toIata, dates){
+    // Date aller — depuis le calendrier ou +7 jours par défaut
+    let departDate = '';
+    if(dpStart){
+        const y=dpStart.getFullYear(), m=String(dpStart.getMonth()+1).padStart(2,'0'), d=String(dpStart.getDate()).padStart(2,'0');
+        departDate = `${y}-${m}-${d}`;
+    } else {
+        const d=new Date(); d.setDate(d.getDate()+7);
+        departDate = d.toISOString().split('T')[0];
+    }
+
+    // Date retour — optionnelle
+    let returnDate = '';
+    if(dpEnd){
+        const y=dpEnd.getFullYear(), m=String(dpEnd.getMonth()+1).padStart(2,'0'), d=String(dpEnd.getDate()).padStart(2,'0');
+        returnDate = `${y}-${m}-${d}`;
+    }
+
+    const adults = parseInt(document.getElementById('search-pax')?.value) || 1;
+
+    // URL Aviasales avec les bons paramètres
+    let aviasalesUrl = `https://www.aviasales.com/search?origin=${fromIata}&destination=${toIata}&depart_date=${departDate}&adults=${adults}`;
+    if(returnDate) aviasalesUrl += `&return_date=${returnDate}`;
+
+    // Lien affilié Travelpayouts — marker 696220
+    return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(aviasalesUrl)}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    rebuildFaq(currentLang);
+    applyLanguage(currentLang);
+    setupAutocomplete('search-from','ac-from','from');
+    setupAutocomplete('search-to','ac-to','to');
+    initDatePicker();
+    initChatbot();
+
+    // Close date picker on outside click
+    document.addEventListener('click', e => {
+        const dp = document.getElementById('date-picker-container');
+        const sf = document.getElementById('date-search-field');
+        if(!dp.classList.contains('hidden') && !dp.contains(e.target) && !sf.contains(e.target)) closeDatePicker();
+    });
+
+    // Header scroll shadow
+    window.addEventListener('scroll',()=>{
+        document.querySelector('.site-header').classList.toggle('scrolled',window.scrollY>10);
+    });
+
+    // Scroll hero bg parallax
+    const heroBg = document.querySelector('.hero-bg');
+    window.addEventListener('scroll',()=>{ if(heroBg) heroBg.style.transform=`scale(1.04) translateY(${window.scrollY*0.15}px)`; });
+
+    // Lang dropdown
+    const lt=document.getElementById('lang-toggle'),lm=document.getElementById('lang-menu');
+    lt.addEventListener('click',e=>{e.stopPropagation();lm.classList.toggle('hidden');});
+    document.querySelectorAll('.lang-option').forEach(b=>b.addEventListener('click',()=>{applyLanguage(b.dataset.lang);lm.classList.add('hidden');resetChat();}));
+    window.addEventListener('click',e=>{if(!lt.contains(e.target))lm.classList.add('hidden');});
+});
+</script>
+
+<!-- ══ HEADER ══ -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="#" class="logo-wrap">
+            <img src="logo.png" alt="Midzo" style="height:36px;width:auto;" onerror="this.style.display='none';document.getElementById('logo-fb').style.display='inline-flex';">
+            <span id="logo-fb" style="display:none;align-items:center;gap:8px;">
+                <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div>
+                <span class="logo-wordmark">MIDZO</span><span class="logo-tag">FLIGHT</span>
+            </span>
+        </a>
+        <nav class="hidden lg:flex items-center gap-7">
+            <a href="#" data-i18n="nav_flights">Vols</a>
+            <a href="#" class="flex items-center gap-1.5"><span data-i18n="nav_hotels">Hôtels</span><span class="badge-soon">bientôt</span></a>
+            <a href="#agent-section" data-i18n="nav_ai">Votre agent</a>
+            <a href="#" onclick="event.preventDefault();openModal('modal-about')" data-i18n="nav_contact">Contact</a>
+        </nav>
+        <div class="flex items-center gap-2.5">
+            <div class="ai-badge hidden xl:flex"><div class="ai-dot"></div><span data-i18n="ai_status">Agent disponible</span></div>
+            <div class="relative">
+                <button id="lang-toggle" class="lang-btn"><span id="lang-flag">🇫🇷</span></button>
+                <div id="lang-menu" class="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 hidden z-50">
+                    <button data-lang="en" class="lang-option w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 flex items-center gap-2.5">🇬🇧 English</button>
+                    <button data-lang="fr" class="lang-option w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 flex items-center gap-2.5">🇫🇷 Français</button>
+                </div>
+            </div>
+            <button onclick="openModal('modal-newsletter')" class="btn-main btn-outline hidden sm:inline-flex" data-i18n="newsletter_btn">Recevoir les offres</button>
+            <a href="#agent-section" class="btn-main hidden sm:inline-flex" data-i18n="cta_start">Rechercher</a>
+        </div>
+    </div>
+</header>
+
+<main>
+
+<!-- ══ HERO ══ -->
+<section class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div style="max-width:740px;">
+            <div class="hero-tag">
+                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="rgba(255,255,255,.8)" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="rgba(255,255,255,.8)" stroke-width="1.1" stroke-linecap="round"/></svg>
+                <span data-i18n="hero_badge">Votre agence de voyage IA · disponible 24h/24</span>
+            </div>
+            <h1 class="syne text-4xl md:text-5xl lg:text-[3.2rem] font-bold text-white leading-[1.18]" data-i18n="hero_title">Votre agent de voyage<br>personnel, propulsé par l'IA</h1>
+            <p class="text-white/78 text-lg mt-5 max-w-xl font-light leading-relaxed" data-i18n="hero_sub">Parlez à Midzo comme à un vrai agent. Il comprend, conseille, et trouve les meilleures offres pour vous.</p>
+
+            <!-- SEARCH PANEL -->
+            <div class="search-panel">
+                <div class="search-grid">
+                    <!-- FROM -->
+                    <div class="sf" style="position:relative;">
+                        <label>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" fill="#0A74FF"/></svg>
+                            <span data-i18n="from_label">Départ</span>
+                        </label>
+                        <input type="text" id="search-from" placeholder="Ex: Paris" autocomplete="off">
+                        <div id="ac-from" class="autocomplete-list hidden"></div>
+                    </div>
+                    <!-- TO -->
+                    <div class="sf" style="position:relative;">
+                        <label>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0A74FF"/></svg>
+                            <span data-i18n="to_label">Destination</span>
+                        </label>
+                        <input type="text" id="search-to" placeholder="Ex: Dubai" autocomplete="off">
+                        <div id="ac-to" class="autocomplete-list hidden"></div>
+                    </div>
+                    <!-- DATES -->
+                    <div class="sf" id="date-search-field" style="cursor:pointer;" onclick="openDatePicker()">
+                        <label data-i18n="date_label">Dates</label>
+                        <input type="text" id="search-dates" placeholder="Choisir les dates" readonly style="cursor:pointer;">
+                        <div id="date-picker-container" class="date-picker-wrap hidden" onclick="event.stopPropagation()">
+                            <div class="cal-header">
+                                <button class="cal-nav" id="dp-prev">‹</button>
+                                <span class="month-title" id="dp-month-title"></span>
+                                <button class="cal-nav" id="dp-next">›</button>
+                            </div>
+                            <div class="cal-grid" id="dp-grid"></div>
+                            <div class="cal-footer">
+                                <button class="cal-clear" id="dp-clear">Effacer</button>
+                                <button class="cal-apply" id="dp-apply">Appliquer</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- PAX -->
+                    <div class="sf">
+                        <label data-i18n="pax_label">Passagers</label>
+                        <input type="number" id="search-pax" value="1" min="1" max="9" style="width:50px;">
+                    </div>
+                    <!-- SEARCH BTN -->
+                    <button id="hero-search-btn" class="btn-main" style="border-radius:12px;height:58px;font-size:.88rem;" data-i18n="search_btn">Rechercher</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ FLASH DEALS ══ -->
+<section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="syne text-2xl font-bold text-gray-900" data-i18n="flash_title">🔥 Offres Flash</h3>
+            <span class="text-sm text-red-500 font-semibold" data-i18n="flash_sub">Expire bientôt</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="deal-card" onclick="fillAndScroll('Paris','Dubai','15 Nov – 22 Nov 2026')">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-bold text-gray-900 syne">Paris → Dubai</span>
+                    <span class="deal-tag">-30%</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">15–22 Nov 2026 · Direct</p>
+                <p class="syne text-2xl font-bold text-gray-900">389€ <span class="text-sm text-gray-400 line-through font-normal">556€</span></p>
+                <button class="mt-3 text-sm font-semibold" style="color:var(--blue)">Réserver →</button>
+            </div>
+            <div class="deal-card" onclick="fillAndScroll('Abidjan','Paris','5 Jan – 12 Jan 2027')">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-bold text-gray-900 syne">Abidjan → Paris</span>
+                    <span class="deal-tag">-20%</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">5–12 Jan 2027 · 1 escale</p>
+                <p class="syne text-2xl font-bold text-gray-900">529€ <span class="text-sm text-gray-400 line-through font-normal">661€</span></p>
+                <button class="mt-3 text-sm font-semibold" style="color:var(--blue)">Réserver →</button>
+            </div>
+            <div class="deal-card" onclick="fillAndScroll('Dakar','Istanbul','20 Nov – 30 Nov 2026')">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-bold text-gray-900 syne">Dakar → Istanbul</span>
+                    <span class="deal-tag">-25%</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">20–30 Nov 2026 · Direct</p>
+                <p class="syne text-2xl font-bold text-gray-900">449€ <span class="text-sm text-gray-400 line-through font-normal">599€</span></p>
+                <button class="mt-3 text-sm font-semibold" style="color:var(--blue)">Réserver →</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ AGENT AI SECTION ══ -->
+<section id="agent-section" class="agent-section scroll-mt-24">
+    <!-- Agent Identity Card -->
+    <div class="agent-header-card">
+        <div class="agent-avatar">✈️</div>
+        <div>
+            <div class="agent-name" id="agent-name-display">Sofia — Votre Agente Midzo</div>
+            <div class="agent-title" id="agent-subtitle-display">Agente de voyage IA · Midzo Flight</div>
+            <div class="agent-online">
+                <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;animation:ping 2s infinite;"></span>
+                <span id="agent-status-display">Agent disponible</span>
+            </div>
+        </div>
+        <div class="agent-badges">
+            <span class="agent-badge">✓ 728 compagnies</span>
+            <span class="agent-badge">✓ Prix temps réel</span>
+            <span class="agent-badge">✓ Disponible 24h/24</span>
+        </div>
+    </div>
+
+    <!-- Chat Box -->
+    <div class="chat-box">
+        <div id="chat-messages"></div>
+
+        <!-- WhatsApp + Input row -->
+        <div style="padding:12px 14px 0;background:#fff;border-top:1px solid #f0f2f5;">
+            <a href="https://wa.me/VOTRE_NUMERO_WHATSAPP?text=Bonjour%20Midzo,%20j'ai%20besoin%20d'aide%20pour%20trouver%20un%20vol." target="_blank" class="whatsapp-btn w-full justify-center mb-3" data-i18n="whatsapp_text">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                Discuter avec un agent sur WhatsApp
+            </a>
+        </div>
+
+        <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Votre réponse..." autocomplete="off">
+            <button id="chat-send">Envoyer</button>
+        </div>
+
+        <!-- Result CTA -->
+        <div id="result-cta-container" class="result-cta">
+            <span id="result-message" class="font-semibold text-gray-700 text-sm"></span>
+            <a href="#" target="_blank" id="aviasales-link" class="btn-main text-sm">Voir les meilleures offres</a>
+        </div>
+    </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <h3 class="syne text-3xl md:text-4xl font-bold text-center mb-14 text-gray-900" data-i18n="features_title">Pourquoi voyager avec Midzo</h3>
+        <div class="grid md:grid-cols-3 gap-7">
+            <div class="card-lift p-8 rounded-3xl border border-gray-100 bg-white shadow-sm">
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(10,116,255,.1),rgba(10,116,255,.04));border:1px solid rgba(10,116,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem;">🤖</div>
+                <h4 class="syne text-lg font-bold mb-2 text-gray-900" data-i18n="feat1_title">Un vrai agent IA</h4>
+                <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat1_desc">Sofia vous accompagne comme un agent humain.</p>
+            </div>
+            <div class="card-lift p-8 rounded-3xl border border-gray-100 bg-white shadow-sm">
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem;">💎</div>
+                <h4 class="syne text-lg font-bold mb-2 text-gray-900" data-i18n="feat2_title">Prix imbattables</h4>
+                <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat2_desc">+700 compagnies comparées en temps réel.</p>
+            </div>
+            <div class="card-lift p-8 rounded-3xl border border-gray-100 bg-white shadow-sm">
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem;">⏰</div>
+                <h4 class="syne text-lg font-bold mb-2 text-gray-900" data-i18n="feat3_title">Disponible 24h/24</h4>
+                <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat3_desc">Votre agente ne dort jamais.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ DESTINATIONS ══ -->
+<section class="py-20" style="background:var(--surface);">
+    <div class="max-w-7xl mx-auto px-6">
+        <h3 class="syne text-3xl md:text-4xl font-bold text-center mb-14 text-gray-900" data-i18n="destinations_title">Destinations populaires</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Paris','')">
+                <img class="dest-img" src="images/paris.jpg" alt="Paris" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=500&q=80'">
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Paris</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+            </div>
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Dubai','')">
+                <img class="dest-img" src="images/dubai.jpg" alt="Dubai" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80'">
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Dubai</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+            </div>
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','New York','')">
+                <img class="dest-img" src="images/newyork.jpg" alt="New York" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=500&q=80'">
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">New York</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+            </div>
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Abidjan','')">
+                <img class="dest-img" src="images/abidjan.jpg" alt="Abidjan" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1580746738098-adb2af4f7d39?w=500&q=80'">
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Abidjan</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+            </div>
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Bangkok','')">
+                <img class="dest-img" src="images/bangkok.jpg" alt="Bangkok" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=500&q=80'">
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Bangkok</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ TRUST + CTA ══ -->
+<section class="py-20 bg-white">
+    <div class="max-w-5xl mx-auto text-center px-6">
+        <p class="text-xs font-bold tracking-widest uppercase text-gray-400 mb-10" data-i18n="trust_title">La confiance de +10 000 voyageurs</p>
+        <div class="flex flex-wrap justify-center gap-14">
+            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">728</div><div class="text-sm text-gray-500 mt-2 font-medium">compagnies</div></div>
+            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">1M+</div><div class="text-sm text-gray-500 mt-2 font-medium">recherches</div></div>
+            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">24/7</div><div class="text-sm text-gray-500 mt-2 font-medium">disponible</div></div>
+        </div>
+        <div class="mt-20">
+            <h3 class="syne text-3xl md:text-5xl font-bold mb-5 text-gray-900" data-i18n="cta_final_title">Prêt à voyager ? Sofia vous attend.</h3>
+            <p class="text-gray-500 mb-8" data-i18n="hero_sub">Parlez à Midzo comme à un vrai agent de voyage.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#agent-section" class="btn-main text-base px-10 py-4" data-i18n="cta_final_btn">Parler à mon agent</a>
+                <a href="https://wa.me/VOTRE_NUMERO_WHATSAPP" target="_blank" class="whatsapp-btn" data-i18n="whatsapp_text">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer class="site-footer">
+    <div class="max-w-7xl mx-auto px-6 py-14">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+            <div class="md:col-span-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="syne font-bold text-xl text-white">MIDZO</span>
+                    <span style="font-size:.57rem;font-weight:700;text-transform:uppercase;color:var(--blue);background:rgba(10,116,255,.18);border:1px solid rgba(10,116,255,.3);border-radius:4px;padding:2px 5px;">FLIGHT</span>
+                </div>
+                <p class="text-sm mb-5 leading-relaxed" style="color:rgba(255,255,255,.4);max-width:280px;" data-i18n="footer_desc">Votre agence de voyage propulsée par l'IA.</p>
+                <div class="flex gap-2.5 mb-6">
+                    <a href="https://t.me/midzoflight_bot" target="_blank" class="soc-btn" title="Telegram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.56-.44.7-.88.43l-2.42-1.79-1.16 1.12c-.13.13-.24.24-.49.24l.17-2.46 4.47-4.04c.19-.17-.04-.27-.3-.1L7.74 15.4l-2.38-.74c-.52-.16-.53-.52.11-.77l9.29-3.58c.43-.16.81.1.68.49z" fill="rgba(255,255,255,.65)"/></svg>
+                    </a>
+                    <a href="https://wa.me/VOTRE_NUMERO_WHATSAPP" target="_blank" class="soc-btn" title="WhatsApp">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(255,255,255,.65)"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    </a>
+                    <a href="#" class="soc-btn" title="Instagram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="rgba(255,255,255,.65)" stroke-width="1.4"/><circle cx="12" cy="12" r="4" stroke="rgba(255,255,255,.65)" stroke-width="1.4"/><circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,.65)"/></svg>
+                    </a>
+                </div>
+                <p class="text-xs font-bold tracking-wider uppercase text-white mb-2">Newsletter</p>
+                <div style="display:flex;">
+                    <input type="email" class="nl-input" placeholder="Votre email">
+                    <button class="nl-btn" onclick="alert('Merci ! ✈️')">OK</button>
+                </div>
+            </div>
+            <div class="md:col-span-3 md:col-start-7">
+                <p class="text-white syne font-bold text-xs mb-4 uppercase tracking-wider" data-i18n="footer_col1">Navigation</p>
+                <div class="flex flex-col gap-3">
+                    <a href="#" class="foot-link" data-i18n="nav_flights">Vols</a>
+                    <a href="#agent-section" class="foot-link" data-i18n="nav_ai">Votre agent</a>
+                    <a href="https://t.me/midzoflight_bot" target="_blank" class="foot-link">@midzoflight_bot</a>
+                </div>
+            </div>
+            <div class="md:col-span-3 md:col-start-10">
+                <p class="text-white syne font-bold text-xs mb-4 uppercase tracking-wider" data-i18n="footer_col2">Légal</p>
+                <div class="flex flex-col gap-3">
+                    <a href="#" class="foot-link" onclick="event.preventDefault();openModal('modal-about')">À propos</a>
+                    <a href="#" class="foot-link" onclick="event.preventDefault();openModal('modal-faq')">FAQ</a>
+                    <a href="#" class="foot-link" onclick="event.preventDefault();openModal('modal-privacy')">Confidentialité</a>
+                    <a href="mailto:contact@midzo.app" class="foot-link">Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.07);">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between flex-wrap gap-2">
+            <p style="font-size:.73rem;color:rgba(255,255,255,.25);">© 2026 Midzo Flight · Tous droits réservés.</p>
+            <span style="font-size:.7rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:3px 10px;color:rgba(255,255,255,.25);display:inline-flex;align-items:center;gap:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Systèmes opérationnels</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+// ── CHATBOT — Sofia Travel Agent ─────────────────────────────────────────────
+let chatStep = 0;
+let userData = {from:'',to:'',dates:'',passengers:'1',budget:''};
+let chatContext = [];
+window.chatComplete = false;
+
+const messagesDiv = document.getElementById('chat-messages');
+const inputField  = document.getElementById('chat-input');
+const sendBtn     = document.getElementById('chat-send');
+const resultCta   = document.getElementById('result-cta-container');
+const aviasalesLink = document.getElementById('aviasales-link');
+const resultMsg   = document.getElementById('result-message');
+
+// System prompt — Sofia the travel agent
+const SOFIA_SYSTEM = {
+    fr: `Tu es Sofia, une agente de voyage IA pour Midzo Flight. Tu parles comme une vraie agente de voyage professionnelle et chaleureuse — pas comme un formulaire.
+
+PERSONNALITÉ : Amicale, professionnelle, enthousiaste pour les voyages. Tu utilises des emojis avec parcimonie. Tu fais des petits commentaires sur les destinations (ex: "Paris en novembre, excellent choix !"). Tu peux proposer des alternatives si pertinent.
+
+MISSION : Collecter ces infos pour trouver le meilleur vol :
+1. Ville de départ
+2. Destination  
+3. Dates (aller + retour si possible)
+4. Nombre de passagers
+5. Budget approximatif (optionnel)
+
+RÈGLES STRICTES :
+- Tu ne réponds QU'aux questions liées aux voyages, vols, destinations, aéroports, compagnies aériennes.
+- Si hors sujet : "Je suis spécialisée dans la recherche de vols ✈️ Dites-moi où vous souhaitez voyager !"
+- Max 2 phrases par réponse.
+- Une seule question à la fois.
+- Quand tu as toutes les infos, dis "Parfait ! Je recherche les meilleures offres pour vous..."`,
+    en: `You are Sofia, an AI travel agent for Midzo Flight. You speak like a real professional, warm travel agent — not like a form.
+
+PERSONALITY: Friendly, professional, enthusiastic about travel. Use emojis sparingly. Make small comments about destinations (e.g., "Paris in November, excellent choice!"). You can suggest alternatives when relevant.
+
+MISSION: Collect this info to find the best flight:
+1. Departure city
+2. Destination
+3. Dates (outbound + return if possible)
+4. Number of passengers
+5. Approximate budget (optional)
+
+STRICT RULES:
+- Only answer questions related to travel, flights, destinations, airports, airlines.
+- If off-topic: "I specialize in flight search ✈️ Tell me where you'd like to travel!"
+- Max 2 sentences per response.
+- One question at a time.
+- When you have all info, say "Perfect! Let me search for the best deals for you..."`
+};
+
+function addBotMessage(text, cb) {
+    const row = document.createElement('div');
+    row.className = 'bubble-row-bot';
+    row.innerHTML = `<div class="bot-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><span class="bot-text"></span><span class="typing-cursor"></span></div>`;
+    const ts = row.querySelector('.bot-text'), cur = row.querySelector('.typing-cursor');
+    messagesDiv.appendChild(row); messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    let i=0;
+    (function type(){ if(i<text.length){ts.textContent+=text[i++];messagesDiv.scrollTop=messagesDiv.scrollHeight;setTimeout(type,14);}else{cur.style.display='none';if(cb)cb();} })();
+}
+
+function addUserMessage(text){
+    const row = document.createElement('div');
+    row.className = 'bubble-row-user';
+    row.innerHTML = `<div class="bubble-user">${text}</div>`;
+    messagesDiv.appendChild(row); messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function showTypingIndicator(){
+    const row = document.createElement('div');
+    row.className = 'bubble-row-bot'; row.id = 'typing-indicator';
+    row.innerHTML = `<div class="bot-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    messagesDiv.appendChild(row); messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+function removeTypingIndicator(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
+
+function addChips(options, onSelect){
+    const row = document.createElement('div');
+    row.className = 'bubble-row-bot';
+    const chips = document.createElement('div');
+    chips.className = 'chips-row';
+    chips.style.paddingLeft = '36px';
+    options.forEach(opt => {
+        const c = document.createElement('button');
+        c.className = 'chip'; c.textContent = opt;
+        c.onclick = () => { chips.remove(); row.remove(); inputField.value = opt; handleUserInput(); };
+        chips.appendChild(c);
+    });
+    row.appendChild(chips);
+    messagesDiv.appendChild(row); messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+async function resetChat(){
+    chatStep=0; userData={from:'',to:'',dates:'',passengers:'1',budget:''};
+    chatContext=[]; resultCta.classList.remove('show'); window.chatComplete=false;
+    messagesDiv.innerHTML='';
+    const first = t('agent_q1');
+    addBotMessage(first);
+    chatContext.push({role:'assistant', content: first});
+    inputField.disabled=false; sendBtn.disabled=false; inputField.value='';
+}
+
+// Detect if all data collected from context
+function extractUserData(userMsg, step){
+    if(step===0) userData.from = userMsg;
+    else if(step===1) userData.to = userMsg;
+    else if(step===2) userData.dates = userMsg;
+    else if(step===3) userData.passengers = userMsg;
+    else if(step===4) userData.budget = userMsg;
+}
+
+async function handleUserInput(){
+    const text = inputField.value.trim(); if(!text) return;
+    addUserMessage(text);
+    chatContext.push({role:'user',content:text});
+    inputField.value=''; inputField.disabled=true; sendBtn.disabled=true;
+
+    extractUserData(text, chatStep);
+    chatStep++;
+
+    if(chatStep >= 4 && userData.from && userData.to && userData.dates){
+        // Enough info — search
+        showTypingIndicator();
+        await new Promise(r=>setTimeout(r,900));
+        removeTypingIndicator();
+        const searchMsg = currentLang==='fr' ? '🔍 Parfait ! Je recherche les meilleures offres en temps réel...' : '🔍 Perfect! Searching for the best deals in real time...';
+        addBotMessage(searchMsg, async () => {
+            await new Promise(r=>setTimeout(r,600));
+            // Utilise le IATA sélectionné depuis l'autocomplete si dispo, sinon fallback
+            const fromIata = selectedIata.from || getIataCode(userData.from);
+            const toIata   = selectedIata.to   || getIataCode(userData.to);
+            const url = generateAviasalesLink(fromIata, toIata, userData.dates);
+            aviasalesLink.href = url;
+            resultMsg.textContent = t('ai_result_prefix');
+            resultCta.classList.add('show');
+            window.chatComplete = true;
+            const finalMsg = currentLang==='fr' ? '🔥 J\'ai trouvé de belles offres pour vous ! Cliquez sur le bouton pour les voir — les prix changent vite.' : '🔥 I found great deals for you! Click the button to see them — prices change fast.';
+            addBotMessage(finalMsg);
+        });
+        inputField.disabled=false; sendBtn.disabled=false;
+        return;
+    }
+
+    // Ask AI for next question
+    showTypingIndicator();
+    let bot = await askAI(text, chatContext);
+    await new Promise(r=>setTimeout(r,400));
+    removeTypingIndicator();
+
+    if(!bot){
+        const fallbacks = {
+            fr:["Parfait ! Et votre destination ? ✈️","Quelles sont vos dates de voyage ? 📅","Combien de passagers voyagent ? 👥","Quel est votre budget approximatif ? (optionnel) 💶"],
+            en:["Great! And your destination? ✈️","What are your travel dates? 📅","How many passengers? 👥","Approximate budget? (optional) 💵"]
+        };
+        bot = fallbacks[currentLang][Math.min(chatStep-1, 3)];
+    }
+
+    addBotMessage(bot);
+    chatContext.push({role:'assistant',content:bot});
+
+    // Add suggestion chips contextually
+    if(chatStep===1){
+        const pop = currentLang==='fr' ? ['Paris','Abidjan','Dubai','New York','Istanbul'] : ['Paris','Abidjan','Dubai','New York','Bangkok'];
+        addChips(pop, ()=>{});
+    } else if(chatStep===3){
+        addChips(['1','2','3','4+'], ()=>{});
+    }
+
+    inputField.disabled=false; sendBtn.disabled=false;
+    inputField.focus();
+}
+
+window.initChatbot = function(){
+    resetChat();
+    sendBtn.onclick = handleUserInput;
+    inputField.onkeypress = e=>{ if(e.key==='Enter'){e.preventDefault();handleUserInput();} };
+};
+
+// Fill search bar from flash deals / destinations
+window.fillAndScroll = function(from, to, dates){
+    if(from) document.getElementById('search-from').value = from;
+    if(to)   document.getElementById('search-to').value   = to;
+    if(dates){ document.getElementById('search-dates').value = dates; }
+    document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>{
+        messagesDiv.innerHTML='';
+        const parts = [];
+        if(from)  parts.push(currentLang==='fr'?`Départ : ${from}`:`From: ${from}`);
+        if(to)    parts.push(currentLang==='fr'?`Destination : ${to}`:`To: ${to}`);
+        if(dates) parts.push(currentLang==='fr'?`Dates : ${dates}`:`Dates: ${dates}`);
+        if(parts.length){
+            const preMsg = currentLang==='fr' ? `Super choix ! J'ai bien noté ${parts.join(', ')}. Combien de passagers voyagent ? 👥` : `Great choice! I noted ${parts.join(', ')}. How many passengers? 👥`;
+            if(from) userData.from = from;
+            if(to)   userData.to   = to;
+            if(dates){ userData.dates = dates; }
+            chatStep = from&&to&&dates ? 3 : (from||to ? 1 : 0);
+            chatContext = [{role:'assistant',content:preMsg}];
+            addBotMessage(preMsg);
+            addChips(['1','2','3','4+'],()=>{});
+        }
+    }, 600);
+};
+
+// Hero search button
+document.getElementById('hero-search-btn').addEventListener('click', ()=>{
+    const from  = document.getElementById('search-from').value.trim();
+    const to    = document.getElementById('search-to').value.trim();
+    const dates = document.getElementById('search-dates').value.trim();
+    fillAndScroll(from, to, dates);
+});
+</script>
+</body>
+</html>
