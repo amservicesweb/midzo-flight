@@ -38,7 +38,7 @@
         .btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(10,116,255,.38);}
         .btn-outline{background:transparent;color:var(--blue);border:1.5px solid rgba(10,116,255,.4);box-shadow:none;}
         .btn-outline:hover{background:rgba(10,116,255,.05);}
-        .lang-btn{display:flex;align-items:center;justify-content:center;width:36px;height:52px;border-radius:50%;background:#f3f4f6;border:1px solid #e5e7eb;cursor:pointer;font-size:1.2rem;transition:all .2s;}
+        .lang-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#f3f4f6;border:1px solid #e5e7eb;cursor:pointer;font-size:1.2rem;transition:all .2s;}
         .lang-btn:hover{background:#e9f0ff;border-color:rgba(10,116,255,.3);}
 
         /* ── PROVIDER STRIP ── */
@@ -52,7 +52,7 @@
         /* ── HERO ── */
         .hero-section{position:relative;min-height:700px;display:flex;align-items:center;overflow:hidden;}
         .hero-bg{position:absolute;inset:0;background:url('https://images.pexels.com/photos/1004584/pexels-photo-1004584.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;transform:scale(1.04);transition:transform 8s ease-out;}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(120deg,rgba(6,19,58,.78) 0%,rgba(6,19,58,.5) 50%,rgba(6,19,58,.55) 100%);}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(120deg,rgba(6,19,58,.78) 0%,rgba(6,19,58,.5) 50%,rgba(6,19,58,.2) 100%);}
         .hero-content{position:relative;max-width:1280px;margin:0 auto;padding:5rem 2rem;width:100%;}
         .hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:5px 14px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-bottom:1.4rem;}
 
@@ -209,9 +209,9 @@
         <div class="modal-body">
             <p><strong class="text-gray-900">Midzo</strong> est le premier site d'achat de billets d'avion assisté par une IA conversationnelle. Notre agent de voyage virtuel vous accompagne comme un vrai agent humain — en posant les bonnes questions, en comprenant vos préférences, et en trouvant les meilleures offres.</p>
             <h4>Notre technologie</h4>
-            <p>Nous utilisons des APIs de recherche de vols en temps réel couplées à une IA. Les clés API sont sécurisées côté serveur.</p>
+            <p>Nous utilisons des APIs de recherche de vols en temps réel (Kiwi Tequila, Aviasales) couplées à une IA. Les clés API sont sécurisées côté serveur.</p>
             <h4>Contact</h4>
-            <p>📧 <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+            <p>📧 <a href="mailto:contact@midzo.app" style="color:var(--blue)">contact@midzo.app</a></p>
             <p>✈️ <a href="https://t.me/midzoflight_bot" target="_blank" style="color:var(--blue)">@midzoflight_bot</a></p>
         </div>
     </div>
@@ -230,7 +230,7 @@
             <h4>Données collectées</h4><p>Midzo collecte uniquement les informations saisies dans le chat : ville de départ, destination, dates, passagers, budget optionnel.</p>
             <h4>Utilisation</h4><p>Ces données sont transmises à nos partenaires API (Kiwi Tequila, Aviasales) pour générer les résultats en temps réel. Elles ne sont pas stockées au-delà de la session ni revendues.</p>
             <h4>Sécurité</h4><p>Les clés API sont gérées côté serveur uniquement, jamais exposées dans le code client.</p>
-            <h4>Droits (RGPD)</h4><p>Contact : <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+            <h4>Droits (RGPD)</h4><p>Contact : <a href="mailto:privacy@midzo.app" style="color:var(--blue)">privacy@midzo.app</a></p>
         </div>
     </div>
 </div>
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <header class="site-header">
     <div class="header-inner">
         <a href="#" class="logo-wrap">
-            <img src="logo.png" alt="Midzo" style="height:36px;width:auto;" onerror="this.style.display='none';document.getElementById('logo-fb').style.display='inline-flex';">
+            <img src="logo.png" alt="Midzo" style="height:54px;width:auto;" onerror="this.style.display='none';document.getElementById('logo-fb').style.display='inline-flex';">
             <span id="logo-fb" style="display:none;align-items:center;gap:8px;">
                 <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div>
                 <span class="logo-wordmark">MIDZO</span><span class="logo-tag">FLIGHT</span>
@@ -700,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span data-i18n="hero_badge">Votre agence de voyage IA · disponible 24h/24</span>
             </div>
             <h1 class="syne text-4xl md:text-5xl lg:text-[3.2rem] font-bold text-white leading-[1.18]" data-i18n="hero_title">Votre agent de voyage<br>personnel, propulsé par l'IA</h1>
-            <p class="text-white/78 text-lg mt-5 max-w-xl font-light leading-relaxed" data-i18n="hero_sub">Parlez à Midzo comme à un vrai agent. Il comprend, conseille, et trouve les meilleures offres pour vous.</p>
+            <p class="text-lg mt-5 max-w-xl leading-relaxed" style="color:rgba(255,255,255,0.97);text-shadow:0 1px 6px rgba(0,0,0,0.6);" data-i18n="hero_sub">Parlez à Midzo comme à un vrai agent. Il comprend, conseille, et trouve les meilleures offres pour vous.</p>
 
             <!-- SEARCH PANEL -->
             <div class="search-panel">
