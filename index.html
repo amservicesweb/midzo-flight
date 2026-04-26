@@ -264,7 +264,11 @@ const i18n = {
         nl_thanks:"Merci ! Vous recevrez nos meilleures offres ✈️",
         footer_about:"À propos", footer_faq:"FAQ", footer_privacy:"Confidentialité", footer_contact:"Contact",
         modal_about_title:"À propos de Midzo", modal_faq_title:"FAQ", modal_privacy_title:"Confidentialité",
-        footer_rights:"Tous droits réservés.", systems_ok:"Systèmes opérationnels"
+        footer_rights:"Tous droits réservés.", systems_ok:"Systèmes opérationnels",
+        stat1:"compagnies", stat2:"recherches", stat3:"disponible",
+        date_depart:"Aller", date_return:"Retour",
+        dest_paris:"Paris", dest_dubai:"Dubai", dest_ny:"New York", dest_abidjan:"Abidjan", dest_bangkok:"Bangkok"
+    
     },
     en:{
         nav_flights:"Flights", nav_hotels:"Hotels", nav_ai:"Your agent", nav_contact:"Contact",
@@ -296,7 +300,11 @@ const i18n = {
         nl_thanks:"Thank you! You'll receive our best deals ✈️",
         footer_about:"About", footer_faq:"FAQ", footer_privacy:"Privacy", footer_contact:"Contact",
         modal_about_title:"About Midzo", modal_faq_title:"FAQ", modal_privacy_title:"Privacy Policy",
-        footer_rights:"All rights reserved.", systems_ok:"All systems operational"
+        footer_rights:"All rights reserved.", systems_ok:"All systems operational",
+        stat1:"airlines", stat2:"searches", stat3:"available",
+        date_depart:"Depart", date_return:"Return",
+        dest_paris:"Paris", dest_dubai:"Dubai", dest_ny:"New York", dest_abidjan:"Abidjan", dest_bangkok:"Bangkok"
+    
     },
     ru:{
         nav_flights:"Рейсы", nav_hotels:"Отели", nav_ai:"Ваш агент", nav_contact:"Контакт",
@@ -329,7 +337,11 @@ const i18n = {
         footer_about:"О нас", footer_faq:"FAQ", footer_privacy:"Конфиденциальность", footer_contact:"Контакт",
         modal_about_title:"О Midzo", modal_faq_title:"FAQ", modal_privacy_title:"Конфиденциальность",
         footer_rights:"Все права защищены.", systems_ok:"Все системы работают",
-        footer_contact:"Контакт"
+        footer_contact:"Контакт",
+        stat1:"авиакомпании", stat2:"поисков", stat3:"доступно",
+        date_depart:"Туда", date_return:"Обратно",
+        dest_paris:"Париж", dest_dubai:"Дубай", dest_ny:"Нью-Йорк", dest_abidjan:"Абиджан", dest_bangkok:"Бангкок"
+    
     }
 };
 
@@ -420,7 +432,7 @@ function rebuildAboutAndPrivacy(lang){
     };
 
     const privacyTexts = {
-        fr: `<p style="font-size:.78rem;color:#9ca3af;">Dernière mise à jour : avril 2026</p><h4>Données collectées</h4><p>Midzo collecte uniquement les informations saisies dans le chat : ville de départ, destination, dates, passagers, budget optionnel.</p><h4>Utilisation</h4><p>Ces données sont transmises à nos partenaires API pour générer les résultats en temps réel. Elles ne sont pas stockées ni revendues.</p><h4>Sécurité</h4><p>Les clés API sont gérées côté serveur uniquement.</p><h4>Droits (RGPD)</h4><p>Contact : <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">privacy@midzo.app</a></p>`,
+        fr: `<p style="font-size:.78rem;color:#9ca3af;">Dernière mise à jour : avril 2026</p><h4>Données collectées</h4><p>Midzo collecte uniquement les informations saisies dans le chat : ville de départ, destination, dates, passagers, budget optionnel.</p><h4>Utilisation</h4><p>Ces données sont transmises à nos partenaires API pour générer les résultats en temps réel. Elles ne sont pas stockées ni revendues.</p><h4>Sécurité</h4><p>Les clés API sont gérées côté serveur uniquement.</p><h4>Droits (RGPD)</h4><p>Contact : <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>`,
         en: `<p style="font-size:.78rem;color:#9ca3af;">Last updated: April 2026</p><h4>Data collected</h4><p>Midzo only collects what you enter in the chat: departure city, destination, dates, passengers, optional budget.</p><h4>Use</h4><p>This data is sent to our API partners to generate real-time results. It is not stored or sold.</p><h4>Security</h4><p>API keys are managed server-side only.</p><h4>Rights (GDPR)</h4><p>Contact: <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>`,
         ru: `<p style="font-size:.78rem;color:#9ca3af;">Последнее обновление: апрель 2026</p><h4>Собираемые данные</h4><p>Midzo собирает только данные, введённые в чате: город отправления, пункт назначения, даты, пассажиры, бюджет (опционально).</p><h4>Использование</h4><p>Данные передаются нашим API-партнёрам для получения результатов в реальном времени. Они не хранятся и не продаются.</p><h4>Безопасность</h4><p>API-ключи хранятся только на сервере.</p><h4>Права (GDPR)</h4><p>Контакт: <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">privacy@midzo.app</a></p>`
     };
@@ -602,6 +614,50 @@ function initDatePicker() {
     document.getElementById('dp-next').onclick = () => { dpMonth++; if(dpMonth>11){dpMonth=0;dpYear++;} renderCal(); };
     document.getElementById('dp-clear').onclick = () => { dpStart=null; dpEnd=null; dpSelecting='start'; renderCal(); document.getElementById('search-dates').value=''; };
     document.getElementById('dp-apply').onclick = () => { applyDates(); closeDatePicker(); };
+
+    // Return date picker
+    let dpRetMonth = dpMonth, dpRetYear = dpYear;
+    function renderRetCal(){
+        const months = currentLang==='en' ? MONTH_EN : currentLang==='ru' ? ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'] : MONTH_FR;
+        const days = currentLang==='en' ? DAY_EN : currentLang==='ru' ? ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] : DAY_FR;
+        document.getElementById('dp-ret-month-title').textContent = months[dpRetMonth]+' '+dpRetYear;
+        const grid = document.getElementById('dp-ret-grid');
+        const dayNames = days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+        const firstDay = new Date(dpRetYear,dpRetMonth,1).getDay();
+        const offset = firstDay===0?6:firstDay-1;
+        const dim = new Date(dpRetYear,dpRetMonth+1,0).getDate();
+        const today = new Date(); today.setHours(0,0,0,0);
+        const minDate = dpStart || today;
+        let cells = Array(offset).fill('<div class="cal-day empty"></div>');
+        for(let d=1;d<=dim;d++){
+            const date=new Date(dpRetYear,dpRetMonth,d);
+            const isPast=date<minDate;
+            let cls='cal-day';
+            if(isPast) cls+=' disabled';
+            cells.push(`<div class="${cls}" data-d="${dpRetYear}-${String(dpRetMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}">${d}</div>`);
+        }
+        grid.innerHTML = dayNames+cells.join('');
+        grid.querySelectorAll('.cal-day:not(.disabled):not(.empty)').forEach(el=>{
+            el.addEventListener('click',()=>{
+                const [y,m,d]=el.dataset.d.split('-').map(Number);
+                dpEnd=new Date(y,m-1,d);
+                applyReturnDate();
+                closeReturnDatePicker();
+            });
+        });
+    }
+    function applyReturnDate(){
+        if(!dpEnd) return;
+        const fmt=d=>`${d.getDate()} ${(currentLang==='en'?['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']:['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'])[d.getMonth()]}`;
+        document.getElementById('search-return-date').value=`${fmt(dpEnd)} ${dpEnd.getFullYear()}`;
+    }
+    window.openReturnDatePicker=function(){ const minDate=dpStart||new Date(); dpRetMonth=minDate.getMonth(); dpRetYear=minDate.getFullYear(); renderRetCal(); document.getElementById('return-date-picker-container').classList.remove('hidden'); };
+    function closeReturnDatePicker(){ document.getElementById('return-date-picker-container').classList.add('hidden'); }
+    document.getElementById('dp-ret-prev').onclick=()=>{ dpRetMonth--; if(dpRetMonth<0){dpRetMonth=11;dpRetYear--;} renderRetCal(); };
+    document.getElementById('dp-ret-next').onclick=()=>{ dpRetMonth++; if(dpRetMonth>11){dpRetMonth=0;dpRetYear++;} renderRetCal(); };
+    document.getElementById('dp-ret-clear').onclick=()=>{ dpEnd=null; document.getElementById('search-return-date').value=''; closeReturnDatePicker(); };
+    document.getElementById('dp-ret-apply').onclick=()=>{ applyReturnDate(); closeReturnDatePicker(); };
+    document.addEventListener('click',e=>{ const rp=document.getElementById('return-date-picker-container'); const rf=document.getElementById('return-date-field'); if(rp&&!rp.classList.contains('hidden')&&!rp.contains(e.target)&&!rf.contains(e.target)) closeReturnDatePicker(); });
 }
 
 const MONTH_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
@@ -700,9 +756,13 @@ function generateAviasalesLink(fromIata, toIata, dates){
 
     // Date retour — optionnelle
     let returnDate = '';
+    // Check separate return date field if available
+    const retInput = document.getElementById('search-return-date');
     if(dpEnd){
         const y=dpEnd.getFullYear(), m=String(dpEnd.getMonth()+1).padStart(2,'0'), d=String(dpEnd.getDate()).padStart(2,'0');
         returnDate = `${y}-${m}-${d}`;
+    } else if(retInput && retInput.value && tripType === 'return'){
+        // fallback: try to parse from display value
     }
 
     const adults = parseInt(document.getElementById('search-pax')?.value) || 1;
@@ -814,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
         </div>
         <div style="background:#fff;border-radius:20px;padding:1.25rem;box-shadow:0 8px 40px rgba(0,0,0,.2);">
-            <div class="search-grid" style="overflow:visible;">
+            <div class="search-grid" id="search-grid-wrap" style="overflow:visible;">
                 <!-- FROM -->
                 <div class="sf" style="position:relative;">
                     <label>
@@ -843,9 +903,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="sf" id="date-search-field" style="cursor:pointer;position:relative;" onclick="openDatePicker()">
                     <label>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0A74FF" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0A74FF" stroke-width="2" stroke-linecap="round"/></svg>
-                        <span data-i18n="date_label">Dates</span>
+                        <span id="date-label-depart" data-i18n="date_depart">Aller</span>
                     </label>
-                    <input type="text" id="search-dates" placeholder="Choisir les dates" readonly style="cursor:pointer;">
+                    <input type="text" id="search-dates" placeholder="Date aller" readonly style="cursor:pointer;">
                     <div id="date-picker-container" class="date-picker-wrap hidden" onclick="event.stopPropagation()">
                         <div class="cal-header">
                             <button class="cal-nav" id="dp-prev">‹</button>
@@ -856,6 +916,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="cal-footer">
                             <button class="cal-clear" id="dp-clear">Effacer</button>
                             <button class="cal-apply" id="dp-apply">Appliquer</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- RETURN DATE - shown only for round trip -->
+                <div class="sf" id="return-date-field" style="cursor:pointer;position:relative;display:none;" onclick="openReturnDatePicker()">
+                    <label>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0A74FF" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0A74FF" stroke-width="2" stroke-linecap="round"/></svg>
+                        <span data-i18n="date_return">Retour</span>
+                    </label>
+                    <input type="text" id="search-return-date" placeholder="Date retour" readonly style="cursor:pointer;">
+                    <div id="return-date-picker-container" class="date-picker-wrap hidden" onclick="event.stopPropagation()">
+                        <div class="cal-header">
+                            <button class="cal-nav" id="dp-ret-prev">‹</button>
+                            <span class="month-title" id="dp-ret-month-title"></span>
+                            <button class="cal-nav" id="dp-ret-next">›</button>
+                        </div>
+                        <div class="cal-grid" id="dp-ret-grid"></div>
+                        <div class="cal-footer">
+                            <button class="cal-clear" id="dp-ret-clear">Effacer</button>
+                            <button class="cal-apply" id="dp-ret-apply">Appliquer</button>
                         </div>
                     </div>
                 </div>
@@ -878,7 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <section id="agent-section" class="agent-section scroll-mt-24">
     <!-- Agent Identity Card -->
     <div class="agent-header-card">
-        <div class="agent-avatar">✈️</div>
+        <div class="agent-avatar"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="rgba(255,255,255,0.9)"/></svg></div>
         <div>
             <div class="agent-name" id="agent-name-display">Sofia — Votre Agente Midzo</div>
             <div class="agent-title" id="agent-subtitle-display" data-i18n="agent_subtitle">Agente de voyage IA · Midzo Flight</div>
@@ -925,17 +1005,17 @@ document.addEventListener('DOMContentLoaded', () => {
         <h3 class="syne text-3xl md:text-4xl font-bold text-center mb-14 text-gray-900" data-i18n="features_title">Pourquoi voyager avec Midzo</h3>
         <div class="grid md:grid-cols-3 gap-7">
             <div class="card-lift p-8 rounded-3xl border border-gray-100 bg-white shadow-sm">
-                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(10,116,255,.1),rgba(10,116,255,.04));border:1px solid rgba(10,116,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem;">🤖</div>
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(10,116,255,.1),rgba(10,116,255,.04));border:1px solid rgba(10,116,255,.12);display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="#0A74FF" stroke-width="1.8"/><path d="M6 20v-1a6 6 0 0112 0v1" stroke="#0A74FF" stroke-width="1.8" stroke-linecap="round"/><path d="M12 11v2m0 0h2m-2 0H10" stroke="#0A74FF" stroke-width="1.8" stroke-linecap="round"/></svg></div>
                 <h4 class="syne text-lg font-bold mb-2 text-gray-900" data-i18n="feat1_title">Un vrai agent IA</h4>
                 <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat1_desc">Sofia vous accompagne comme un agent humain.</p>
             </div>
             <div class="card-lift p-8 rounded-3xl border border-gray-100 bg-white shadow-sm">
-                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem;">💎</div>
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.14);display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 9l10 13L22 9l-10-7z" stroke="#22c55e" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 9h20" stroke="#22c55e" stroke-width="1.8"/><path d="M8 9l4 13M16 9l-4 13" stroke="#22c55e" stroke-width="1.8"/></svg></div>
                 <h4 class="syne text-lg font-bold mb-2 text-gray-900" data-i18n="feat2_title">Prix imbattables</h4>
                 <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat2_desc">+700 compagnies comparées en temps réel.</p>
             </div>
             <div class="card-lift p-8 rounded-3xl border border-gray-100 bg-white shadow-sm">
-                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem;">⏰</div>
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.14);display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#f59e0b" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/></svg></div>
                 <h4 class="syne text-lg font-bold mb-2 text-gray-900" data-i18n="feat3_title">Disponible 24h/24</h4>
                 <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat3_desc">Votre agente ne dort jamais.</p>
             </div>
@@ -948,25 +1028,25 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="max-w-7xl mx-auto px-6">
         <h3 class="syne text-3xl md:text-4xl font-bold text-center mb-14 text-gray-900" data-i18n="destinations_title">Destinations populaires</h3>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Paris','')">
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Paris','','CDG')">
                 <img class="dest-img" src="images/paris.jpg" alt="Paris" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=500&q=80'">
-                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Paris</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm" data-i18n="dest_paris">Paris</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
             </div>
-            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Dubai','')">
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Dubai','','DXB')">
                 <img class="dest-img" src="images/dubai.jpg" alt="Dubai" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80'">
-                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Dubai</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm" data-i18n="dest_dubai">Dubai</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
             </div>
-            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','New York','')">
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','New York','','JFK')">
                 <img class="dest-img" src="images/newyork.jpg" alt="New York" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=500&q=80'">
-                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">New York</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm" data-i18n="dest_ny">New York</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
             </div>
-            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Abidjan','')">
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Abidjan','','ABJ')">
                 <img class="dest-img" src="images/abidjan.jpg" alt="Abidjan" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1580746738098-adb2af4f7d39?w=500&q=80'">
-                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Abidjan</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm" data-i18n="dest_abidjan">Abidjan</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
             </div>
-            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Bangkok','')">
+            <div class="card-lift rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer" onclick="fillAndScroll('','Bangkok','','BKK')">
                 <img class="dest-img" src="images/bangkok.jpg" alt="Bangkok" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=500&q=80'">
-                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm">Bangkok</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
+                <div class="p-4"><p class="syne font-bold text-gray-900 text-sm" data-i18n="dest_bangkok">Bangkok</p><span class="text-xs font-semibold" style="color:var(--blue);" data-i18n="dest_cta">Voir les offres →</span></div>
             </div>
         </div>
     </div>
@@ -977,9 +1057,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="max-w-5xl mx-auto text-center px-6">
         <p class="text-xs font-bold tracking-widest uppercase text-gray-400 mb-10" data-i18n="trust_title">La confiance de +10 000 voyageurs</p>
         <div class="flex flex-wrap justify-center gap-14">
-            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">728</div><div class="text-sm text-gray-500 mt-2 font-medium">compagnies</div></div>
-            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">1M+</div><div class="text-sm text-gray-500 mt-2 font-medium">recherches</div></div>
-            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">24/7</div><div class="text-sm text-gray-500 mt-2 font-medium">disponible</div></div>
+            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">728</div><div class="text-sm text-gray-500 mt-2 font-medium" data-i18n="stat1">compagnies</div></div>
+            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">1M+</div><div class="text-sm text-gray-500 mt-2 font-medium" data-i18n="stat2">recherches</div></div>
+            <div><div class="syne text-5xl font-bold" style="color:var(--blue);">24/7</div><div class="text-sm text-gray-500 mt-2 font-medium" data-i18n="stat3">disponible</div></div>
         </div>
         <div class="mt-20">
             <h3 class="syne text-3xl md:text-5xl font-bold mb-5 text-gray-900" data-i18n="cta_final_title">Prêt à voyager ? Sofia vous attend.</h3>
@@ -1046,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div style="border-top:1px solid rgba(255,255,255,.07);">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between flex-wrap gap-2">
             <p style="font-size:.73rem;color:rgba(255,255,255,.25);">© 2026 Midzo Flight · <span data-i18n="footer_rights">Tous droits réservés.</span></p>
-            <span style="font-size:.7rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:3px 10px;color:rgba(255,255,255,.25);display:inline-flex;align-items:center;gap:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span data-i18n="systems_ok">Systèmes opérationnels</span>
+            <span style="font-size:.7rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:3px 10px;color:rgba(255,255,255,.25);display:inline-flex;align-items:center;gap:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span><span data-i18n="systems_ok">Systèmes opérationnels</span></span>
         </div>
     </div>
 </footer>
@@ -1242,6 +1322,8 @@ function setTripType(type){
     tripType = type;
     const btnR = document.getElementById('btn-return');
     const btnO = document.getElementById('btn-oneway');
+    const retField = document.getElementById('return-date-field');
+    const grid = document.getElementById('search-grid-wrap');
     if(type === 'return'){
         btnR.style.background = 'rgba(255,255,255,0.2)';
         btnR.style.color = '#fff';
@@ -1249,6 +1331,8 @@ function setTripType(type){
         btnO.style.background = 'transparent';
         btnO.style.color = 'rgba(255,255,255,0.7)';
         btnO.style.borderColor = 'rgba(255,255,255,0.25)';
+        if(retField) retField.style.display = '';
+        if(grid) grid.style.gridTemplateColumns = 'repeat(6, 1fr)';
     } else {
         btnO.style.background = 'rgba(255,255,255,0.2)';
         btnO.style.color = '#fff';
@@ -1256,6 +1340,11 @@ function setTripType(type){
         btnR.style.background = 'transparent';
         btnR.style.color = 'rgba(255,255,255,0.7)';
         btnR.style.borderColor = 'rgba(255,255,255,0.25)';
+        if(retField) retField.style.display = 'none';
+        if(grid) grid.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 140px';
+        const rd = document.getElementById('search-return-date');
+        if(rd) rd.value = '';
+        dpEnd = null;
     }
 }
 
@@ -1266,26 +1355,39 @@ window.initChatbot = function(){
 };
 
 // Fill search bar from flash deals / destinations
-window.fillAndScroll = function(from, to, dates){
+window.fillAndScroll = function(from, to, dates, toIata){
+    // Translated city name for display
+    const cityNames = {
+        'Paris':   {fr:'Paris',   en:'Paris',    ru:'Париж'},
+        'Dubai':   {fr:'Dubai',   en:'Dubai',    ru:'Дубай'},
+        'New York':{fr:'New York',en:'New York', ru:'Нью-Йорк'},
+        'Abidjan': {fr:'Abidjan', en:'Abidjan',  ru:'Абиджан'},
+        'Bangkok': {fr:'Bangkok', en:'Bangkok',  ru:'Бангкок'},
+    };
+    const toDisplay = (cityNames[to] && cityNames[to][currentLang]) || to;
+
     if(from) document.getElementById('search-from').value = from;
-    if(to)   document.getElementById('search-to').value   = to;
-    if(dates){ document.getElementById('search-dates').value = dates; }
+    if(to){
+        document.getElementById('search-to').value = toDisplay;
+        if(toIata) selectedIata.to = toIata;
+    }
+    if(dates) document.getElementById('search-dates').value = dates;
+
     document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
     setTimeout(()=>{
         messagesDiv.innerHTML='';
-        const parts = [];
-        if(from)  parts.push(currentLang==='fr'?`Départ : ${from}`:`From: ${from}`);
-        if(to)    parts.push(currentLang==='fr'?`Destination : ${to}`:`To: ${to}`);
-        if(dates) parts.push(currentLang==='fr'?`Dates : ${dates}`:`Dates: ${dates}`);
-        if(parts.length){
-            const preMsg = currentLang==='fr' ? `Super choix ! J'ai bien noté ${parts.join(', ')}. Combien de passagers voyagent ? 👥` : `Great choice! I noted ${parts.join(', ')}. How many passengers? 👥`;
-            if(from) userData.from = from;
-            if(to)   userData.to   = to;
-            if(dates){ userData.dates = dates; }
-            chatStep = from&&to&&dates ? 3 : (from||to ? 1 : 0);
-            chatContext = [{role:'assistant',content:preMsg}];
+        if(to){
+            const msgs = {
+                fr: `Super choix ! ${toDisplay} est une destination magnifique. De quelle ville partez-vous ?`,
+                en: `Great choice! ${toDisplay} is a wonderful destination. Where are you flying from?`,
+                ru: `Отличный выбор! ${toDisplay} — прекрасное направление. Откуда вы летите?`
+            };
+            const preMsg = msgs[currentLang] || msgs['fr'];
+            userData.to = toDisplay;
+            if(toIata) selectedIata.to = toIata;
+            chatStep = 0;
+            chatContext = [{role:'assistant', content:preMsg}];
             addBotMessage(preMsg);
-            addChips(['1','2','3','4+'],()=>{});
         }
     }, 600);
 };
