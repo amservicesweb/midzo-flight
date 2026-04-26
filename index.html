@@ -57,7 +57,7 @@
         .hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:5px 14px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-bottom:1.4rem;}
 
         /* ── SEARCH BAR ── */
-        .search-panel{background:rgba(255,255,255,.93);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:14px;box-shadow:0 25px 60px rgba(0,0,0,.22);margin-top:2.5rem;}
+        .search-panel{background:rgba(255,255,255,.93);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:14px;box-shadow:0 25px 60px rgba(0,0,0,.22);margin-top:2.5rem;position:relative;z-index:500;}
         .search-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 140px;gap:8px;align-items:stretch;}
         @media(max-width:960px){.search-grid{grid-template-columns:1fr 1fr;}}
         @media(max-width:540px){.search-grid{grid-template-columns:1fr;}}
@@ -68,7 +68,7 @@
         .sf input::placeholder{color:#cbd5e1;font-weight:400;}
 
         /* Autocomplete */
-        .autocomplete-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.1);z-index:300;overflow:hidden;max-height:220px;overflow-y:auto;}
+        .autocomplete-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.1);z-index:1000;overflow:hidden;max-height:220px;overflow-y:auto;}
         .autocomplete-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s;font-size:.85rem;}
         .autocomplete-item:hover,.autocomplete-item.active{background:#f0f7ff;}
         .autocomplete-item .iata{font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:5px;padding:2px 6px;flex-shrink:0;}
@@ -209,7 +209,7 @@
         <div class="modal-body">
             <p><strong class="text-gray-900">Midzo</strong> est le premier site d'achat de billets d'avion assisté par une IA conversationnelle. Notre agent de voyage virtuel vous accompagne comme un vrai agent humain — en posant les bonnes questions, en comprenant vos préférences, et en trouvant les meilleures offres.</p>
             <h4>Notre technologie</h4>
-            <p>Nous utilisons des APIs de recherche de vols en temps réel couplées à une IA. Les clés API sont sécurisées côté serveur.</p>
+            <p>Nous utilisons des APIs de recherche de vols en temps réel (Kiwi Tequila, Aviasales) couplées à une IA. Les clés API sont sécurisées côté serveur.</p>
             <h4>Contact</h4>
             <p>📧 <a href="mailto:contact@midzo.app" style="color:var(--blue)">contact@midzo.app</a></p>
             <p>✈️ <a href="https://t.me/midzoflight_bot" target="_blank" style="color:var(--blue)">@midzoflight_bot</a></p>
