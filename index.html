@@ -50,15 +50,15 @@
         .strip-item:last-child{border-right:none;}
 
         /* ── HERO ── */
-        .hero-section{position:relative;min-height:700px;display:flex;align-items:center;overflow:visible;}
+        .hero-section{position:relative;min-height:700px;display:flex;align-items:center;overflow:hidden;}
         .hero-bg{position:absolute;inset:0;background:url('https://images.pexels.com/photos/1004584/pexels-photo-1004584.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;transform:scale(1.04);transition:transform 8s ease-out;}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(120deg,rgba(6,19,58,.78) 0%,rgba(6,19,58,.6) 50%,rgba(6,19,58,.55) 100%);}
-        .hero-content{position:relative;max-width:1280px;margin:0 auto;padding:5rem 2rem;width:100%;z-index:10;}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(120deg,rgba(6,19,58,.82) 0%,rgba(6,19,58,.65) 60%,rgba(6,19,58,.5) 100%);}
+        .hero-content{position:relative;max-width:1280px;margin:0 auto;padding:5rem 2rem;width:100%;}
         .hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:5px 14px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-bottom:1.4rem;}
 
         /* ── SEARCH BAR ── */
         .search-panel{background:rgba(255,255,255,.93);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:14px;box-shadow:0 25px 60px rgba(0,0,0,.22);margin-top:2.5rem;position:relative;z-index:500;overflow:visible;}
-        .search-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 140px;gap:8px;align-items:stretch;overflow:visible;}
+        .search-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 140px;gap:8px;align-items:center;overflow:visible;position:relative;}
         @media(max-width:960px){.search-grid{grid-template-columns:1fr 1fr;}}
         @media(max-width:540px){.search-grid{grid-template-columns:1fr;}}
         .sf{background:#fff;border-radius:12px;padding:9px 14px;height:58px;display:flex;flex-direction:column;justify-content:center;box-shadow:inset 0 1px 3px rgba(0,0,0,.05);position:relative;transition:box-shadow .2s;overflow:visible;}
@@ -702,52 +702,58 @@ document.addEventListener('DOMContentLoaded', () => {
             <h1 class="syne text-4xl md:text-5xl lg:text-[3.2rem] font-bold text-white leading-[1.18]" data-i18n="hero_title">Votre agent de voyage<br>personnel, propulsé par l'IA</h1>
             <p class="text-lg mt-5 max-w-xl leading-relaxed" style="color:rgba(255,255,255,0.97);text-shadow:0 1px 6px rgba(0,0,0,0.6);" data-i18n="hero_sub">Parlez à Midzo comme à un vrai agent. Il comprend, conseille, et trouve les meilleures offres pour vous.</p>
 
-            <!-- SEARCH PANEL -->
-            <div class="search-panel">
-                <div class="search-grid">
-                    <!-- FROM -->
-                    <div class="sf" style="position:relative;">
-                        <label>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" fill="#0A74FF"/></svg>
-                            <span data-i18n="from_label">Départ</span>
-                        </label>
-                        <input type="text" id="search-from" placeholder="Ex: Paris" autocomplete="off">
-                        <div id="ac-from" class="autocomplete-list hidden"></div>
-                    </div>
-                    <!-- TO -->
-                    <div class="sf" style="position:relative;">
-                        <label>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0A74FF"/></svg>
-                            <span data-i18n="to_label">Destination</span>
-                        </label>
-                        <input type="text" id="search-to" placeholder="Ex: Dubai" autocomplete="off">
-                        <div id="ac-to" class="autocomplete-list hidden"></div>
-                    </div>
-                    <!-- DATES -->
-                    <div class="sf" id="date-search-field" style="cursor:pointer;" onclick="openDatePicker()">
-                        <label data-i18n="date_label">Dates</label>
-                        <input type="text" id="search-dates" placeholder="Choisir les dates" readonly style="cursor:pointer;">
-                        <div id="date-picker-container" class="date-picker-wrap hidden" onclick="event.stopPropagation()">
-                            <div class="cal-header">
-                                <button class="cal-nav" id="dp-prev">‹</button>
-                                <span class="month-title" id="dp-month-title"></span>
-                                <button class="cal-nav" id="dp-next">›</button>
-                            </div>
-                            <div class="cal-grid" id="dp-grid"></div>
-                            <div class="cal-footer">
-                                <button class="cal-clear" id="dp-clear">Effacer</button>
-                                <button class="cal-apply" id="dp-apply">Appliquer</button>
-                            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ══ SEARCH SECTION ══ -->
+<section style="background:linear-gradient(135deg,#0A74FF 0%,#003FBB 100%);padding:2rem 0 2.5rem;position:relative;z-index:100;">
+    <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;">
+        <div style="background:#fff;border-radius:20px;padding:1.5rem;box-shadow:0 8px 40px rgba(0,0,0,.18);">
+            <div class="search-grid" style="overflow:visible;">
+                <!-- FROM -->
+                <div class="sf" style="position:relative;">
+                    <label>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" fill="#0A74FF"/></svg>
+                        <span data-i18n="from_label">Départ</span>
+                    </label>
+                    <input type="text" id="search-from" placeholder="Ex: Paris" autocomplete="off">
+                    <div id="ac-from" class="autocomplete-list hidden"></div>
+                </div>
+                <!-- TO -->
+                <div class="sf" style="position:relative;">
+                    <label>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0A74FF"/></svg>
+                        <span data-i18n="to_label">Destination</span>
+                    </label>
+                    <input type="text" id="search-to" placeholder="Ex: Dubai" autocomplete="off">
+                    <div id="ac-to" class="autocomplete-list hidden"></div>
+                </div>
+                <!-- DATES -->
+                <div class="sf" id="date-search-field" style="cursor:pointer;position:relative;" onclick="openDatePicker()">
+                    <label data-i18n="date_label">Dates</label>
+                    <input type="text" id="search-dates" placeholder="Choisir les dates" readonly style="cursor:pointer;">
+                    <div id="date-picker-container" class="date-picker-wrap hidden" onclick="event.stopPropagation()">
+                        <div class="cal-header">
+                            <button class="cal-nav" id="dp-prev">‹</button>
+                            <span class="month-title" id="dp-month-title"></span>
+                            <button class="cal-nav" id="dp-next">›</button>
+                        </div>
+                        <div class="cal-grid" id="dp-grid"></div>
+                        <div class="cal-footer">
+                            <button class="cal-clear" id="dp-clear">Effacer</button>
+                            <button class="cal-apply" id="dp-apply">Appliquer</button>
                         </div>
                     </div>
-                    <!-- PAX -->
-                    <div class="sf">
-                        <label data-i18n="pax_label">Passagers</label>
-                        <input type="number" id="search-pax" value="1" min="1" max="9" style="width:50px;">
-                    </div>
-                    <!-- SEARCH BTN -->
-                    <button id="hero-search-btn" class="btn-main" style="border-radius:12px;height:58px;font-size:.88rem;" data-i18n="search_btn">Rechercher</button>
                 </div>
+                <!-- PAX -->
+                <div class="sf">
+                    <label data-i18n="pax_label">Passagers</label>
+                    <input type="number" id="search-pax" value="1" min="1" max="9" style="width:50px;">
+                </div>
+                <!-- SEARCH BTN -->
+                <button id="hero-search-btn" class="btn-main" style="border-radius:12px;height:58px;font-size:.88rem;" data-i18n="search_btn">Rechercher</button>
             </div>
         </div>
     </div>
