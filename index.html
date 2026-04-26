@@ -434,7 +434,7 @@ function rebuildAboutAndPrivacy(lang){
     const privacyTexts = {
         fr: `<p style="font-size:.78rem;color:#9ca3af;">Dernière mise à jour : avril 2026</p><h4>Données collectées</h4><p>Midzo collecte uniquement les informations saisies dans le chat : ville de départ, destination, dates, passagers, budget optionnel.</p><h4>Utilisation</h4><p>Ces données sont transmises à nos partenaires API pour générer les résultats en temps réel. Elles ne sont pas stockées ni revendues.</p><h4>Sécurité</h4><p>Les clés API sont gérées côté serveur uniquement.</p><h4>Droits (RGPD)</h4><p>Contact : <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>`,
         en: `<p style="font-size:.78rem;color:#9ca3af;">Last updated: April 2026</p><h4>Data collected</h4><p>Midzo only collects what you enter in the chat: departure city, destination, dates, passengers, optional budget.</p><h4>Use</h4><p>This data is sent to our API partners to generate real-time results. It is not stored or sold.</p><h4>Security</h4><p>API keys are managed server-side only.</p><h4>Rights (GDPR)</h4><p>Contact: <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>`,
-        ru: `<p style="font-size:.78rem;color:#9ca3af;">Последнее обновление: апрель 2026</p><h4>Собираемые данные</h4><p>Midzo собирает только данные, введённые в чате: город отправления, пункт назначения, даты, пассажиры, бюджет (опционально).</p><h4>Использование</h4><p>Данные передаются нашим API-партнёрам для получения результатов в реальном времени. Они не хранятся и не продаются.</p><h4>Безопасность</h4><p>API-ключи хранятся только на сервере.</p><h4>Права (GDPR)</h4><p>Контакт: <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">privacy@midzo.app</a></p>`
+        ru: `<p style="font-size:.78rem;color:#9ca3af;">Последнее обновление: апрель 2026</p><h4>Собираемые данные</h4><p>Midzo собирает только данные, введённые в чате: город отправления, пункт назначения, даты, пассажиры, бюджет (опционально).</p><h4>Использование</h4><p>Данные передаются нашим API-партнёрам для получения результатов в реальном времени. Они не хранятся и не продаются.</p><h4>Безопасность</h4><p>API-ключи хранятся только на сервере.</p><h4>Права (GDPR)</h4><p>Контакт: <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>`
     };
 
     aboutBody.innerHTML = aboutTexts[lang] || aboutTexts['fr'];
@@ -1132,10 +1132,9 @@ document.addEventListener('DOMContentLoaded', () => {
 </footer>
 
 <script>
-// ── CHATBOT — Sofia Travel Agent ─────────────────────────────────────────────
-let chatStep = 0;
-let userData = {from:'',to:'',dates:'',passengers:'1',budget:''};
+// ── CHATBOT — Sofia IA Pure (JSON-driven) ─────────────────────────────────────
 let chatContext = [];
+let collectedData = {from:'', fromIata:'', to:'', toIata:'', dates:'', returnDate:'', passengers:'1', budget:''};
 window.chatComplete = false;
 
 const messagesDiv = document.getElementById('chat-messages');
@@ -1144,44 +1143,6 @@ const sendBtn     = document.getElementById('chat-send');
 const resultCta   = document.getElementById('result-cta-container');
 const aviasalesLink = document.getElementById('aviasales-link');
 const resultMsg   = document.getElementById('result-message');
-
-// System prompt — Sofia the travel agent
-const SOFIA_SYSTEM = {
-    fr: `Tu es Sofia, une agente de voyage IA pour Midzo Flight. Tu parles comme une vraie agente de voyage professionnelle et chaleureuse — pas comme un formulaire.
-
-PERSONNALITÉ : Amicale, professionnelle, enthousiaste pour les voyages. Tu utilises des emojis avec parcimonie. Tu fais des petits commentaires sur les destinations (ex: "Paris en novembre, excellent choix !"). Tu peux proposer des alternatives si pertinent.
-
-MISSION : Collecter ces infos pour trouver le meilleur vol :
-1. Ville de départ
-2. Destination  
-3. Dates (aller + retour si possible)
-4. Nombre de passagers
-5. Budget approximatif (optionnel)
-
-RÈGLES STRICTES :
-- Tu ne réponds QU'aux questions liées aux voyages, vols, destinations, aéroports, compagnies aériennes.
-- Si hors sujet : "Je suis spécialisée dans la recherche de vols ✈️ Dites-moi où vous souhaitez voyager !"
-- Max 2 phrases par réponse.
-- Une seule question à la fois.
-- Quand tu as toutes les infos, dis "Parfait ! Je recherche les meilleures offres pour vous..."`,
-    en: `You are Sofia, an AI travel agent for Midzo Flight. You speak like a real professional, warm travel agent — not like a form.
-
-PERSONALITY: Friendly, professional, enthusiastic about travel. Use emojis sparingly. Make small comments about destinations (e.g., "Paris in November, excellent choice!"). You can suggest alternatives when relevant.
-
-MISSION: Collect this info to find the best flight:
-1. Departure city
-2. Destination
-3. Dates (outbound + return if possible)
-4. Number of passengers
-5. Approximate budget (optional)
-
-STRICT RULES:
-- Only answer questions related to travel, flights, destinations, airports, airlines.
-- If off-topic: "I specialize in flight search ✈️ Tell me where you'd like to travel!"
-- Max 2 sentences per response.
-- One question at a time.
-- When you have all info, say "Perfect! Let me search for the best deals for you..."`
-};
 
 function addBotMessage(text, cb) {
     const row = document.createElement('div');
@@ -1208,7 +1169,7 @@ function showTypingIndicator(){
 }
 function removeTypingIndicator(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 
-function addChips(options, onSelect){
+function addChips(options){
     const row = document.createElement('div');
     row.className = 'bubble-row-bot';
     const chips = document.createElement('div');
@@ -1225,84 +1186,104 @@ function addChips(options, onSelect){
 }
 
 async function resetChat(){
-    chatStep=0; userData={from:'',to:'',dates:'',passengers:'1',budget:''};
-    chatContext=[]; resultCta.classList.remove('show'); window.chatComplete=false;
-    messagesDiv.innerHTML='';
+    collectedData = {from:'', fromIata:'', to:'', toIata:'', dates:'', returnDate:'', passengers:'1', budget:''};
+    chatContext = [];
+    resultCta.classList.remove('show');
+    window.chatComplete = false;
+    messagesDiv.innerHTML = '';
     const first = t('agent_q1');
     addBotMessage(first);
     chatContext.push({role:'assistant', content: first});
-    inputField.disabled=false; sendBtn.disabled=false; inputField.value='';
+    inputField.disabled = false; sendBtn.disabled = false; inputField.value = '';
 }
 
-// Detect if all data collected from context
-function extractUserData(userMsg, step){
-    if(step===0) userData.from = userMsg;
-    else if(step===1) userData.to = userMsg;
-    else if(step===2) userData.dates = userMsg;
-    else if(step===3) userData.passengers = userMsg;
-    else if(step===4) userData.budget = userMsg;
+function launchSearch(){
+    const fromIata = collectedData.fromIata || selectedIata.from || getIataCode(collectedData.from);
+    const toIata   = collectedData.toIata   || selectedIata.to   || getIataCode(collectedData.to);
+    if(!fromIata || !toIata) return;
+    const url = generateAviasalesLink(fromIata, toIata, collectedData.dates);
+    aviasalesLink.href = url;
+    resultMsg.textContent = t('ai_result_prefix');
+    resultCta.classList.add('show');
+    window.chatComplete = true;
 }
 
 async function handleUserInput(){
     const text = inputField.value.trim(); if(!text) return;
+
+    // Reset si salutation après conversation terminée
+    if(window.chatComplete){
+        const greetings = ['salut','bonjour','hello','hi','hey','allo','bonsoir','coucou','hola','salam','привет','здравствуйте'];
+        if(greetings.some(g => text.toLowerCase().trim().startsWith(g))){
+            resetChat(); return;
+        }
+    }
+
     addUserMessage(text);
-    chatContext.push({role:'user',content:text});
-    inputField.value=''; inputField.disabled=true; sendBtn.disabled=true;
+    chatContext.push({role:'user', content: text});
+    inputField.value = ''; inputField.disabled = true; sendBtn.disabled = true;
 
-    extractUserData(text, chatStep);
-    chatStep++;
+    showTypingIndicator();
+    let response = null;
 
-    if(chatStep >= 4 && userData.from && userData.to && userData.dates){
-        // Enough info — search
-        showTypingIndicator();
-        await new Promise(r=>setTimeout(r,900));
-        removeTypingIndicator();
-        const searchMsg = currentLang==='fr' ? '🔍 Parfait ! Je recherche les meilleures offres en temps réel...' : '🔍 Perfect! Searching for the best deals in real time...';
-        addBotMessage(searchMsg, async () => {
-            await new Promise(r=>setTimeout(r,600));
-            // Utilise le IATA sélectionné depuis l'autocomplete si dispo, sinon fallback
-            const fromIata = selectedIata.from || getIataCode(userData.from);
-            const toIata   = selectedIata.to   || getIataCode(userData.to);
-            const url = generateAviasalesLink(fromIata, toIata, userData.dates);
-            aviasalesLink.href = url;
-            resultMsg.textContent = t('ai_result_prefix');
-            resultCta.classList.add('show');
-            window.chatComplete = true;
-            const finalMsg = currentLang==='fr' ? '🔥 J\'ai trouvé de belles offres pour vous ! Cliquez sur le bouton pour les voir — les prix changent vite.' : '🔥 I found great deals for you! Click the button to see them — prices change fast.';
-            addBotMessage(finalMsg);
+    try {
+        const r = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                message: text,
+                context: chatContext.slice(-14),
+                lang: currentLang,
+                collected: collectedData
+            })
         });
-        inputField.disabled=false; sendBtn.disabled=false;
+        if(r.ok) response = await r.json();
+    } catch(e){ console.error('Chat error:', e); }
+
+    await new Promise(r => setTimeout(r, 300));
+    removeTypingIndicator();
+
+    if(!response || !response.reply){
+        const fallback = {fr:'Désolée, une erreur est survenue. Réessayez ?', en:"Sorry, something went wrong. Try again?", ru:'Произошла ошибка. Попробуйте ещё раз?'};
+        addBotMessage(fallback[currentLang] || fallback.fr);
+        inputField.disabled = false; sendBtn.disabled = false;
         return;
     }
 
-    // Ask AI for next question
-    showTypingIndicator();
-    let bot = await askAI(text, chatContext);
-    await new Promise(r=>setTimeout(r,400));
-    removeTypingIndicator();
+    const reply = response.reply;
 
-    if(!bot){
-        const fallbacks = {
-            fr:["Parfait ! Et votre destination ? ✈️","Quelles sont vos dates de voyage ? 📅","Combien de passagers voyagent ? 👥","Quel est votre budget approximatif ? (optionnel) 💶"],
-            en:["Great! And your destination? ✈️","What are your travel dates? 📅","How many passengers? 👥","Approximate budget? (optional) 💵"]
-        };
-        bot = fallbacks[currentLang][Math.min(chatStep-1, 3)];
+    // Merge collected data from backend
+    if(response.collected){
+        const c = response.collected;
+        if(c.from){ collectedData.from = c.from; collectedData.fromIata = getIataCode(c.from); }
+        if(c.to)  { collectedData.to   = c.to;   collectedData.toIata   = getIataCode(c.to); }
+        if(c.dates) collectedData.dates = c.dates;
+        if(c.passengers) collectedData.passengers = c.passengers;
+        if(c.budget) collectedData.budget = c.budget;
     }
 
-    addBotMessage(bot);
-    chatContext.push({role:'assistant',content:bot});
-
-    // Add suggestion chips contextually
-    if(chatStep===1){
-        const pop = currentLang==='fr' ? ['Paris','Abidjan','Dubai','New York','Istanbul'] : ['Paris','Abidjan','Dubai','New York','Bangkok'];
-        addChips(pop, ()=>{});
-    } else if(chatStep===3){
-        addChips(['1','2','3','4+'], ()=>{});
+    // Ready to search
+    if(response.ready === true){
+        addBotMessage(reply, () => setTimeout(launchSearch, 800));
+        chatContext.push({role:'assistant', content: reply});
+        inputField.disabled = false; sendBtn.disabled = false;
+        return;
     }
 
-    inputField.disabled=false; sendBtn.disabled=false;
+    addBotMessage(reply);
+    chatContext.push({role:'assistant', content: reply});
+
+    // Contextual chips
+    if(response.suggest_destinations){
+        const dests = {fr:['Paris','Abidjan','Dubaï','New York','Istanbul'], en:['Paris','Abidjan','Dubai','New York','Bangkok'], ru:['Париж','Дубай','Нью-Йорк','Абиджан','Бангкок']};
+        addChips(dests[currentLang] || dests.fr);
+    }
+    if(response.suggest_passengers){ addChips(['1','2','3','4+']); }
+
+    inputField.disabled = false; sendBtn.disabled = false;
     inputField.focus();
 }
+
 
 // Swap departure and destination
 function swapCities(){
@@ -1352,6 +1333,8 @@ window.initChatbot = function(){
     resetChat();
     sendBtn.onclick = handleUserInput;
     inputField.onkeypress = e=>{ if(e.key==='Enter'){e.preventDefault();handleUserInput();} };
+    // Init return trip as default
+    setTimeout(()=>setTripType('return'), 100);
 };
 
 // Fill search bar from flash deals / destinations
