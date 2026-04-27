@@ -3,6 +3,14 @@ const fs = require('fs');
 const path = require('path');
 
 let airportsData = null;
+const cityRateMap = new Map();
+function cityRateLimit(ip){
+    const now = Date.now(), win = 60000, max = 60;
+    const e = cityRateMap.get(ip) || {c:0, r:now+win};
+    if(now > e.r){e.c=0; e.r=now+win;}
+    e.c++; cityRateMap.set(ip,e);
+    return e.c <= max;
+}
 
 function loadAirports() {
     if (airportsData) return airportsData;
@@ -67,8 +75,10 @@ module.exports = function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
+    const ip = req.headers['x-forwarded-for']?.split(',')[0] || 'unknown';
+    if(!cityRateLimit(ip)) return res.status(429).json({locations:[]});
     const q = req.query.q;
-    if (!q || q.trim().length < 1) {
+    if (!q || typeof q !== 'string' || q.trim().length < 1 || q.length > 50) {
         return res.status(200).json({ locations: [] });
     }
 
@@ -101,3 +111,6 @@ module.exports = function handler(req, res) {
     const results = [...startsWith, ...contains].slice(0, 8);
     return res.status(200).json({ locations: results });
 };
+// Note: cities.js already has in-memory caching via airportsData singleton.
+// The search results themselves are fast (local JSON) so no additional cache needed.
+// Rate limiting is handled at the Vercel edge level.
