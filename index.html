@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ══ TOKENS ══════════════════════════════════════════════════════ */
 :root {
   --blue:#0770e3; --blue-dk:#044faa; --blue-lt:#e8f2fd;
   --sky:#f1f7ff; --text:#111236; --muted:#68697f;
@@ -56,7 +55,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 /* ── MODALS ── */
 .modal-ov{position:fixed;inset:0;background:rgba(7,18,60,.6);backdrop-filter:blur(4px);z-index:800;display:none;align-items:center;justify-content:center;padding:1rem;}
 .modal-ov.open{display:flex;}
-.modal-box{background:#fff;border-radius:16px;max-width:500px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.2);}
+.modal-box{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.2);}
 .modal-hd{padding:1.1rem 1.6rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:16px 16px 0 0;}
 .modal-hd h3{font-weight:800;font-size:1rem;color:var(--text);}
 .modal-close{width:27px;height:27px;border-radius:50%;background:var(--sky);border:none;cursor:pointer;font-size:.8rem;color:var(--muted);display:flex;align-items:center;justify-content:center;}
@@ -190,7 +189,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 #chat-send{background:var(--blue);color:#fff;border:none;border-radius:100px;padding:9px 20px;font-family:inherit;font-weight:700;font-size:.8rem;cursor:pointer;transition:background .15s;}
 #chat-send:hover{background:var(--blue-dk);}
 #chat-send:disabled{opacity:.4;cursor:default;}
-.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;color:#fff;font-weight:700;font-size:.85rem;padding:11px;border-radius:9px;text-decoration:none;margin:0 12px 10px;transition:background .15s;}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;color:#fff;font-weight:700;font-size:.85rem;padding:11px;border-radius:9px;text-decoration:none;margin:0 12px 10px;transition:background .15s;font-family:inherit;}
 .wa-btn:hover{background:#1db954;}
 .result-cta{display:none;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.9rem 1.2rem;background:var(--blue-lt);border-top:1px solid rgba(7,112,227,.15);}
 .result-cta.show{display:flex;}
@@ -217,8 +216,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 .footer-bottom{border-top:1px solid rgba(255,255,255,.07);}
 .footer-bottom-inner{max-width:1280px;margin:0 auto;padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
 .footer-bottom p{font-size:.7rem;color:rgba(255,255,255,.18);}
-.sys-pill{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;color:rgba(255,255,255,.18);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:100px;padding:3px 9px;}
-.sys-dot{width:5px;height:5px;border-radius:50%;background:#00d26a;display:inline-block;}
 
 @media(max-width:900px){
   .sb{flex-wrap:wrap;}
@@ -238,11 +235,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 <!-- ══ MODALS ══ -->
 <div id="modal-newsletter" class="modal-ov" onclick="if(event.target===this)closeModal('newsletter')">
   <div class="modal-box">
-    <div class="modal-hd"><h3>✈️ Alertes prix</h3><button class="modal-close" onclick="closeModal('newsletter')">✕</button></div>
+    <div class="modal-hd"><h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:6px;"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="#0770e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Alertes prix</h3><button class="modal-close" onclick="closeModal('newsletter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
     <div class="modal-body">
-      <p style="margin-bottom:1rem;">Recevez en avant-première les meilleures offres. Gratuit, sans engagement.</p>
-      <input type="text" id="sub-name" placeholder="Prénom" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;margin-bottom:9px;font-size:.84rem;outline:none;font-family:inherit;">
-      <input type="email" id="sub-email" placeholder="Email" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;margin-bottom:13px;font-size:.84rem;outline:none;font-family:inherit;">
+      <p style="margin-bottom:1rem;">Recevez en avant-première les meilleures offres de vols. Gratuit, sans engagement, désinscription en 1 clic.</p>
+      <input type="text" id="sub-name" placeholder="Votre prénom" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;margin-bottom:9px;font-size:.84rem;outline:none;font-family:inherit;">
+      <input type="email" id="sub-email" placeholder="Votre adresse email" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;margin-bottom:13px;font-size:.84rem;outline:none;font-family:inherit;">
       <button onclick="subscribeNewsletter()" class="btn btn-primary" style="width:100%;padding:11px;border-radius:9px;font-size:.88rem;">Activer les alertes</button>
       <p style="font-size:.72rem;color:var(--muted);margin-top:9px;text-align:center;">Pas de spam. Désactivez en 1 clic.</p>
     </div>
@@ -251,21 +248,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 
 <div id="modal-about" class="modal-ov" onclick="if(event.target===this)closeModal('about')">
   <div class="modal-box">
-    <div class="modal-hd"><h3 id="modal-about-title">À propos de Midzo Flight</h3><button class="modal-close" onclick="closeModal('about')">✕</button></div>
+    <div class="modal-hd"><h3 id="modal-about-title">À propos de Midzo Flight</h3><button class="modal-close" onclick="closeModal('about')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
     <div class="modal-body" id="about-body"></div>
   </div>
 </div>
 
 <div id="modal-faq" class="modal-ov" onclick="if(event.target===this)closeModal('faq')">
   <div class="modal-box">
-    <div class="modal-hd"><h3 id="modal-faq-title">Questions fréquentes</h3><button class="modal-close" onclick="closeModal('faq')">✕</button></div>
+    <div class="modal-hd"><h3 id="modal-faq-title">Questions fréquentes</h3><button class="modal-close" onclick="closeModal('faq')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
     <div class="modal-body" id="faq-body"></div>
   </div>
 </div>
 
 <div id="modal-privacy" class="modal-ov" onclick="if(event.target===this)closeModal('privacy')">
   <div class="modal-box">
-    <div class="modal-hd"><h3 id="modal-privacy-title">Confidentialité</h3><button class="modal-close" onclick="closeModal('privacy')">✕</button></div>
+    <div class="modal-hd"><h3 id="modal-privacy-title">Confidentialité</h3><button class="modal-close" onclick="closeModal('privacy')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
     <div class="modal-body" id="privacy-body"></div>
   </div>
 </div>
@@ -308,7 +305,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
   <div class="hero-bg"></div>
   <div class="hero-ov"></div>
   <div class="hero-txt">
-    <div class="hero-eyebrow">Recherchez · Comparez · Voyagez</div>
+    <div class="hero-eyebrow"><svg width="7" height="7" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><path d="M6 3v3l2 1" stroke="rgba(255,255,255,.8)" stroke-width="1.2" stroke-linecap="round"/></svg>Recherchez · Comparez · Voyagez</div>
     <h1 class="hero-title">Trouvez votre vol<br>au meilleur prix</h1>
     <p class="hero-sub">Midzo compare des centaines de compagnies en quelques secondes. Aucun frais. Aucune surprise.</p>
   </div>
@@ -318,48 +315,50 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 <div class="sc-wrap">
   <div class="sc">
     <div class="sc-tabs">
-      <button class="sc-tab active">✈️ Vols</button>
-      <button class="sc-tab">🏨 Hôtels <span class="badge-soon">bientôt</span></button>
+      <button class="sc-tab active"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0770e3"/></svg>Vols</button>
+      <button class="sc-tab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8"/></svg>Hôtels<span class="badge-soon">bientôt</span></button>
     </div>
     <div class="sc-body">
       <div class="trip-toggle">
-        <button id="btn-return" class="trip-btn active" onclick="setTripType('return')">🔄 Aller-retour</button>
-        <button id="btn-oneway" class="trip-btn" onclick="setTripType('oneway')">➡️ Aller simple</button>
+        <button id="btn-return" class="trip-btn active" onclick="setTripType('return')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Aller-retour</button>
+        <button id="btn-oneway" class="trip-btn" onclick="setTripType('oneway')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Aller simple</button>
       </div>
       <div class="sb" id="sb">
         <div class="sb-field" style="overflow:visible;">
-          <label>📍 Départ</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="10" r="3" stroke="#0770e3" stroke-width="2"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#0770e3" stroke-width="2"/></svg>Départ</label>
           <input type="text" id="search-from" autocomplete="off" placeholder="Ex: Paris">
           <div class="ac-list" id="ac-from"></div>
         </div>
         <div class="sb-swap-wrap">
-          <button class="sb-swap" onclick="swapCities()">↔️</button>
+          <button class="sb-swap" onclick="swapCities()" title="Échanger départ et destination">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4" stroke="#0770e3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
         <div class="sb-field" style="overflow:visible;">
-          <label>📍 Destination</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="10" r="3" stroke="#0770e3" stroke-width="2"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#0770e3" stroke-width="2"/></svg>Destination</label>
           <input type="text" id="search-to" autocomplete="off" placeholder="Ex: Dubai">
           <div class="ac-list" id="ac-to"></div>
         </div>
         <div class="sb-field" id="sf-depart" style="cursor:pointer;overflow:visible;" onclick="openDP('depart')">
-          <label>📅 Aller</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0770e3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg>Aller</label>
           <input type="text" id="search-depart" placeholder="Date aller" readonly>
           <div class="dp-wrap" id="dp-depart" onclick="event.stopPropagation()">
-            <div class="dp-hd"><button class="dp-nav" id="dp-d-prev">‹</button><span class="dp-month" id="dp-d-month"></span><button class="dp-nav" id="dp-d-next">›</button></div>
+            <div class="dp-hd"><button class="dp-nav" id="dp-d-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button><span class="dp-month" id="dp-d-month"></span><button class="dp-nav" id="dp-d-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
             <div class="dp-grid" id="dp-d-grid"></div>
             <div class="dp-ft"><button class="dp-clear" id="dp-d-clear">Effacer</button><button class="dp-apply" id="dp-d-apply">Appliquer</button></div>
           </div>
         </div>
         <div class="sb-field" id="sf-return" style="cursor:pointer;overflow:visible;" onclick="openDP('return')">
-          <label>📅 Retour</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0770e3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg>Retour</label>
           <input type="text" id="search-return" placeholder="Date retour" readonly>
           <div class="dp-wrap" id="dp-return" onclick="event.stopPropagation()">
-            <div class="dp-hd"><button class="dp-nav" id="dp-r-prev">‹</button><span class="dp-month" id="dp-r-month"></span><button class="dp-nav" id="dp-r-next">›</button></div>
+            <div class="dp-hd"><button class="dp-nav" id="dp-r-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button><span class="dp-month" id="dp-r-month"></span><button class="dp-nav" id="dp-r-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
             <div class="dp-grid" id="dp-r-grid"></div>
             <div class="dp-ft"><button class="dp-clear" id="dp-r-clear">Effacer</button><button class="dp-apply" id="dp-r-apply">Appliquer</button></div>
           </div>
         </div>
         <div class="sb-field" style="flex:0 0 110px;">
-          <label>👥 Passagers</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="9" cy="7" r="4" stroke="#0770e3" stroke-width="2"/><path d="M1 21v-2a4 4 0 014-4h8a4 4 0 014 4v2" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg>Passagers</label>
           <input type="number" id="search-pax" value="1" min="1" max="9">
         </div>
         <button class="sb-submit" id="btn-search">Rechercher</button>
@@ -383,7 +382,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 <!-- ══ AGENT CHAT ══ -->
 <div class="agent-wrap" id="agent-section">
   <div class="agent-banner">
-    <div class="agent-av">✈️</div>
+    <div class="agent-av"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="rgba(255,255,255,.8)" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="rgba(255,255,255,.8)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="1.5" fill="rgba(255,255,255,.8)"/></svg></div>
     <div>
       <div class="agent-name" id="agent-name">Sofia · Agent de voyage IA</div>
       <div class="agent-sub">Powered by Midzo Flight</div>
@@ -399,7 +398,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
     <div id="chat-msgs"></div>
     <div style="padding:8px 12px 0;">
       <a href="https://wa.me/79961792326?text=Bonjour%20Midzo" target="_blank" class="wa-btn">
-        💬 Parler à un agent WhatsApp
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Parler à un agent WhatsApp
       </a>
     </div>
     <div class="chat-input-row">
@@ -423,14 +423,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
       </div>
       <p style="font-size:.83rem;max-width:250px;line-height:1.6;margin-bottom:1.1rem;">Comparez des centaines de vols. Réservez au meilleur prix.</p>
       <div style="margin-bottom:1.1rem;">
-        <a href="https://t.me/midzoflight_bot" target="_blank" class="soc-btn">📱</a>
-        <a href="https://wa.me/79961792326" target="_blank" class="soc-btn">💬</a>
+        <a href="https://t.me/midzoflight_bot" target="_blank" class="soc-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.56-.44.7-.88.43l-2.42-1.79-1.16 1.12c-.13.13-.24.24-.49.24l.17-2.46 4.47-4.04c.19-.17-.04-.27-.3-.1L7.74 15.4l-2.38-.74c-.52-.16-.53-.52.11-.77l9.29-3.58c.43-.16.81.1.68.49z" fill="rgba(255,255,255,.65)"/></svg></a>
+        <a href="https://wa.me/79961792326" target="_blank" class="soc-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,.65)"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
       </div>
       <p class="foot-col-title">Newsletter</p>
-      <div class="nl-row">
-        <input type="email" class="nl-input" placeholder="Votre email">
-        <button class="nl-btn">OK</button>
-      </div>
+      <div class="nl-row"><input type="email" class="nl-input" placeholder="Votre email"><button class="nl-btn">OK</button></div>
     </div>
     <div>
       <p class="foot-col-title">Navigation</p>
@@ -446,68 +443,128 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
       <a href="mailto:kwami.wampah@yahoo.com" class="foot-link">Contact</a>
     </div>
   </div>
-  <div class="footer-bottom">
-    <div class="footer-bottom-inner">
-      <p>© 2026 Midzo Flight · Tous droits réservés.</p>
-      <span class="sys-pill"><span class="sys-dot"></span> Tous systèmes opérationnels</span>
-    </div>
-  </div>
+  <div class="footer-bottom"><div class="footer-bottom-inner"><p>© 2026 Midzo Flight · Tous droits réservés.</p></div></div>
 </footer>
 
 <script>
 /* ══════════════════════════════════════════════════════════════
-   GLOBAL DOM REFS
+   GLOBAL STATE
 ═══════════════════════════════════════════════════════════════ */
+let lang = localStorage.getItem('midzo_lang') || 'fr';
+let tripType = 'return';
+let dpDeptDate = null, dpRetDate = null, dpDMonth, dpDYear, dpRMonth, dpRYear;
+let chatCtx = [], collectedData = {from:'',fromIata:'',to:'',toIata:'',passengers:'1'}, chatDone = false;
+const selectedIata = {from:'', to:''};
 const chatMsgs = document.getElementById('chat-msgs');
 const chatInput = document.getElementById('chat-input');
 const chatSendBtn = document.getElementById('chat-send');
 const resultCtaEl = document.getElementById('result-cta');
 const aviasalesLnk = document.getElementById('aviasales-link');
 const resultMsgEl = document.getElementById('result-msg');
-let lang = localStorage.getItem('midzo_lang') || 'fr';
 
 /* ══════════════════════════════════════════════════════════════
-   MODALS CONTENT
+   MODALS
 ═══════════════════════════════════════════════════════════════ */
 function openModal(id){ document.getElementById('modal-'+id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeModal(id){ document.getElementById('modal-'+id).classList.remove('open'); document.body.style.overflow=''; }
-function subscribeNewsletter(){ const e=document.getElementById('sub-email').value; if(!e)return; alert('Merci ! Vous recevrez nos meilleures offres sur '+e+' ✈️'); closeModal('newsletter'); }
+function subscribeNewsletter(){ const e=document.getElementById('sub-email').value; if(!e)return; alert('Merci ! Vous recevrez nos meilleures offres sur '+e); closeModal('newsletter'); }
 
 function rebuildModals(l){
   document.getElementById('modal-about-title').textContent = l==='en'?'About Midzo Flight':l==='ru'?'О Midzo Flight':'À propos de Midzo Flight';
   document.getElementById('modal-faq-title').textContent = l==='en'?'Frequently asked questions':l==='ru'?'Частые вопросы':'Questions fréquentes';
   document.getElementById('modal-privacy-title').textContent = l==='en'?'Privacy Policy':l==='ru'?'Конфиденциальность':'Confidentialité';
   
-  document.getElementById('about-body').innerHTML = l==='en'?
-    `<p><strong>Midzo Flight</strong> is a flight comparison platform powered by a conversational AI agent named Sofia.</p><h4>Contact</h4><p>📧 kwami.wampah@yahoo.com<br>✈️ @midzoflight_bot</p>`
-    : l==='ru'?
-    `<p><strong>Midzo Flight</strong> — сервис сравнения авиабилетов с ИИ-агентом Софией.</p><h4>Контакт</h4><p>📧 kwami.wampah@yahoo.com<br>✈️ @midzoflight_bot</p>`
-    :`<p><strong>Midzo Flight</strong> est un comparateur de vols propulsé par une IA conversationnelle nommée Sofia.</p><h4>Contact</h4><p>📧 kwami.wampah@yahoo.com<br>✈️ @midzoflight_bot</p>`;
+  const aboutTexts = {
+    fr:`<p style="font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:.5rem;">Midzo Flight est un comparateur de vols propulsé par une IA conversationnelle.</p>
+        <p>Plutôt que de remplir un formulaire froid, vous parlez à <strong>Sofia</strong> — notre agente de voyage IA qui comprend votre voyage, vos préférences et votre budget, puis cherche en temps réel parmi <strong>728 compagnies aériennes</strong>.</p>
+        <h4>Notre mission</h4>
+        <p>Rendre la recherche de vols simple, rapide et humaine — pour tous les voyageurs, partout dans le monde, et particulièrement pour les <strong>voyageurs francophones et africains</strong> souvent mal servis par les grandes plateformes.</p>
+        <h4>Comment ça marche</h4>
+        <p>Sofia collecte vos informations via le chat, puis génère un lien de recherche optimisé vers nos partenaires (Aviasales). Vous êtes redirigé directement sur la page de résultats — sans étapes inutiles.</p>
+        <h4>Notre modèle</h4>
+        <p>Midzo est <strong>100 % gratuit</strong> pour les voyageurs. Nous sommes rémunérés via un système d'affiliation lorsque vous réservez via nos partenaires. Cela ne change jamais le prix que vous payez.</p>
+        <h4>Contact</h4>
+        <p>📧 <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+        <p>✈️ Telegram : <a href="https://t.me/midzoflight_bot" target="_blank" style="color:var(--blue)">@midzoflight_bot</a></p>
+        <p>💬 WhatsApp : <a href="https://wa.me/79961792326" target="_blank" style="color:var(--blue)">+7 996 179-23-26</a></p>`,
+    en:`<p style="font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:.5rem;">Midzo Flight is a flight comparison platform powered by a conversational AI agent named Sofia.</p>
+        <p>Instead of filling out a cold form, you talk to <strong>Sofia</strong> — our AI travel agent who understands your trip, preferences, and budget, then searches in real time across <strong>728 airlines</strong>.</p>
+        <h4>Our mission</h4>
+        <p>Make flight search simple, fast, and human — for all travelers worldwide, especially <strong>francophone and African travelers</strong> often underserved by major platforms.</p>
+        <h4>How it works</h4>
+        <p>Sofia collects your travel details through chat, then generates an optimized search link to our partners (Aviasales). You are redirected straight to the results page — no unnecessary steps.</p>
+        <h4>Our model</h4>
+        <p>Midzo is <strong>100% free</strong> for travelers. We earn a commission through our affiliate program when you book via our partners. This never changes the price you pay.</p>
+        <h4>Contact</h4>
+        <p>📧 <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+        <p>✈️ Telegram: <a href="https://t.me/midzoflight_bot" target="_blank" style="color:var(--blue)">@midzoflight_bot</a></p>
+        <p>💬 WhatsApp: <a href="https://wa.me/79961792326" target="_blank" style="color:var(--blue)">+7 996 179-23-26</a></p>`,
+    ru:`<p style="font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:.5rem;">Midzo Flight — сервис сравнения авиабилетов на основе разговорного ИИ-агента Софии.</p>
+        <p>Вместо скучной формы вы общаетесь с <strong>Софией</strong> — нашим ИИ-агентом по путешествиям, который понимает ваш маршрут, предпочтения и бюджет, а затем в реальном времени ищет среди <strong>728 авиакомпаний</strong>.</p>
+        <h4>Наша миссия</h4>
+        <p>Сделать поиск авиабилетов простым, быстрым и человечным для всех путешественников мира, особенно для <strong>франкоязычных и африканских</strong> пассажиров.</p>
+        <h4>Как это работает</h4>
+        <p>София собирает данные о вашей поездке через чат, затем формирует оптимизированную ссылку поиска к нашим партнёрам (Aviasales).</p>
+        <h4>Контакт</h4>
+        <p>📧 <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+        <p>✈️ Telegram: <a href="https://t.me/midzoflight_bot" target="_blank" style="color:var(--blue)">@midzoflight_bot</a></p>`
+  };
+  document.getElementById('about-body').innerHTML = aboutTexts[l] || aboutTexts.fr;
   
-  document.getElementById('privacy-body').innerHTML = l==='en'?
-    `<h4>Data collected</h4><p>Only what you enter in chat. Never stored or sold.</p>`
-    : l==='ru'?
-    `<h4>Собираемые данные</h4><p>Только то, что вы вводите в чате. Никогда не хранятся и не продаются.</p>`
-    :`<h4>Données collectées</h4><p>Uniquement ce que vous saisissez dans le chat. Jamais stockées ni revendues.</p>`;
+  const faqs = {
+    fr:[
+      ["Comment fonctionne Sofia ?", "Sofia est une IA entraînée pour se comporter comme un vrai agent de voyage. Elle pose les bonnes questions — départ, destination, dates, budget — puis cherche en temps réel parmi 728 compagnies aériennes. Une fois les infos collectées, elle génère un lien de résultats personnalisé."],
+      ["Midzo est-il gratuit ?", "Oui, totalement gratuit pour les voyageurs. Midzo est rémunéré via un système d'affiliation : lorsque vous réservez via nos partenaires (Aviasales), nous recevons une petite commission. Cela ne change pas le prix que vous payez."],
+      ["Puis-je réserver directement sur Midzo ?", "Non — Midzo est un moteur de recherche et de comparaison. Sofia trouve les meilleures offres correspondant à votre demande, puis vous redirige vers nos partenaires pour finaliser votre réservation en toute sécurité."],
+      ["Quelles compagnies sont incluses ?", "Plus de 728 compagnies aériennes : des grandes internationales (Air France, Emirates, Turkish Airlines, Qatar Airways…) aux low-cost (EasyJet, Ryanair, Transavia…) et aux compagnies régionales africaines (Air Sénégal, Ethiopian Airlines, Kenya Airways, Air Ivoire…)."],
+      ["Midzo fonctionne-t-il pour les vols depuis l'Afrique ?", "Oui ! C'est même l'une de nos forces. Sofia est formée pour gérer les routes africaines et propose des résultats depuis Abidjan, Dakar, Lomé, Lagos, Douala, Casablanca, et bien d'autres villes du continent."],
+      ["Comment joindre un humain ?", "Via le bouton WhatsApp visible sur le site. Notre équipe répond dans les plus brefs délais pour toute question ou assistance manuelle."],
+      ["Mes données personnelles sont-elles protégées ?", "Absolument. Seules les informations que vous partagez dans le chat (villes, dates, nombre de passagers) sont utilisées pour votre recherche. Elles ne sont jamais stockées de façon permanente ni revendues à des tiers."],
+      ["Sofia parle-t-elle plusieurs langues ?", "Oui — Sofia communique en français, en anglais et en russe. Il vous suffit de lui écrire dans votre langue et elle s'adapte automatiquement."]
+    ],
+    en:[
+      ["How does Sofia work?", "Sofia is an AI trained to behave like a real travel agent. She asks the right questions — departure, destination, dates, budget — then searches in real time across 728 airlines. Once she has your info, she generates a personalized results link."],
+      ["Is Midzo free?", "Yes, completely free for travelers. Midzo earns via an affiliate program: when you book through our partners (Aviasales), we receive a small commission. This never changes the price you pay."],
+      ["Can I book directly on Midzo?", "No — Midzo is a search and comparison engine. Sofia finds the best offers matching your request, then redirects you to our partners to complete your booking securely."],
+      ["Which airlines are included?", "Over 728 airlines: major internationals (Air France, Emirates, Turkish Airlines, Qatar Airways…), low-cost (EasyJet, Ryanair, Transavia…), and African regional carriers (Air Sénégal, Ethiopian Airlines, Kenya Airways, Air Ivoire…)."],
+      ["Does Midzo work for flights from Africa?", "Yes! That's actually one of our strengths. Sofia is trained to handle African routes and returns results from Abidjan, Dakar, Lomé, Lagos, Douala, Casablanca, and many other cities across the continent."],
+      ["How do I reach a human?", "Use the WhatsApp button on the site. Our team responds quickly for any question or manual assistance."],
+      ["Is my personal data protected?", "Absolutely. Only the information you share in chat (cities, dates, passengers) is used for your search. It is never permanently stored or sold to third parties."],
+      ["Does Sofia speak multiple languages?", "Yes — Sofia communicates in French, English, and Russian. Just write in your language and she adapts automatically."]
+    ],
+    ru:[
+      ["Как работает София?", "София — ИИ, обученный как настоящий турагент. Она задаёт нужные вопросы и в реальном времени ищет среди 728 авиакомпаний."],
+      ["Midzo бесплатный?", "Да, полностью бесплатен. Midzo зарабатывает через партнёрскую программу."],
+      ["Какие авиакомпании?", "728+: Air France, Emirates, Turkish, EasyJet, Ryanair и африканские перевозчики."],
+      ["Как связаться с человеком?", "Используйте кнопку WhatsApp на сайте."]
+    ]
+  };
+  document.getElementById('faq-body').innerHTML = (faqs[l]||faqs.fr).map(([q,a])=>`<div class="faq-item"><div class="faq-q" onclick="this.closest('.faq-item').classList.toggle('open')"><span>${q}</span><span class="faq-icon">+</span></div><div class="faq-a">${a}</div></div>`).join('');
   
-  const faq = l==='en'?[
-    ["How does Sofia work?","Sofia is an AI trained like a real travel agent. She finds the best flights among 728+ airlines."],
-    ["Is Midzo free?","Yes, completely free. We earn via affiliation."],
-    ["Which airlines?","728+: Air France, Emirates, Turkish, EasyJet, Ryanair, and African carriers."]
-  ] : l==='ru'?[
-    ["Как работает София?","София — ИИ, обученный как настоящий турагент. Ищет лучшие рейсы среди 728+ авиакомпаний."],
-    ["Midzo бесплатный?","Да, полностью бесплатен."],
-    ["Какие авиакомпании?","728+: Air France, Emirates, Turkish, EasyJet, Ryanair и африканские перевозчики."]
-  ] : [
-    ["Comment fonctionne Sofia ?","Sofia est une IA entraînée comme un vrai agent de voyage. Elle trouve les meilleurs vols parmi 728+ compagnies."],
-    ["Midzo est-il gratuit ?","Oui, totalement gratuit. Nous sommes rémunérés via affiliation."],
-    ["Quelles compagnies ?","728+: Air France, Emirates, Turkish, EasyJet, Ryanair, et les compagnies africaines."]
-  ];
-  document.getElementById('faq-body').innerHTML = faq.map(([q,a])=>`<div class="faq-item"><div class="faq-q" onclick="this.closest('.faq-item').classList.toggle('open')"><span>${q}</span><span class="faq-icon">+</span></div><div class="faq-a">${a}</div></div>`).join('');
+  const privacyTexts = {
+    fr:`<p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem;">Dernière mise à jour : avril 2026</p>
+        <h4>1. Données collectées</h4><p>Midzo Flight collecte uniquement les informations que vous saisissez volontairement dans le chat : ville de départ, destination, dates de voyage, nombre de passagers et budget optionnel. Aucune donnée personnelle d'identification (nom, email, téléphone) n'est requise pour effectuer une recherche.</p>
+        <h4>2. Utilisation des données</h4><p>Les données saisies sont transmises en temps réel à nos APIs partenaires (Aviasales) dans le seul but de générer des résultats de recherche de vols. Elles ne sont <strong>pas stockées</strong> sur nos serveurs de manière permanente et ne sont <strong>jamais revendues</strong> à des tiers.</p>
+        <h4>3. Cookies</h4><p>Midzo utilise uniquement le stockage local de votre navigateur pour sauvegarder votre préférence de langue. Aucun cookie publicitaire ou de suivi comportemental n'est activé.</p>
+        <h4>4. Liens externes</h4><p>Lorsque Sofia vous redirige vers nos partenaires (Aviasales), vous quittez l'environnement Midzo. Ces sites ont leurs propres politiques de confidentialité.</p>
+        <h4>5. Vos droits (RGPD)</h4><p>Conformément au Règlement Général sur la Protection des Données, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour exercer ces droits, contactez-nous à : <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+        <h4>6. Contact</h4><p>Pour toute question relative à la protection de vos données : <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>`,
+    en:`<p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem;">Last updated: April 2026</p>
+        <h4>1. Data collected</h4><p>Midzo Flight only collects information you voluntarily enter in the chat: departure city, destination, travel dates, number of passengers, and optional budget. No personal identifying data (name, email, phone) is required to perform a search.</p>
+        <h4>2. Use of data</h4><p>The data you enter is transmitted in real time to our partner APIs (Aviasales) solely to generate flight search results. It is <strong>not permanently stored</strong> on our servers and is <strong>never sold</strong> to third parties.</p>
+        <h4>3. Cookies</h4><p>Midzo uses only browser local storage to save your language preference. No advertising or behavioral tracking cookies are activated.</p>
+        <h4>4. External links</h4><p>When Sofia redirects you to our partners (Aviasales), you leave the Midzo environment. These sites have their own privacy policies.</p>
+        <h4>5. Your rights (GDPR)</h4><p>Under the General Data Protection Regulation, you have the right to access, correct, and delete your data. To exercise these rights, contact us at: <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>
+        <h4>6. Contact</h4><p>For any questions regarding your data protection: <a href="mailto:kwami.wampah@yahoo.com" style="color:var(--blue)">kwami.wampah@yahoo.com</a></p>`,
+    ru:`<p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem;">Последнее обновление: апрель 2026</p>
+        <h4>1. Собираемые данные</h4><p>Midzo Flight собирает только информацию, которую вы добровольно вводите в чате. Для поиска не требуется никаких личных идентификационных данных.</p>
+        <h4>2. Использование данных</h4><p>Данные передаются в реальном времени в API наших партнёров (Aviasales) исключительно для формирования результатов поиска.</p>`
+  };
+  document.getElementById('privacy-body').innerHTML = privacyTexts[l] || privacyTexts.fr;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   CITY DATA + AUTOCOMPLETE
+   CITIES + AUTOCOMPLETE
 ═══════════════════════════════════════════════════════════════ */
 const CITIES = [
   {city:"Paris",country:"France",iata:"CDG",flag:"🇫🇷"},{city:"Lyon",country:"France",iata:"LYS",flag:"🇫🇷"},
@@ -523,11 +580,9 @@ const CITIES = [
   {city:"Lagos",country:"Nigeria",iata:"LOS",flag:"🇳🇬"},{city:"Nairobi",country:"Kenya",iata:"NBO",flag:"🇰🇪"},
   {city:"Casablanca",country:"Maroc",iata:"CMN",flag:"🇲🇦"},{city:"Tunis",country:"Tunisie",iata:"TUN",flag:"🇹🇳"},
   {city:"Douala",country:"Cameroun",iata:"DLA",flag:"🇨🇲"},{city:"Montréal",country:"Canada",iata:"YUL",flag:"🇨🇦"},
-  {city:"Singapour",country:"Singapour",iata:"SIN",flag:"🇸🇬"},{city:"Москва",country:"Россия",iata:"SVO",flag:"🇷🇺"},
-  {city:"Санкт-Петербург",country:"Россия",iata:"LED",flag:"🇷🇺"}
+  {city:"Singapour",country:"Singapour",iata:"SIN",flag:"🇸🇬"},{city:"Москва",country:"Россия",iata:"SVO",flag:"🇷🇺"}
 ];
 const cityCache = {};
-const selectedIata = {from:'', to:''};
 
 async function resolveIata(cityName){
   if(!cityName) return 'XXX';
@@ -568,7 +623,6 @@ function swapCities(){
 /* ══════════════════════════════════════════════════════════════
    TRIP TYPE
 ═══════════════════════════════════════════════════════════════ */
-let tripType = 'return';
 function setTripType(type){
   tripType = type;
   document.getElementById('btn-return').classList.toggle('active', type==='return');
@@ -580,7 +634,6 @@ function setTripType(type){
 /* ══════════════════════════════════════════════════════════════
    DATE PICKER
 ═══════════════════════════════════════════════════════════════ */
-let dpDeptDate=null, dpRetDate=null, dpDMonth, dpDYear, dpRMonth, dpRYear;
 const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const MONTHS_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS=['Lu','Ma','Me','Je','Ve','Sa','Di'], DAYS_EN=['Mo','Tu','We','Th','Fr','Sa','Su'];
@@ -617,7 +670,7 @@ function openDP(which){
 function closeDP(which){ document.getElementById('dp-'+which).style.display='none'; }
 
 /* ══════════════════════════════════════════════════════════════
-   SEARCH → AVIASALES
+   AVIASALES LINK
 ═══════════════════════════════════════════════════════════════ */
 function buildAviasalesURL(fromIata, toIata){
   let dep=''; if(dpDeptDate){ dep=`${dpDeptDate.getFullYear()}-${String(dpDeptDate.getMonth()+1).padStart(2,'0')}-${String(dpDeptDate.getDate()).padStart(2,'0')}`; }
@@ -638,7 +691,7 @@ document.getElementById('btn-search').addEventListener('click', async()=>{
   collectedData={from,fromIata:selectedIata.from||from.substring(0,3).toUpperCase(),to,toIata:selectedIata.to||to.substring(0,3).toUpperCase(),passengers:pax};
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
   setTimeout(async()=>{ chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
-    addBotMsg(`🔍 Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)...`);
+    addBotMsg(`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px;"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)...`);
     setTimeout(async()=>{ await launchSearch(); }, 800);
     chatInput.disabled=false; chatSendBtn.disabled=false;
   },400);
@@ -647,11 +700,9 @@ document.getElementById('btn-search').addEventListener('click', async()=>{
 /* ══════════════════════════════════════════════════════════════
    CHATBOT
 ═══════════════════════════════════════════════════════════════ */
-let chatCtx=[], collectedData={from:'',fromIata:'',to:'',toIata:'',passengers:'1'}, chatDone=false;
-
 function addBotMsg(text, cb){
   const row=document.createElement('div'); row.className='brow-bot';
-  row.innerHTML=`<div class="bot-av">✈️</div><div class="bubble-bot"><span class="msg-txt"></span><span class="cursor"></span></div>`;
+  row.innerHTML=`<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><span class="msg-txt"></span><span class="cursor"></span></div>`;
   const ts=row.querySelector('.msg-txt'), cur=row.querySelector('.cursor');
   chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
   let i=0; (function type(){ if(i<text.length){ts.textContent+=text[i++];chatMsgs.scrollTop=chatMsgs.scrollHeight;setTimeout(type,13);}else{cur.style.display='none';if(cb)cb();} })();
@@ -664,7 +715,7 @@ function addUserMsg(text){
 
 function showTyping(){
   const row=document.createElement('div'); row.className='brow-bot'; row.id='typing';
-  row.innerHTML=`<div class="bot-av">✈️</div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  row.innerHTML=`<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
   chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
 }
 
@@ -675,14 +726,14 @@ async function launchSearch(){
   const ti=collectedData.toIata||await resolveIata(collectedData.to);
   if(!fi||!ti) return;
   aviasalesLnk.href=buildAviasalesURL(fi, ti);
-  resultMsgEl.textContent='✈️ Meilleurs vols trouvés pour vous';
+  resultMsgEl.textContent='Meilleurs vols trouvés pour vous';
   resultCtaEl.classList.add('show'); chatDone=true;
 }
 
 async function resetChat(){
   collectedData={from:'',fromIata:'',to:'',toIata:'',passengers:'1'}; selectedIata.from=''; selectedIata.to='';
   dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML='';
-  const q='Bonjour ! Je suis Sofia. D\'où partez-vous ? ✈️';
+  const q='Bonjour ! Je suis Sofia, votre agente de voyage. D\'où souhaitez-vous partir ?';
   addBotMsg(q); chatCtx.push({role:'assistant',content:q});
   chatInput.disabled=false; chatSendBtn.disabled=false; chatInput.value='';
 }
@@ -697,11 +748,11 @@ async function handleSend(){
     hideTyping();
     if(!r.ok) throw new Error();
     const res=await r.json();
-    if(!res?.reply){ addBotMsg('Pouvez-vous préciser votre départ et destination ?'); chatInput.disabled=false; chatSendBtn.disabled=false; return; }
-    if(res.collected){ const c=res.collected; if(c.from){collectedData.from=c.from; collectedData.fromIata=await resolveIata(c.from);} if(c.to){collectedData.to=c.to; collectedData.toIata=await resolveIata(c.to);} }
+    if(!res?.reply){ addBotMsg('Pouvez-vous me préciser votre ville de départ et votre destination ?'); chatInput.disabled=false; chatSendBtn.disabled=false; return; }
+    if(res.collected){ const c=res.collected; if(c.from){collectedData.from=c.from; collectedData.fromIata=await resolveIata(c.from);} if(c.to){collectedData.to=c.to; collectedData.toIata=await resolveIata(c.to);} if(c.dates) collectedData.dates=c.dates; if(c.passengers) collectedData.passengers=c.passengers; }
     if(res.ready){ addBotMsg(res.reply, ()=>setTimeout(launchSearch,700)); chatCtx.push({role:'assistant',content:res.reply}); }
     else { addBotMsg(res.reply); chatCtx.push({role:'assistant',content:res.reply}); }
-  }catch(e){ hideTyping(); addBotMsg('Désolé, je rencontre un problème technique. Veuillez réessayer.'); }
+  }catch(e){ hideTyping(); addBotMsg('Désolé, je rencontre un problème technique. Veuillez réessayer dans un instant.'); }
   chatInput.disabled=false; chatSendBtn.disabled=false; chatInput.focus();
 }
 
@@ -711,7 +762,7 @@ function fillAndScroll(from, to, toIata){
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
   setTimeout(async()=>{ collectedData={from:'',fromIata:'',to:'',toIata:'',passengers:'1'}; chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML='';
     if(to){ collectedData.to=to; collectedData.toIata=toIata||await resolveIata(to); selectedIata.to=toIata||collectedData.toIata;
-      const m=`Super choix ! Depuis quelle ville partez-vous pour ${to} ?`; chatCtx=[{role:'assistant',content:m}]; addBotMsg(m); }
+      const m=`Super choix ! De quelle ville partez-vous pour ${to} ?`; chatCtx=[{role:'assistant',content:m}]; addBotMsg(m); }
   },500);
 }
 
@@ -723,7 +774,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   setupAC('search-from','ac-from','from');
   setupAC('search-to','ac-to','to');
   
-  // Init date picker
   const today=new Date(); dpDMonth=today.getMonth(); dpDYear=today.getFullYear();
   document.getElementById('dp-d-prev').onclick=()=>{ dpDMonth--; if(dpDMonth<0){dpDMonth=11;dpDYear--;} renderDPGrid('dp-d-grid',dpDMonth,dpDYear,dpDeptDate,null); };
   document.getElementById('dp-d-next').onclick=()=>{ dpDMonth++; if(dpDMonth>11){dpDMonth=0;dpDYear++;} renderDPGrid('dp-d-grid',dpDMonth,dpDYear,dpDeptDate,null); };
