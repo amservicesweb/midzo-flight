@@ -371,11 +371,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 <div class="section">
   <h2 class="section-title">Où voulez-vous aller ?</h2>
   <div class="dest-grid">
-    <div class="dest-card" onclick="fillAndScroll('','Paris','CDG')"><img class="dest-img" src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=500&q=80" alt="Paris"><div class="dest-info"><div class="dest-name">Paris</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','Dubai','DXB')"><img class="dest-img" src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80" alt="Dubai"><div class="dest-info"><div class="dest-name">Dubaï</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','New York','JFK')"><img class="dest-img" src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=500&q=80" alt="New York"><div class="dest-info"><div class="dest-name">New York</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','Abidjan','ABJ')"><img class="dest-img" src="https://images.unsplash.com/photo-1580746738098-adb2af4f7d39?w=500&q=80" alt="Abidjan"><div class="dest-info"><div class="dest-name">Abidjan</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','Bangkok','BKK')"><img class="dest-img" src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=500&q=80" alt="Bangkok"><div class="dest-info"><div class="dest-name">Bangkok</div><div class="dest-cta">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Paris','CDG')"><img class="dest-img" src="images/paris.jpg" alt="Paris" onerror="this.src='https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=500&q=80'"><div class="dest-info"><div class="dest-name">Paris</div><div class="dest-cta">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Dubai','DXB')"><img class="dest-img" src="images/dubai.jpg" alt="Dubaï" onerror="this.src='https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80'"><div class="dest-info"><div class="dest-name">Dubaï</div><div class="dest-cta">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','New York','JFK')"><img class="dest-img" src="images/newyork.jpg" alt="New York" onerror="this.src='https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=500&q=80'"><div class="dest-info"><div class="dest-name">New York</div><div class="dest-cta">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Abidjan','ABJ')"><img class="dest-img" src="images/abidjan.jpg" alt="Abidjan" onerror="this.src='https://images.unsplash.com/photo-1580746738098-adb2af4f7d39?w=500&q=80'"><div class="dest-info"><div class="dest-name">Abidjan</div><div class="dest-cta">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Bangkok','BKK')"><img class="dest-img" src="images/bangkok.jpg" alt="Bangkok" onerror="this.src='https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=500&q=80'"><div class="dest-info"><div class="dest-name">Bangkok</div><div class="dest-cta">Explorer →</div></div></div>
   </div>
 </div>
 
@@ -453,7 +453,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 let lang = localStorage.getItem('midzo_lang') || 'fr';
 let tripType = 'return';
 let dpDeptDate = null, dpRetDate = null, dpDMonth, dpDYear, dpRMonth, dpRYear;
-let chatCtx = [], collectedData = {from:'',fromIata:'',to:'',toIata:'',passengers:'1'}, chatDone = false;
+// Variables migrées vers state unique (voir section CHATBOT ci-dessous)
 const selectedIata = {from:'', to:''};
 const chatMsgs = document.getElementById('chat-msgs');
 const chatInput = document.getElementById('chat-input');
@@ -584,34 +584,115 @@ const CITIES = [
 ];
 const cityCache = {};
 
+/* ─── resolveIata : cherche d'abord local, puis /api/cities ─── */
 async function resolveIata(cityName){
   if(!cityName) return 'XXX';
-  const q = cityName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-  if(cityCache[q]) return cityCache[q];
-  const found = CITIES.find(c => c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"") === q || c.iata.toLowerCase() === q);
-  if(found){ cityCache[q] = found.iata; return found.iata; }
+  const nq = cityName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(cityCache[nq]) return cityCache[nq];
+
+  // 1. Cherche dans CITY_MAP (parser local)
+  if(CITY_MAP[nq]){ cityCache[nq]=CITY_MAP[nq]; return CITY_MAP[nq]; }
+
+  // 2. Cherche dans la liste CITIES (fallback statique)
+  const local = CITIES.find(c =>
+    c.city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') === nq ||
+    c.iata.toLowerCase() === nq
+  );
+  if(local){ cityCache[nq]=local.iata; return local.iata; }
+
+  // 3. Appel /api/cities → airports.json
+  try {
+    const r = await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
+    if(r.ok){
+      const d = await r.json();
+      if(d.locations && d.locations.length > 0){
+        const iata = d.locations[0].iata;
+        cityCache[nq] = iata;
+        return iata;
+      }
+    }
+  } catch(_){}
+
+  // 4. Fallback : 3 premières lettres majuscules
   const fallback = cityName.substring(0,3).toUpperCase();
-  cityCache[q] = fallback;
+  cityCache[nq] = fallback;
   return fallback;
 }
 
-function searchLocal(q){
-  const nq = q.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-  return CITIES.filter(c=>c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").startsWith(nq)||c.iata.toLowerCase().startsWith(nq)).slice(0,8);
+/* ─── searchCities : appel /api/cities avec fallback local ─── */
+async function searchCities(q){
+  // Essai API
+  try {
+    const r = await fetch(`/api/cities?q=${encodeURIComponent(q)}`);
+    if(r.ok){
+      const d = await r.json();
+      if(d.locations && d.locations.length > 0){
+        // Normalise format pour renderAC (compatible avec CITIES)
+        return d.locations.map(a => ({
+          city: a.city || a.name || a.iata,
+          country: a.country || '',
+          iata: a.iata,
+          flag: a.flag || countryFlag(a.country_code || a.countryCode || '')
+        }));
+      }
+    }
+  } catch(_){}
+
+  // Fallback local (CITIES array)
+  const nq = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  return CITIES.filter(c =>
+    c.city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').startsWith(nq) ||
+    c.iata.toLowerCase().startsWith(nq)
+  ).slice(0,8);
+}
+
+/* ─── Convertit country_code ISO2 en emoji drapeau ─── */
+function countryFlag(code){
+  if(!code || code.length !== 2) return '🌍';
+  return String.fromCodePoint(...[...code.toUpperCase()].map(c => 127397 + c.charCodeAt(0)));
 }
 
 function renderAC(list, results, input, field){
   if(!results.length){ list.style.display='none'; return; }
-  list.innerHTML = results.map(c=>`<div class="ac-item" data-city="${c.city}" data-iata="${c.iata}"><span class="ac-iata">${c.iata}</span><span>${c.flag||'🌍'}</span><div><div class="ac-city">${c.city}</div><div class="ac-country">${c.country}</div></div></div>`).join('');
+  list.innerHTML = results.map(c =>
+    `<div class="ac-item" data-city="${c.city}" data-iata="${c.iata}">
+      <span class="ac-iata">${c.iata}</span>
+      <span>${c.flag||'🌍'}</span>
+      <div><div class="ac-city">${c.city}</div><div class="ac-country">${c.country}</div></div>
+    </div>`
+  ).join('');
   list.style.display='block';
-  list.querySelectorAll('.ac-item').forEach(item=>{ item.addEventListener('mousedown', e=>{ e.preventDefault(); input.value=item.dataset.city; selectedIata[field]=item.dataset.iata; list.style.display='none'; }); });
+  list.querySelectorAll('.ac-item').forEach(item=>{
+    item.addEventListener('mousedown', e=>{
+      e.preventDefault();
+      input.value = item.dataset.city;
+      selectedIata[field] = item.dataset.iata;
+      // Met aussi à jour state si applicable
+      if(field==='from'){ state.from=item.dataset.city; state.fromIata=item.dataset.iata; }
+      if(field==='to')  { state.to=item.dataset.city;   state.toIata=item.dataset.iata; }
+      list.style.display='none';
+    });
+  });
 }
 
+let acTimers = {};
 function setupAC(inputId, listId, field){
-  const input=document.getElementById(inputId), list=document.getElementById(listId);
-  input.addEventListener('input',()=>{ const q=input.value.trim(); if(!q){list.style.display='none';return;} renderAC(list, searchLocal(q), input, field); });
-  input.addEventListener('blur',()=>setTimeout(()=>list.style.display='none', 150));
-  input.addEventListener('keydown',e=>{ if(e.key==='Escape') list.style.display='none'; });
+  const input = document.getElementById(inputId);
+  const list  = document.getElementById(listId);
+
+  input.addEventListener('input', ()=>{
+    const q = input.value.trim();
+    if(!q || q.length < 1){ list.style.display='none'; return; }
+    clearTimeout(acTimers[field]);
+    // Debounce 200ms pour ne pas spammer /api/cities
+    acTimers[field] = setTimeout(async()=>{
+      const results = await searchCities(q);
+      renderAC(list, results, input, field);
+    }, 200);
+  });
+
+  input.addEventListener('blur', ()=> setTimeout(()=> list.style.display='none', 150));
+  input.addEventListener('keydown', e=>{ if(e.key==='Escape') list.style.display='none'; });
 }
 
 function swapCities(){
@@ -688,29 +769,375 @@ document.getElementById('btn-search').addEventListener('click', async()=>{
   if(!from||!to){ alert('Veuillez indiquer une ville de départ et une destination.'); return; }
   if(!selectedIata.from) selectedIata.from=await resolveIata(from);
   if(!selectedIata.to) selectedIata.to=await resolveIata(to);
-  collectedData={from,fromIata:selectedIata.from||from.substring(0,3).toUpperCase(),to,toIata:selectedIata.to||to.substring(0,3).toUpperCase(),passengers:pax};
+  // FIX 4 — utiliser state unique
+  state = {
+    from, fromIata: selectedIata.from||from.substring(0,3).toUpperCase(),
+    to, toIata: selectedIata.to||to.substring(0,3).toUpperCase(),
+    departureDate: dpDeptDate ? dpDeptDate.toISOString().split('T')[0] : null,
+    returnDate: dpRetDate ? dpRetDate.toISOString().split('T')[0] : null,
+    tripType: tripType==='return' ? 'roundtrip' : 'oneway',
+    passengers: pax
+  };
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
-  setTimeout(async()=>{ chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
-    addBotMsg(`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px;"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)...`);
+  setTimeout(async()=>{
+    chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
+    addBotMsg(`Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)...`);
     setTimeout(async()=>{ await launchSearch(); }, 800);
     chatInput.disabled=false; chatSendBtn.disabled=false;
   },400);
 });
 
 /* ══════════════════════════════════════════════════════════════
-   CHATBOT
+   STATE CENTRAL
 ═══════════════════════════════════════════════════════════════ */
+let state = {
+  from: null,         // nom ville départ
+  fromIata: null,     // code IATA
+  to: null,           // nom ville arrivée
+  toIata: null,
+  departureDate: null, // YYYY-MM-DD
+  returnDate: null,
+  tripType: 'oneway', // 'oneway' | 'roundtrip'
+  passengers: 1
+};
+let chatCtx = [];
+let chatDone = false;
+
+/* ══════════════════════════════════════════════════════════════
+   PARSER LOCAL — détection sans API
+═══════════════════════════════════════════════════════════════ */
+
+// Table de mapping villes → IATA (étendue)
+const CITY_MAP = {
+  // France
+  'paris':'CDG','cdg':'CDG','roissy':'CDG',
+  'lyon':'LYS','lys':'LYS',
+  'marseille':'MRS','mrs':'MRS',
+  'nice':'NCE','nce':'NCE',
+  'bordeaux':'BOD','bod':'BOD',
+  'toulouse':'TLS','tls':'TLS',
+  'nantes':'NTE','nte':'NTE',
+  'strasbourg':'SXB','sxb':'SXB',
+  // Afrique
+  'abidjan':'ABJ','abj':'ABJ',
+  'dakar':'DSS','dss':'DSS',
+  'lome':'LFW','lomé':'LFW','lfw':'LFW',
+  'lagos':'LOS','los':'LOS',
+  'nairobi':'NBO','nbo':'NBO',
+  'casablanca':'CMN','cmn':'CMN',
+  'tunis':'TUN','tun':'TUN',
+  'douala':'DLA','dla':'DLA',
+  'accra':'ACC','acc':'ACC',
+  'bamako':'BKO','bko':'BKO',
+  'ouagadougou':'OUA','oua':'OUA',
+  'cotonou':'COO','coo':'COO',
+  'libreville':'LBV','lbv':'LBV',
+  'yaounde':'NSI','yaoundé':'NSI','nsi':'NSI',
+  'kinshasa':'FIH','fih':'FIH',
+  'addis abeba':'ADD','add':'ADD','addis':'ADD',
+  'johannesburg':'JNB','jnb':'JNB',
+  'cape town':'CPT','cpt':'CPT',
+  'alger':'ALG','alg':'ALG',
+  'rabat':'RBA','rba':'RBA',
+  'cairo':'CAI','le caire':'CAI','cai':'CAI',
+  // Europe
+  'londres':'LHR','london':'LHR','lhr':'LHR',
+  'amsterdam':'AMS','ams':'AMS',
+  'bruxelles':'BRU','brussels':'BRU','bru':'BRU',
+  'berlin':'BER','ber':'BER',
+  'madrid':'MAD','mad':'MAD',
+  'barcelone':'BCN','barcelona':'BCN','bcn':'BCN',
+  'rome':'FCO','fco':'FCO',
+  'milan':'MXP','mxp':'MXP',
+  'lisbonne':'LIS','lisbon':'LIS','lis':'LIS',
+  'geneve':'GVA','genève':'GVA','gva':'GVA',
+  'zurich':'ZRH','zurich':'ZRH','zrh':'ZRH',
+  'vienne':'VIE','vienna':'VIE','vie':'VIE',
+  // Moyen-Orient / Asie
+  'dubai':'DXB','dubaï':'DXB','dxb':'DXB',
+  'istanbul':'IST','ist':'IST',
+  'doha':'DOH','doh':'DOH',
+  'abu dhabi':'AUH','auh':'AUH',
+  'riyad':'RUH','riyadh':'RUH','ruh':'RUH',
+  'bangkok':'BKK','bkk':'BKK',
+  'tokyo':'HND','hnd':'HND',
+  'singapour':'SIN','singapore':'SIN','sin':'SIN',
+  'pekin':'PEK','beijing':'PEK','pékin':'PEK','pek':'PEK',
+  'shanghai':'PVG','pvg':'PVG',
+  'hong kong':'HKG','hkg':'HKG',
+  // Amériques
+  'new york':'JFK','jfk':'JFK','new-york':'JFK',
+  'miami':'MIA','mia':'MIA',
+  'los angeles':'LAX','lax':'LAX',
+  'montreal':'YUL','montréal':'YUL','yul':'YUL',
+  'toronto':'YYZ','yyz':'YYZ',
+  'sao paulo':'GRU','são paulo':'GRU','gru':'GRU',
+  // Russie / CEI
+  'moscou':'SVO','moscow':'SVO','svo':'SVO',
+  'saint petersbourg':'LED','led':'LED',
+};
+
+function normalize(str){
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[''`]/g,'')
+    .trim();
+}
+
+function cityToIata(name){
+  if(!name) return null;
+  const n = normalize(name);
+  if(CITY_MAP[n]) return CITY_MAP[n];
+  // Cherche dans CITIES array (autocomplete existant)
+  const found = CITIES.find(c =>
+    normalize(c.city) === n ||
+    c.iata.toLowerCase() === n
+  );
+  return found ? found.iata : null;
+}
+
+function iataToCity(iata){
+  if(!iata) return iata;
+  const found = CITIES.find(c => c.iata === iata.toUpperCase());
+  return found ? found.city : iata;
+}
+
+// Détection de date dans un texte naturel
+function parseDate(text){
+  const n = normalize(text);
+  const today = new Date();
+
+  // "demain"
+  if(/\bdemain\b/.test(n)){
+    const d = new Date(today); d.setDate(d.getDate()+1);
+    return d.toISOString().split('T')[0];
+  }
+  // "après-demain"
+  if(/apr[eè]s.demain/.test(n)){
+    const d = new Date(today); d.setDate(d.getDate()+2);
+    return d.toISOString().split('T')[0];
+  }
+  // "dans X jours"
+  const inDays = n.match(/dans\s+(\d+)\s+jours?/);
+  if(inDays){
+    const d = new Date(today); d.setDate(d.getDate()+parseInt(inDays[1]));
+    return d.toISOString().split('T')[0];
+  }
+  // ISO direct YYYY-MM-DD
+  const iso = text.match(/\b(20\d{2})[.\-\/](0?[1-9]|1[0-2])[.\-\/](0?[1-9]|[12]\d|3[01])\b/);
+  if(iso) return `${iso[1]}-${iso[2].padStart(2,'0')}-${iso[3].padStart(2,'0')}`;
+
+  // "30 avril 2026" / "30/04" / "30-04"
+  const MONTHS_FR = {
+    'jan':1,'janv':1,'janvier':1,
+    'fev':2,'fevr':2,'février':2,'fevrier':2,
+    'mar':3,'mars':3,
+    'avr':4,'avril':4,
+    'mai':5,
+    'jun':6,'juin':6,
+    'jul':7,'juil':7,'juillet':7,
+    'aou':8,'août':8,'aout':8,
+    'sep':9,'sept':9,'septembre':9,
+    'oct':10,'octobre':10,
+    'nov':11,'novembre':11,
+    'dec':12,'déc':12,'decembre':12,'décembre':12
+  };
+  const MONTHS_EN = {
+    'jan':1,'january':1,'feb':2,'february':2,'mar':3,'march':3,
+    'apr':4,'april':4,'may':5,'jun':6,'june':6,'jul':7,'july':7,
+    'aug':8,'august':8,'sep':9,'september':9,'oct':10,'october':10,
+    'nov':11,'november':11,'dec':12,'december':12
+  };
+  const allMonths = {...MONTHS_FR,...MONTHS_EN};
+
+  // "15 juin" / "15 juin 2026"
+  const dmatch = n.match(/\b(\d{1,2})\s+([a-zéèûôàâê]+)(?:\s+(20\d{2}))?\b/);
+  if(dmatch){
+    const day = parseInt(dmatch[1]);
+    const mon = allMonths[dmatch[2]];
+    if(mon && day>=1 && day<=31){
+      const year = dmatch[3] ? parseInt(dmatch[3]) : today.getFullYear();
+      const candidate = new Date(year, mon-1, day);
+      if(candidate < today) candidate.setFullYear(candidate.getFullYear()+1);
+      return candidate.toISOString().split('T')[0];
+    }
+  }
+  // "15/04" ou "15/04/2026"
+  const slashDate = text.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?\b/);
+  if(slashDate){
+    const day=parseInt(slashDate[1]),mon=parseInt(slashDate[2]);
+    if(day>=1&&day<=31&&mon>=1&&mon<=12){
+      const year=slashDate[3]?parseInt(slashDate[3]):today.getFullYear();
+      const candidate=new Date(year,mon-1,day);
+      if(candidate<today) candidate.setFullYear(candidate.getFullYear()+1);
+      return candidate.toISOString().split('T')[0];
+    }
+  }
+  return null;
+}
+
+// Détection passagers
+function parsePassengers(text){
+  const n = normalize(text);
+  const m = n.match(/(\d+)\s*(passager|voyageur|adulte|personne|pax|ticket)/);
+  if(m) return parseInt(m[1]);
+  if(/\bseul\b|\b1\s*(personne|pax)?\b/.test(n)) return 1;
+  return null;
+}
+
+// Détection tripType
+function parseTripType(text){
+  const n = normalize(text);
+  if(/aller.simple|sans.retour|one.way|pas.de.retour/.test(n)) return 'oneway';
+  if(/aller.retour|retour|round.trip/.test(n)) return 'roundtrip';
+  return null;
+}
+
+/**
+ * parseMessage(message) → extrait villes, dates, passagers, tripType
+ * Retourne un objet partiel avec les champs détectés
+ */
+function parseMessage(message){
+  const result = {};
+  const n = normalize(message);
+
+  // Détection tripType en premier (pour ne pas polluer la détection villes)
+  const tt = parseTripType(message);
+  if(tt) result.tripType = tt;
+
+  // Détection passagers
+  const pax = parsePassengers(message);
+  if(pax) result.passengers = pax;
+
+  // Détection dates
+  const date = parseDate(message);
+  if(date) result.departureDate = date;
+
+  // Détection villes — cherche dans CITY_MAP et CITIES
+  // On découpe le message en mots/groupes et on cherche des matches
+  const detectedCities = [];
+
+  // Essai groupes de 3 mots
+  const words = n.split(/\s+/);
+  for(let i=0; i<words.length; i++){
+    for(let len=3; len>=1; len--){
+      const phrase = words.slice(i,i+len).join(' ');
+      // Ignore les mots parasites
+      if(['pour','vers','depuis','de','à','a','en','au','aux','le','la','les','je','veux','aller','partir','voler','vol','vols','un','une','des','du','et','avec','pas','retour','simple','date','demain','juin','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre','janvier','fevrier','aujourd'].includes(phrase)) continue;
+      const iata = cityToIata(phrase) ||
+        (CITIES.find(c=>normalize(c.city).startsWith(phrase)&&phrase.length>=3)?.iata);
+      if(iata && !detectedCities.find(c=>c.iata===iata)){
+        detectedCities.push({phrase, iata, pos:i});
+        i += len-1; break;
+      }
+    }
+  }
+
+  // Patterns directionnels : "de X à Y", "X → Y", "X - Y", "X pour Y"
+  const arrowMatch = message.match(/([A-ZÀ-Ö][a-zà-ö]+(?:\s[A-ZÀ-Ö][a-zà-ö]+)?)\s*(?:→|->|–|-|\/|vers|pour|à|a)\s*([A-ZÀ-Ö][a-zà-ö]+(?:\s[A-ZÀ-Ö][a-zà-ö]+)?)/);
+  if(arrowMatch){
+    const iataA = cityToIata(arrowMatch[1]);
+    const iataB = cityToIata(arrowMatch[2]);
+    if(iataA && iataB){
+      result.from = arrowMatch[1];
+      result.fromIata = iataA;
+      result.to = arrowMatch[2];
+      result.toIata = iataB;
+      return result;
+    }
+  }
+  const deMatch = message.match(/(?:de|depuis|from|partir de)\s+([A-ZÀ-Öa-zà-ö]+(?:\s[A-ZÀ-Öa-zà-ö]+)?)/i);
+  if(deMatch){ const iata=cityToIata(deMatch[1]); if(iata){ result.from=deMatch[1]; result.fromIata=iata; } }
+  const versMatch = message.match(/(?:à|a|vers|pour|to|destination)\s+([A-ZÀ-Öa-zà-ö]+(?:\s[A-ZÀ-Öa-zà-ö]+)?)/i);
+  if(versMatch){ const iata=cityToIata(versMatch[1]); if(iata){ result.to=versMatch[1]; result.toIata=iata; } }
+
+  // Si on a détecté des villes par le scan et pas encore attribuées
+  if(!result.from && !result.to && detectedCities.length>=2){
+    result.from = iataToCity(detectedCities[0].iata)||detectedCities[0].phrase;
+    result.fromIata = detectedCities[0].iata;
+    result.to = iataToCity(detectedCities[1].iata)||detectedCities[1].phrase;
+    result.toIata = detectedCities[1].iata;
+  } else if(!result.from && detectedCities.length>=1 && !result.fromIata){
+    // Contexte : si from est déjà dans state, c'est la destination
+    if(state.from){
+      result.to = iataToCity(detectedCities[0].iata)||detectedCities[0].phrase;
+      result.toIata = detectedCities[0].iata;
+    } else {
+      result.from = iataToCity(detectedCities[0].iata)||detectedCities[0].phrase;
+      result.fromIata = detectedCities[0].iata;
+    }
+  }
+
+  return result;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MOTEUR DE RÉPONSE — generateBotReply
+═══════════════════════════════════════════════════════════════ */
+function generateBotReply(s){
+  if(!s.from){
+    return {
+      text: "D'où partez-vous ?",
+      chips: ['Paris','Abidjan','Dakar','Lomé','Douala']
+    };
+  }
+  if(!s.to){
+    return {
+      text: `Parfait, départ de ${s.from}. Quelle est votre destination ?`,
+      chips: ['Paris','Dubai','Istanbul','New York','Lomé','Abidjan']
+        .filter(c=>normalize(c)!==normalize(s.from))
+    };
+  }
+  if(!s.departureDate){
+    return {
+      text: `${s.from} → ${s.to}, super trajet ! Quelle date de départ ?`,
+      chips: ['Demain','Dans 7 jours','Dans 15 jours','Dans 1 mois']
+    };
+  }
+  // Tout est là
+  return { text: null, chips: [] };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UI — CHAT RENDERER
+═══════════════════════════════════════════════════════════════ */
+
+function cleanAIResponse(text){
+  return text.replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+}
+
 function addBotMsg(text, cb){
-  const row=document.createElement('div'); row.className='brow-bot';
+  const clean = cleanAIResponse(text);
+  const row = document.createElement('div'); row.className='brow-bot';
   row.innerHTML=`<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><span class="msg-txt"></span><span class="cursor"></span></div>`;
   const ts=row.querySelector('.msg-txt'), cur=row.querySelector('.cursor');
   chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
-  let i=0; (function type(){ if(i<text.length){ts.textContent+=text[i++];chatMsgs.scrollTop=chatMsgs.scrollHeight;setTimeout(type,13);}else{cur.style.display='none';if(cb)cb();} })();
+  let i=0;
+  (function type(){
+    if(i<clean.length){ ts.textContent+=clean[i++]; chatMsgs.scrollTop=chatMsgs.scrollHeight; setTimeout(type,13); }
+    else { cur.style.display='none'; if(cb) cb(); }
+  })();
 }
+
+function addChips(chips, onSelect){
+  if(!chips||!chips.length) return;
+  const row = document.createElement('div'); row.className='chips-row'; row.id='chips-row-active';
+  row.innerHTML = chips.map(c=>`<button class="chip">${c}</button>`).join('');
+  chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
+  row.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      row.remove();
+      onSelect(btn.textContent);
+    });
+  });
+}
+
+function removeChips(){ const el=document.getElementById('chips-row-active'); if(el) el.remove(); }
 
 function addUserMsg(text){
   const row=document.createElement('div'); row.className='brow-usr';
-  row.innerHTML=`<div class="bubble-usr">${text}</div>`; chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
+  row.innerHTML=`<div class="bubble-usr">${cleanAIResponse(text)}</div>`;
+  chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
 }
 
 function showTyping(){
@@ -721,48 +1148,260 @@ function showTyping(){
 
 function hideTyping(){ const el=document.getElementById('typing'); if(el) el.remove(); }
 
+// Synchronise le state vers les inputs classiques
+function syncStateToInputs(){
+  if(state.from) document.getElementById('search-from').value = state.from;
+  if(state.to)   document.getElementById('search-to').value   = state.to;
+  if(state.fromIata) selectedIata.from = state.fromIata;
+  if(state.toIata)   selectedIata.to   = state.toIata;
+  if(state.departureDate){
+    const d = new Date(state.departureDate+'T00:00:00');
+    dpDeptDate = d;
+    document.getElementById('search-depart').value = fmtDate(d);
+  }
+  if(state.returnDate && state.tripType==='roundtrip'){
+    const d = new Date(state.returnDate+'T00:00:00');
+    dpRetDate = d;
+    document.getElementById('search-return').value = fmtDate(d);
+    setTripType('return');
+  }
+  if(state.passengers){
+    document.getElementById('search-pax').value = state.passengers;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MOTEUR LOGIQUE — handleUserMessage (DeepSeek + fallback local)
+═══════════════════════════════════════════════════════════════ */
+async function handleUserMessage(message){
+  if(message.length < 2){
+    addBotMsg("Donnez-moi un trajet (ex: Paris → Lomé).");
+    return;
+  }
+
+  showTyping();
+
+  // ── Appel DeepSeek via /api/chat ──
+  let apiSuccess = false;
+  try {
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message,
+        context: chatCtx.slice(-12),
+        lang,
+        collected: {
+          from:     state.from,
+          to:       state.to,
+          dates:    state.departureDate,
+          return_date: state.returnDate,
+          passengers: String(state.passengers||'')
+        },
+        tripType: state.tripType === 'roundtrip' ? 'return' : 'oneway'
+      })
+    });
+
+    if(r.ok){
+      const data = await r.json();
+
+      // Mise à jour state depuis la réponse DeepSeek
+      if(data.collected){
+        const c = data.collected;
+        if(c.from && c.from !== 'null'){
+          state.from = c.from;
+          state.fromIata = cityToIata(c.from) || await resolveIata(c.from);
+        }
+        if(c.to && c.to !== 'null'){
+          state.to = c.to;
+          state.toIata = cityToIata(c.to) || await resolveIata(c.to);
+        }
+        if(c.dates && c.dates !== 'null')       state.departureDate = normalizeDate(c.dates);
+        if(c.return_date && c.return_date !== 'null') state.returnDate = normalizeDate(c.return_date);
+        if(c.passengers && c.passengers !== 'null')   state.passengers = parseInt(c.passengers)||1;
+      }
+
+      hideTyping();
+
+      if(data.ready === true){
+        // DeepSeek dit que tout est prêt
+        if(data.reply) addBotMsg(data.reply);
+        chatCtx.push({role:'assistant', content: data.reply||''});
+        syncStateToInputs();
+        setTimeout(showResults, 900);
+        apiSuccess = true;
+        return;
+      }
+
+      if(data.reply){
+        // Réponse DeepSeek normale
+        addBotMsg(data.reply, ()=>{
+          // Chips contextuelles selon état actuel
+          const {chips} = generateBotReply(state);
+          if(chips.length && !state.from) addChips(chips, v=>processInput(v));
+          else if(chips.length && !state.to) addChips(chips, v=>processInput(v));
+        });
+        chatCtx.push({role:'assistant', content: data.reply});
+        syncStateToInputs();
+
+        // Vérification locale : si state complet après mise à jour DeepSeek
+        if(state.from && state.to && state.departureDate){
+          setTimeout(()=>{
+            if(!chatDone){
+              syncStateToInputs();
+              showResults();
+            }
+          }, 2200);
+        }
+        apiSuccess = true;
+        return;
+      }
+    }
+  } catch(e){
+    // API injoignable → fallback
+    console.warn('DeepSeek unavailable, using local parser:', e.message);
+  }
+
+  // ── FALLBACK : parser local si DeepSeek indisponible ──
+  hideTyping();
+  if(!apiSuccess){
+    const parsed = parseMessage(message);
+    if(parsed.from)          { state.from=parsed.from; state.fromIata=parsed.fromIata||cityToIata(parsed.from); }
+    if(parsed.to)            { state.to=parsed.to;     state.toIata=parsed.toIata||cityToIata(parsed.to); }
+    if(parsed.departureDate) state.departureDate = parsed.departureDate;
+    if(parsed.returnDate)    state.returnDate    = parsed.returnDate;
+    if(parsed.tripType)      state.tripType      = parsed.tripType;
+    if(parsed.passengers)    state.passengers    = parsed.passengers;
+
+    syncStateToInputs();
+
+    const { text, chips } = generateBotReply(state);
+    if(text === null){
+      showResults();
+    } else {
+      addBotMsg(text, ()=>{ if(chips.length) addChips(chips, v=>processInput(v)); });
+      chatCtx.push({role:'assistant', content:text});
+    }
+  }
+}
+
+/* ─── Normalise une chaîne de date vers YYYY-MM-DD ─── */
+function normalizeDate(str){
+  if(!str) return null;
+  // Déjà ISO
+  if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  // Essai parseDate local
+  const local = parseDate(str);
+  if(local) return local;
+  // Essai Date native
+  const d = new Date(str);
+  if(!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+  return null;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SHOW RESULTS — buildAviasalesLink
+═══════════════════════════════════════════════════════════════ */
+function buildAviasalesLink(s){
+  const fi = s.fromIata || 'XXX';
+  const ti = s.toIata   || 'XXX';
+  let dep = '';
+  if(s.departureDate){
+    const d = new Date(s.departureDate+'T00:00:00');
+    dep = `${String(d.getDate()).padStart(2,'0')}${String(d.getMonth()+1).padStart(2,'0')}`;
+  } else {
+    const d = new Date(); d.setDate(d.getDate()+7);
+    dep = `${String(d.getDate()).padStart(2,'0')}${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+  const pax = s.passengers || 1;
+  let url = `https://www.aviasales.com/search/${fi}${dep}${ti}${pax}`;
+  if(s.returnDate && s.tripType==='roundtrip'){
+    const r = new Date(s.returnDate+'T00:00:00');
+    const ret = `${String(r.getDate()).padStart(2,'0')}${String(r.getMonth()+1).padStart(2,'0')}`;
+    url = `https://www.aviasales.com/search/${fi}${dep}${ti}${ret}${pax}`;
+  }
+  return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
+}
+
+function showResults(){
+  chatDone = true;
+  const fi = state.fromIata || 'XXX';
+  const ti = state.toIata   || 'XXX';
+  aviasalesLnk.href = buildAviasalesLink(state);
+  // Fallback aussi sur buildAviasalesURL existant
+  try { aviasalesLnk.href = buildAviasalesURL(fi, ti); } catch(_){}
+
+  const fromLabel = state.from || fi;
+  const toLabel   = state.to   || ti;
+  const dateLabel = state.departureDate
+    ? new Date(state.departureDate+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})
+    : '';
+
+  const msg = `✅ J'ai trouvé des vols pour votre trajet !\n${fromLabel} → ${toLabel}${dateLabel ? ' · '+dateLabel : ''}${state.passengers>1 ? ' · '+state.passengers+' passagers' : ''}`;
+  addBotMsg(msg);
+  chatCtx.push({role:'assistant',content:msg});
+
+  resultMsgEl.textContent = `Vols ${fromLabel} → ${toLabel} trouvés`;
+  resultCtaEl.classList.add('show');
+  syncStateToInputs();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   POINT D'ENTRÉE — processInput
+═══════════════════════════════════════════════════════════════ */
+function processInput(text){
+  if(!text || text.trim().length < 2) return;
+  removeChips();
+  addUserMsg(text);
+  chatCtx.push({role:'user', content:text});
+  handleUserMessage(text);
+}
+
 async function launchSearch(){
-  const fi=collectedData.fromIata||await resolveIata(collectedData.from);
-  const ti=collectedData.toIata||await resolveIata(collectedData.to);
-  if(!fi||!ti) return;
-  aviasalesLnk.href=buildAviasalesURL(fi, ti);
-  resultMsgEl.textContent='Meilleurs vols trouvés pour vous';
-  resultCtaEl.classList.add('show'); chatDone=true;
+  showResults();
 }
 
 async function resetChat(){
-  collectedData={from:'',fromIata:'',to:'',toIata:'',passengers:'1'}; selectedIata.from=''; selectedIata.to='';
-  dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML='';
-  const q='Bonjour ! Je suis Sofia, votre agente de voyage. D\'où souhaitez-vous partir ?';
-  addBotMsg(q); chatCtx.push({role:'assistant',content:q});
+  state = { from:null, fromIata:null, to:null, toIata:null, departureDate:null, returnDate:null, tripType:'oneway', passengers:1 };
+  selectedIata.from=''; selectedIata.to='';
+  dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false;
+  resultCtaEl.classList.remove('show'); chatMsgs.innerHTML='';
+
+  // Message de bienvenue
+  const welcome = "Bonjour ! Je suis Sofia 👋 Dites-moi votre trajet — par exemple : \"Paris → Abidjan, 15 juin\"";
+  addBotMsg(welcome, ()=>{
+    addChips(['Paris → Lomé','Paris → Abidjan','Paris → Dakar','Paris → Dubai'], v => processInput(v));
+  });
+  chatCtx.push({role:'assistant', content:welcome});
   chatInput.disabled=false; chatSendBtn.disabled=false; chatInput.value='';
+
+  // Désactiver send si vide
+  chatSendBtn.disabled = true;
 }
 
 async function handleSend(){
-  const text=chatInput.value.trim(); if(!text) return;
-  addUserMsg(text); chatCtx.push({role:'user',content:text});
-  chatInput.value=''; chatInput.disabled=true; chatSendBtn.disabled=true;
-  showTyping();
-  try{
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,context:chatCtx.slice(-10),lang,collected:collectedData})});
-    hideTyping();
-    if(!r.ok) throw new Error();
-    const res=await r.json();
-    if(!res?.reply){ addBotMsg('Pouvez-vous me préciser votre ville de départ et votre destination ?'); chatInput.disabled=false; chatSendBtn.disabled=false; return; }
-    if(res.collected){ const c=res.collected; if(c.from){collectedData.from=c.from; collectedData.fromIata=await resolveIata(c.from);} if(c.to){collectedData.to=c.to; collectedData.toIata=await resolveIata(c.to);} if(c.dates) collectedData.dates=c.dates; if(c.passengers) collectedData.passengers=c.passengers; }
-    if(res.ready){ addBotMsg(res.reply, ()=>setTimeout(launchSearch,700)); chatCtx.push({role:'assistant',content:res.reply}); }
-    else { addBotMsg(res.reply); chatCtx.push({role:'assistant',content:res.reply}); }
-  }catch(e){ hideTyping(); addBotMsg('Désolé, je rencontre un problème technique. Veuillez réessayer dans un instant.'); }
-  chatInput.disabled=false; chatSendBtn.disabled=false; chatInput.focus();
+  const text = chatInput.value.trim();
+  if(!text) return;
+  chatInput.value='';
+  processInput(text);
 }
+
 
 function fillAndScroll(from, to, toIata){
   if(from) document.getElementById('search-from').value=from;
   if(to){ document.getElementById('search-to').value=to; if(toIata) selectedIata.to=toIata; }
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
-  setTimeout(async()=>{ collectedData={from:'',fromIata:'',to:'',toIata:'',passengers:'1'}; chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML='';
-    if(to){ collectedData.to=to; collectedData.toIata=toIata||await resolveIata(to); selectedIata.to=toIata||collectedData.toIata;
-      const m=`Super choix ! De quelle ville partez-vous pour ${to} ?`; chatCtx=[{role:'assistant',content:m}]; addBotMsg(m); }
+  setTimeout(async()=>{
+    state = { from:null, fromIata:null, to:null, toIata:null, departureDate:null, returnDate:null, tripType:'oneway', passengers:1 };
+    chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
+    if(to){
+      state.to = to; state.toIata = toIata || cityToIata(to) || await resolveIata(to);
+      selectedIata.to = state.toIata || '';
+      const m = `Super choix ! De quelle ville partez-vous pour ${to} ?`;
+      const chips = ['Paris','Abidjan','Dakar','Lomé','Douala'].filter(c=>normalize(c)!==normalize(to));
+      chatCtx = [{role:'assistant',content:m}];
+      addBotMsg(m, ()=>addChips(chips, v=>processInput(v)));
+    }
   },500);
 }
 
@@ -790,6 +1429,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   resetChat();
   chatSendBtn.addEventListener('click', handleSend);
   chatInput.addEventListener('keypress', e=>{ if(e.key==='Enter'){e.preventDefault();handleSend();} });
+  // Désactiver/activer send selon input
+  chatInput.addEventListener('input', ()=>{ chatSendBtn.disabled = chatInput.value.trim().length < 2; });
   
   document.getElementById('lang-btn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('lang-dd').classList.toggle('open'); });
   document.querySelectorAll('.lang-opt').forEach(b=>b.addEventListener('click',()=>{ lang=b.dataset.lang; localStorage.setItem('midzo_lang',lang); rebuildModals(lang); document.getElementById('lang-flag').textContent=lang==='en'?'🇬🇧':lang==='ru'?'🇷🇺':'🇫🇷'; document.getElementById('lang-dd').classList.remove('open'); resetChat(); }));
