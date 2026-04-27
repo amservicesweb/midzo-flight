@@ -813,8 +813,59 @@ function addUserMessage(text){ const row=document.createElement('div'); row.clas
 function showTypingIndicator(){ const row=document.createElement('div'); row.className='bubble-row-bot'; row.id='typing-indicator'; row.innerHTML=`<div class="bot-av"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`; messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
 function removeTypingIndicator(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 function addChips(options){ const row=document.createElement('div'); row.className='bubble-row-bot'; const chips=document.createElement('div'); chips.className='chips-row'; options.forEach(opt=>{ const c=document.createElement('button'); c.className='chip'; c.textContent=opt; c.onclick=()=>{ chips.remove(); row.remove(); inputField.value=opt; handleUserInput(); }; chips.appendChild(c); }); row.appendChild(chips); messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
-function launchSearch(){ const fromIata=selectedIata.from||collectedData.fromIata||getIataCode(collectedData.from), toIata=selectedIata.to||collectedData.toIata||getIataCode(collectedData.to); if(!fromIata||!toIata||!collectedData.from||!collectedData.to) return; const url=generateAviasalesLink(fromIata,toIata); aviasalesLink.href=url; resultMsg.textContent=t('ai_result_prefix'); resultCta.classList.add('show'); window.chatComplete=true; }
-async function resetChat(){ collectedData={from:'',fromIata:'',to:'',toIata:'',dates:'',returnDate:'',passengers:'1',budget:''}; chatContext=[]; resultCta.classList.remove('show'); window.chatComplete=false; messagesDiv.innerHTML=''; const first=t('agent_q1'); addBotMessage(first); chatContext.push({role:'assistant',content:first}); inputField.disabled=false; sendBtn.disabled=false; inputField.value=''; }
+function launchSearch(){
+  const fromIata = selectedIata.from || collectedData.fromIata || getIataCode(collectedData.from);
+  const toIata   = selectedIata.to   || collectedData.toIata   || getIataCode(collectedData.to);
+  if(!fromIata || !toIata || !collectedData.from || !collectedData.to) return;
+
+  // Build dates from collectedData (chat) — these override the calendar picker
+  const pax = parseInt(collectedData.passengers) || 1;
+
+  // Parse dates from collectedData.dates string if dpStart not set by picker
+  let departDate = '';
+  let returnDate = '';
+
+  if(dpStart){
+    const y=dpStart.getFullYear(),m=String(dpStart.getMonth()+1).padStart(2,'0'),d=String(dpStart.getDate()).padStart(2,'0');
+    departDate=`${y}-${m}-${d}`;
+  } else if(collectedData.dates){
+    // Use today + 7 days as fallback if we have a date string but can't parse it
+    const d=new Date(); d.setDate(d.getDate()+7);
+    departDate=d.toISOString().split('T')[0];
+  } else {
+    const d=new Date(); d.setDate(d.getDate()+7);
+    departDate=d.toISOString().split('T')[0];
+  }
+
+  if(dpEnd && tripType==='return'){
+    const y=dpEnd.getFullYear(),m=String(dpEnd.getMonth()+1).padStart(2,'0'),d=String(dpEnd.getDate()).padStart(2,'0');
+    returnDate=`${y}-${m}-${d}`;
+  }
+
+  let url=`https://www.aviasales.com/search?origin=${fromIata}&destination=${toIata}&depart_date=${departDate}&adults=${pax}`;
+  if(returnDate) url+=`&return_date=${returnDate}`;
+  const affiliateUrl=`https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
+
+  aviasalesLink.href=affiliateUrl;
+  resultMsg.textContent=t('ai_result_prefix');
+  resultCta.classList.add('show');
+  window.chatComplete=true;
+}
+async function resetChat(){
+  collectedData={from:'',fromIata:'',to:'',toIata:'',dates:'',returnDate:'',passengers:'1',budget:''};
+  chatContext=[];
+  resultCta.classList.remove('show');
+  window.chatComplete=false;
+  messagesDiv.innerHTML='';
+  // Reset calendar so old dates don't contaminate new search
+  dpStart=null; dpEnd=null;
+  document.getElementById('search-dates').value='';
+  const rd=document.getElementById('search-return-date'); if(rd) rd.value='';
+  const first=t('agent_q1');
+  addBotMessage(first);
+  chatContext.push({role:'assistant',content:first});
+  inputField.disabled=false; sendBtn.disabled=false; inputField.value='';
+}
 async function handleUserInput(){
   const text=inputField.value.trim(); if(!text) return;
   if(window.chatComplete){ const greetings=['salut','bonjour','hello','hi','hey','привет','здравствуйте']; if(greetings.some(g=>text.toLowerCase().startsWith(g))){resetChat();return;} }
