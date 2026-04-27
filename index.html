@@ -764,50 +764,49 @@ function buildAviasalesURL(fromIata, toIata){
 }
 
 document.getElementById('btn-search').addEventListener('click', async()=>{
-  const from=document.getElementById('search-from').value.trim(), to=document.getElementById('search-to').value.trim();
-  const pax=document.getElementById('search-pax').value||'1';
+  const from=document.getElementById('search-from').value.trim();
+  const to=document.getElementById('search-to').value.trim();
+  const pax=parseInt(document.getElementById('search-pax').value)||1;
   if(!from||!to){ alert('Veuillez indiquer une ville de départ et une destination.'); return; }
-  if(!selectedIata.from) selectedIata.from=await resolveIata(from);
-  if(!selectedIata.to) selectedIata.to=await resolveIata(to);
-  // FIX 4 — utiliser state unique
+  if(!selectedIata.from) selectedIata.from = findIata(from) || await resolveIata(from);
+  if(!selectedIata.to)   selectedIata.to   = findIata(to)   || await resolveIata(to);
   state = {
-    from, fromIata: selectedIata.from||from.substring(0,3).toUpperCase(),
-    to, toIata: selectedIata.to||to.substring(0,3).toUpperCase(),
+    from, fromIata: selectedIata.from || from.substring(0,3).toUpperCase(),
+    to,   toIata:   selectedIata.to   || to.substring(0,3).toUpperCase(),
     departureDate: dpDeptDate ? dpDeptDate.toISOString().split('T')[0] : null,
-    returnDate: dpRetDate ? dpRetDate.toISOString().split('T')[0] : null,
-    tripType: tripType==='return' ? 'roundtrip' : 'oneway',
-    passengers: pax
+    returnDate:    dpRetDate  ? dpRetDate.toISOString().split('T')[0]  : null,
+    tripType:  tripType==='return' ? 'roundtrip' : 'oneway',
+    passengers: pax, budget: null
   };
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
   setTimeout(async()=>{
     chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
-    addBotMsg(`Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)...`);
-    setTimeout(async()=>{ await launchSearch(); }, 800);
-    chatInput.disabled=false; chatSendBtn.disabled=false;
+    addBotMsg(`Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)…`);
+    setTimeout(()=>showResults(), 800);
+    chatInput.disabled=false; chatSendBtn.disabled=true;
   },400);
 });
 
 /* ══════════════════════════════════════════════════════════════
-   STATE CENTRAL
+   STATE CENTRAL — source unique de vérité
 ═══════════════════════════════════════════════════════════════ */
 let state = {
-  from: null,         // nom ville départ
-  fromIata: null,     // code IATA
-  to: null,           // nom ville arrivée
-  toIata: null,
-  departureDate: null, // YYYY-MM-DD
-  returnDate: null,
-  tripType: 'oneway', // 'oneway' | 'roundtrip'
-  passengers: 1
+  from:         null,  // label ville départ (ex: "Moscou")
+  fromIata:     null,  // code IATA          (ex: "SVO")
+  to:           null,  // label ville arrivée
+  toIata:       null,
+  departureDate:null,  // YYYY-MM-DD
+  returnDate:   null,  // YYYY-MM-DD ou null
+  passengers:   1,
+  budget:       null,
+  tripType:     'oneway' // 'oneway' | 'roundtrip'
 };
-let chatCtx = [];
+let chatCtx  = [];
 let chatDone = false;
 
 /* ══════════════════════════════════════════════════════════════
-   PARSER LOCAL — détection sans API
+   CITY → IATA  (CITY_MAP + CITIES fallback + /api/cities)
 ═══════════════════════════════════════════════════════════════ */
-
-// Table de mapping villes → IATA (étendue)
 const CITY_MAP = {
   // France
   'paris':'CDG','cdg':'CDG','roissy':'CDG',
@@ -818,11 +817,12 @@ const CITY_MAP = {
   'toulouse':'TLS','tls':'TLS',
   'nantes':'NTE','nte':'NTE',
   'strasbourg':'SXB','sxb':'SXB',
+  'lille':'LIL','lil':'LIL',
+  'montpellier':'MPL','mpl':'MPL',
   // Afrique
   'abidjan':'ABJ','abj':'ABJ',
   'dakar':'DSS','dss':'DSS',
   'lome':'LFW','lomé':'LFW','lfw':'LFW',
-  'lagos':'LOS','los':'LOS',
   'nairobi':'NBO','nbo':'NBO',
   'casablanca':'CMN','cmn':'CMN',
   'tunis':'TUN','tun':'TUN',
@@ -834,12 +834,29 @@ const CITY_MAP = {
   'libreville':'LBV','lbv':'LBV',
   'yaounde':'NSI','yaoundé':'NSI','nsi':'NSI',
   'kinshasa':'FIH','fih':'FIH',
-  'addis abeba':'ADD','add':'ADD','addis':'ADD',
+  'addis abeba':'ADD','addis ababa':'ADD','add':'ADD','addis':'ADD',
   'johannesburg':'JNB','jnb':'JNB',
   'cape town':'CPT','cpt':'CPT',
-  'alger':'ALG','alg':'ALG',
+  'alger':'ALG','algiers':'ALG','alg':'ALG',
   'rabat':'RBA','rba':'RBA',
   'cairo':'CAI','le caire':'CAI','cai':'CAI',
+  'lagos':'LOS','los':'LOS',
+  'kigali':'KGL','kgl':'KGL',
+  'kampala':'EBB','ebb':'EBB',
+  'dar es salaam':'DAR','dar':'DAR',
+  'maputo':'MPM','mpm':'MPM',
+  'luanda':'LAD','lad':'LAD',
+  'conakry':'CKY','cky':'CKY',
+  'freetown':'FNA','fna':'FNA',
+  'monrovia':'ROB','rob':'ROB',
+  'abuja':'ABV','abv':'ABV',
+  'kano':'KAN','kan':'KAN',
+  'mombasa':'MBA','mba':'MBA',
+  'antananarivo':'TNR','tnr':'TNR',
+  'nosy be':'NOS','nos':'NOS',
+  'reunion':'RUN','run':'RUN','saint-denis':'RUN',
+  'ile maurice':'MRU','mauritius':'MRU','mru':'MRU',
+  'dakar':'DSS','dss':'DSS',
   // Europe
   'londres':'LHR','london':'LHR','lhr':'LHR',
   'amsterdam':'AMS','ams':'AMS',
@@ -851,495 +868,451 @@ const CITY_MAP = {
   'milan':'MXP','mxp':'MXP',
   'lisbonne':'LIS','lisbon':'LIS','lis':'LIS',
   'geneve':'GVA','genève':'GVA','gva':'GVA',
-  'zurich':'ZRH','zurich':'ZRH','zrh':'ZRH',
+  'zurich':'ZRH','zrh':'ZRH',
   'vienne':'VIE','vienna':'VIE','vie':'VIE',
-  // Moyen-Orient / Asie
+  'copenhague':'CPH','copenhagen':'CPH','cph':'CPH',
+  'stockholm':'ARN','arn':'ARN',
+  'oslo':'OSL','osl':'OSL',
+  'helsinki':'HEL','hel':'HEL',
+  'varsovie':'WAW','warsaw':'WAW','waw':'WAW',
+  'prague':'PRG','prg':'PRG',
+  'budapest':'BUD','bud':'BUD',
+  'bucarest':'OTP','bucharest':'OTP','otp':'OTP',
+  'athenes':'ATH','athens':'ATH','ath':'ATH',
+  'munich':'MUC','muc':'MUC',
+  'francfort':'FRA','frankfurt':'FRA','fra':'FRA',
+  // Moyen-Orient
   'dubai':'DXB','dubaï':'DXB','dxb':'DXB',
   'istanbul':'IST','ist':'IST',
   'doha':'DOH','doh':'DOH',
   'abu dhabi':'AUH','auh':'AUH',
   'riyad':'RUH','riyadh':'RUH','ruh':'RUH',
+  'koweït':'KWI','kuwait':'KWI','kwi':'KWI',
+  'beyrouth':'BEY','beirut':'BEY','bey':'BEY',
+  'amman':'AMM','amm':'AMM',
+  'tel aviv':'TLV','tlv':'TLV',
+  'mascate':'MCT','muscat':'MCT','mct':'MCT',
+  // Asie
+  'bali':'DPS','denpasar':'DPS','dps':'DPS',
+  'jakarta':'CGK','cgk':'CGK',
+  'kuala lumpur':'KUL','kul':'KUL','kl':'KUL',
+  'manille':'MNL','manila':'MNL','mnl':'MNL',
+  'ho chi minh':'SGN','saigon':'SGN','sgn':'SGN',
+  'hanoi':'HAN','han':'HAN',
+  'mumbai':'BOM','bombay':'BOM','bom':'BOM',
+  'delhi':'DEL','del':'DEL','new delhi':'DEL',
+  'seoul':'ICN','icn':'ICN',
+  'osaka':'KIX','kix':'KIX',
   'bangkok':'BKK','bkk':'BKK',
   'tokyo':'HND','hnd':'HND',
   'singapour':'SIN','singapore':'SIN','sin':'SIN',
   'pekin':'PEK','beijing':'PEK','pékin':'PEK','pek':'PEK',
   'shanghai':'PVG','pvg':'PVG',
   'hong kong':'HKG','hkg':'HKG',
+  'taipei':'TPE','tpe':'TPE',
+  'colombo':'CMB','cmb':'CMB',
+  'kathmandu':'KTM','ktm':'KTM',
+  'dhaka':'DAC','dac':'DAC',
+  'karachi':'KHI','khi':'KHI',
+  'lahore':'LHE','lhe':'LHE',
+  'islamabad':'ISB','isb':'ISB',
   // Amériques
   'new york':'JFK','jfk':'JFK','new-york':'JFK',
   'miami':'MIA','mia':'MIA',
   'los angeles':'LAX','lax':'LAX',
+  'chicago':'ORD','ord':'ORD',
+  'houston':'IAH','iah':'IAH',
   'montreal':'YUL','montréal':'YUL','yul':'YUL',
   'toronto':'YYZ','yyz':'YYZ',
+  'vancouver':'YVR','yvr':'YVR',
   'sao paulo':'GRU','são paulo':'GRU','gru':'GRU',
+  'rio de janeiro':'GIG','gig':'GIG',
+  'buenos aires':'EZE','eze':'EZE',
+  'lima':'LIM','lim':'LIM',
+  'bogota':'BOG','bog':'BOG',
+  'mexico':'MEX','mexico city':'MEX','mex':'MEX',
   // Russie / CEI
   'moscou':'SVO','moscow':'SVO','svo':'SVO',
-  'saint petersbourg':'LED','led':'LED',
+  'krasnodar':'KRR','krr':'KRR',
+  'saint petersbourg':'LED','saint-petersbourg':'LED','led':'LED',
+  'novosibirsk':'OVB','ovb':'OVB',
+  'ekaterinbourg':'SVX','svx':'SVX',
+  // Océanie
+  'sydney':'SYD','syd':'SYD',
+  'melbourne':'MEL','mel':'MEL',
+  'brisbane':'BNE','bne':'BNE',
+  'auckland':'AKL','akl':'AKL',
 };
 
 function normalize(str){
-  return str.toLowerCase()
+  return (str||'').toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[''`]/g,'')
-    .trim();
+    .replace(/[''`]/g,'').trim();
 }
 
-function cityToIata(name){
-  if(!name) return null;
-  const n = normalize(name);
+/**
+ * findIata(cityName) → code IATA ou null
+ * Cherche dans CITY_MAP puis dans le tableau CITIES (autocomplete)
+ */
+function findIata(cityName){
+  if(!cityName) return null;
+  const n = normalize(cityName);
+  // 1. CITY_MAP exact
   if(CITY_MAP[n]) return CITY_MAP[n];
-  // Cherche dans CITIES array (autocomplete existant)
+  // 2. IATA direct (3 lettres majuscules)
+  if(/^[A-Z]{3}$/.test(cityName.toUpperCase())) return cityName.toUpperCase();
+  // 3. CITIES array
   const found = CITIES.find(c =>
     normalize(c.city) === n ||
     c.iata.toLowerCase() === n
   );
-  return found ? found.iata : null;
+  if(found) return found.iata;
+  // 4. Préfixe dans CITIES
+  const partial = CITIES.find(c => normalize(c.city).startsWith(n) && n.length >= 3);
+  return partial ? partial.iata : null;
 }
 
-function iataToCity(iata){
-  if(!iata) return iata;
+function iataToLabel(iata){
+  if(!iata) return null;
   const found = CITIES.find(c => c.iata === iata.toUpperCase());
-  return found ? found.city : iata;
+  if(found) return found.city;
+  // Cherche dans CITY_MAP inversé
+  for(const [k,v] of Object.entries(CITY_MAP)){
+    if(v === iata.toUpperCase() && k.length > 3) return k.charAt(0).toUpperCase()+k.slice(1);
+  }
+  return iata;
 }
 
-// Détection de date dans un texte naturel
+const iataCache = {};
+async function resolveIata(cityName){
+  if(!cityName) return null;
+  const n = normalize(cityName);
+  if(iataCache[n]) return iataCache[n];
+  // Local first
+  const local = findIata(cityName);
+  if(local){ iataCache[n]=local; return local; }
+  // /api/cities fallback
+  try {
+    const r = await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
+    if(r.ok){
+      const d = await r.json();
+      if(d.locations?.length){
+        const iata = d.locations[0].iata;
+        iataCache[n]=iata; return iata;
+      }
+    }
+  } catch(_){}
+  return null;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   AUTOCOMPLETE — /api/cities avec debounce + fallback local
+═══════════════════════════════════════════════════════════════ */
+async function searchCities(q){
+  try {
+    const r = await fetch(`/api/cities?q=${encodeURIComponent(q)}`);
+    if(r.ok){
+      const d = await r.json();
+      if(d.locations?.length){
+        return d.locations.map(a=>({
+          city:    a.city || a.name || a.iata,
+          country: a.country || '',
+          iata:    a.iata,
+          flag:    a.flag || countryFlag(a.country_code||a.countryCode||'')
+        }));
+      }
+    }
+  } catch(_){}
+  // Fallback liste statique
+  const nq = normalize(q);
+  return CITIES.filter(c=>
+    normalize(c.city).startsWith(nq) || c.iata.toLowerCase().startsWith(nq)
+  ).slice(0,8);
+}
+
+function countryFlag(code){
+  if(!code||code.length!==2) return '🌍';
+  return String.fromCodePoint(...[...code.toUpperCase()].map(c=>127397+c.charCodeAt(0)));
+}
+
+function renderAC(list, results, input, field){
+  if(!results.length){ list.style.display='none'; return; }
+  list.innerHTML='';
+  results.forEach(c=>{
+    const item = document.createElement('div');
+    item.className = 'ac-item';
+    item.dataset.city = c.city;
+    item.dataset.iata = c.iata;
+    item.innerHTML = `<span class="ac-iata">${c.iata}</span><span>${c.flag||'🌍'}</span><div><div class="ac-city"></div><div class="ac-country"></div></div>`;
+    item.querySelector('.ac-city').textContent    = c.city;
+    item.querySelector('.ac-country').textContent = c.country;
+    item.addEventListener('mousedown', e=>{
+      e.preventDefault();
+      input.value = c.city;
+      selectedIata[field] = c.iata;
+      if(field==='from'){ state.from=c.city; state.fromIata=c.iata; }
+      if(field==='to')  { state.to=c.city;   state.toIata=c.iata; }
+      list.style.display='none';
+    });
+    list.appendChild(item);
+  });
+  list.style.display='block';
+}
+
+const _acTimers = {};
+function setupAC(inputId, listId, field){
+  const input = document.getElementById(inputId);
+  const list  = document.getElementById(listId);
+  input.addEventListener('input', ()=>{
+    const q = input.value.trim();
+    if(q.length < 1){ list.style.display='none'; return; }
+    clearTimeout(_acTimers[field]);
+    _acTimers[field] = setTimeout(async()=>{
+      renderAC(list, await searchCities(q), input, field);
+    }, 200);
+  });
+  input.addEventListener('blur',  ()=>setTimeout(()=>list.style.display='none', 150));
+  input.addEventListener('keydown',e=>{ if(e.key==='Escape') list.style.display='none'; });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DATE HELPERS
+═══════════════════════════════════════════════════════════════ */
 function parseDate(text){
   const n = normalize(text);
-  const today = new Date();
+  const today = new Date(); today.setHours(0,0,0,0);
 
-  // "demain"
   if(/\bdemain\b/.test(n)){
-    const d = new Date(today); d.setDate(d.getDate()+1);
-    return d.toISOString().split('T')[0];
+    const d=new Date(today); d.setDate(d.getDate()+1); return d.toISOString().split('T')[0];
   }
-  // "après-demain"
-  if(/apr[eè]s.demain/.test(n)){
-    const d = new Date(today); d.setDate(d.getDate()+2);
-    return d.toISOString().split('T')[0];
+  if(/apres.demain|après.demain/.test(n)){
+    const d=new Date(today); d.setDate(d.getDate()+2); return d.toISOString().split('T')[0];
   }
-  // "dans X jours"
   const inDays = n.match(/dans\s+(\d+)\s+jours?/);
   if(inDays){
-    const d = new Date(today); d.setDate(d.getDate()+parseInt(inDays[1]));
+    const d=new Date(today); d.setDate(d.getDate()+parseInt(inDays[1]));
     return d.toISOString().split('T')[0];
   }
-  // ISO direct YYYY-MM-DD
-  const iso = text.match(/\b(20\d{2})[.\-\/](0?[1-9]|1[0-2])[.\-\/](0?[1-9]|[12]\d|3[01])\b/);
+  const inMonths = n.match(/dans\s+(\d+)\s+mois/);
+  if(inMonths){
+    const d=new Date(today); d.setMonth(d.getMonth()+parseInt(inMonths[1]));
+    return d.toISOString().split('T')[0];
+  }
+  // ISO YYYY-MM-DD
+  const iso = text.match(/\b(20\d{2})[-\/](0?[1-9]|1[0-2])[-\/](0?[1-9]|[12]\d|3[01])\b/);
   if(iso) return `${iso[1]}-${iso[2].padStart(2,'0')}-${iso[3].padStart(2,'0')}`;
 
-  // "30 avril 2026" / "30/04" / "30-04"
-  const MONTHS_FR = {
-    'jan':1,'janv':1,'janvier':1,
-    'fev':2,'fevr':2,'février':2,'fevrier':2,
-    'mar':3,'mars':3,
-    'avr':4,'avril':4,
-    'mai':5,
-    'jun':6,'juin':6,
-    'jul':7,'juil':7,'juillet':7,
-    'aou':8,'août':8,'aout':8,
-    'sep':9,'sept':9,'septembre':9,
-    'oct':10,'octobre':10,
-    'nov':11,'novembre':11,
-    'dec':12,'déc':12,'decembre':12,'décembre':12
+  const MONS = {
+    jan:1,janv:1,janvier:1,fev:2,fevr:2,fevrier:2,
+    mar:3,mars:3,avr:4,avril:4,mai:5,
+    jun:6,juin:6,jul:7,juil:7,juillet:7,
+    aou:8,aout:8,sep:9,sept:9,septembre:9,
+    oct:10,octobre:10,nov:11,novembre:11,
+    dec:12,decembre:12,
+    january:1,february:2,march:3,april:4,may:5,june:6,
+    july:7,august:8,september:9,october:10,november:11,december:12
   };
-  const MONTHS_EN = {
-    'jan':1,'january':1,'feb':2,'february':2,'mar':3,'march':3,
-    'apr':4,'april':4,'may':5,'jun':6,'june':6,'jul':7,'july':7,
-    'aug':8,'august':8,'sep':9,'september':9,'oct':10,'october':10,
-    'nov':11,'november':11,'dec':12,'december':12
-  };
-  const allMonths = {...MONTHS_FR,...MONTHS_EN};
-
-  // "15 juin" / "15 juin 2026"
-  const dmatch = n.match(/\b(\d{1,2})\s+([a-zéèûôàâê]+)(?:\s+(20\d{2}))?\b/);
-  if(dmatch){
-    const day = parseInt(dmatch[1]);
-    const mon = allMonths[dmatch[2]];
-    if(mon && day>=1 && day<=31){
-      const year = dmatch[3] ? parseInt(dmatch[3]) : today.getFullYear();
-      const candidate = new Date(year, mon-1, day);
-      if(candidate < today) candidate.setFullYear(candidate.getFullYear()+1);
-      return candidate.toISOString().split('T')[0];
+  // "30 avril 2026" ou "30 avril"
+  const dm = n.match(/\b(\d{1,2})\s+([a-z]{3,10})(?:\s+(20\d{2}))?\b/);
+  if(dm){
+    const day=parseInt(dm[1]), mon=MONS[dm[2]];
+    if(mon&&day>=1&&day<=31){
+      const yr = dm[3]?parseInt(dm[3]):today.getFullYear();
+      const c = new Date(yr,mon-1,day);
+      if(c<today) c.setFullYear(c.getFullYear()+1);
+      return c.toISOString().split('T')[0];
     }
   }
-  // "15/04" ou "15/04/2026"
-  const slashDate = text.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?\b/);
-  if(slashDate){
-    const day=parseInt(slashDate[1]),mon=parseInt(slashDate[2]);
+  // "30/04" ou "30/04/2026"
+  const sl = text.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?\b/);
+  if(sl){
+    const day=parseInt(sl[1]),mon=parseInt(sl[2]);
     if(day>=1&&day<=31&&mon>=1&&mon<=12){
-      const year=slashDate[3]?parseInt(slashDate[3]):today.getFullYear();
-      const candidate=new Date(year,mon-1,day);
-      if(candidate<today) candidate.setFullYear(candidate.getFullYear()+1);
-      return candidate.toISOString().split('T')[0];
+      const yr=sl[3]?parseInt(sl[3]):today.getFullYear();
+      const c=new Date(yr,mon-1,day);
+      if(c<today) c.setFullYear(c.getFullYear()+1);
+      return c.toISOString().split('T')[0];
     }
   }
   return null;
 }
 
-// Détection passagers
-function parsePassengers(text){
-  const n = normalize(text);
-  const m = n.match(/(\d+)\s*(passager|voyageur|adulte|personne|pax|ticket)/);
-  if(m) return parseInt(m[1]);
-  if(/\bseul\b|\b1\s*(personne|pax)?\b/.test(n)) return 1;
-  return null;
-}
-
-// Détection tripType
-function parseTripType(text){
-  const n = normalize(text);
-  if(/aller.simple|sans.retour|one.way|pas.de.retour/.test(n)) return 'oneway';
-  if(/aller.retour|retour|round.trip/.test(n)) return 'roundtrip';
-  return null;
-}
-
-/**
- * parseMessage(message) → extrait villes, dates, passagers, tripType
- * Retourne un objet partiel avec les champs détectés
- */
-function parseMessage(message){
-  const result = {};
-  const n = normalize(message);
-
-  // Détection tripType en premier (pour ne pas polluer la détection villes)
-  const tt = parseTripType(message);
-  if(tt) result.tripType = tt;
-
-  // Détection passagers
-  const pax = parsePassengers(message);
-  if(pax) result.passengers = pax;
-
-  // Détection dates
-  const date = parseDate(message);
-  if(date) result.departureDate = date;
-
-  // Détection villes — cherche dans CITY_MAP et CITIES
-  // On découpe le message en mots/groupes et on cherche des matches
-  const detectedCities = [];
-
-  // Essai groupes de 3 mots
-  const words = n.split(/\s+/);
-  for(let i=0; i<words.length; i++){
-    for(let len=3; len>=1; len--){
-      const phrase = words.slice(i,i+len).join(' ');
-      // Ignore les mots parasites
-      if(['pour','vers','depuis','de','à','a','en','au','aux','le','la','les','je','veux','aller','partir','voler','vol','vols','un','une','des','du','et','avec','pas','retour','simple','date','demain','juin','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre','janvier','fevrier','aujourd'].includes(phrase)) continue;
-      const iata = cityToIata(phrase) ||
-        (CITIES.find(c=>normalize(c.city).startsWith(phrase)&&phrase.length>=3)?.iata);
-      if(iata && !detectedCities.find(c=>c.iata===iata)){
-        detectedCities.push({phrase, iata, pos:i});
-        i += len-1; break;
-      }
-    }
-  }
-
-  // Patterns directionnels : "de X à Y", "X → Y", "X - Y", "X pour Y"
-  const arrowMatch = message.match(/([A-ZÀ-Ö][a-zà-ö]+(?:\s[A-ZÀ-Ö][a-zà-ö]+)?)\s*(?:→|->|–|-|\/|vers|pour|à|a)\s*([A-ZÀ-Ö][a-zà-ö]+(?:\s[A-ZÀ-Ö][a-zà-ö]+)?)/);
-  if(arrowMatch){
-    const iataA = cityToIata(arrowMatch[1]);
-    const iataB = cityToIata(arrowMatch[2]);
-    if(iataA && iataB){
-      result.from = arrowMatch[1];
-      result.fromIata = iataA;
-      result.to = arrowMatch[2];
-      result.toIata = iataB;
-      return result;
-    }
-  }
-  const deMatch = message.match(/(?:de|depuis|from|partir de)\s+([A-ZÀ-Öa-zà-ö]+(?:\s[A-ZÀ-Öa-zà-ö]+)?)/i);
-  if(deMatch){ const iata=cityToIata(deMatch[1]); if(iata){ result.from=deMatch[1]; result.fromIata=iata; } }
-  const versMatch = message.match(/(?:à|a|vers|pour|to|destination)\s+([A-ZÀ-Öa-zà-ö]+(?:\s[A-ZÀ-Öa-zà-ö]+)?)/i);
-  if(versMatch){ const iata=cityToIata(versMatch[1]); if(iata){ result.to=versMatch[1]; result.toIata=iata; } }
-
-  // Si on a détecté des villes par le scan et pas encore attribuées
-  if(!result.from && !result.to && detectedCities.length>=2){
-    result.from = iataToCity(detectedCities[0].iata)||detectedCities[0].phrase;
-    result.fromIata = detectedCities[0].iata;
-    result.to = iataToCity(detectedCities[1].iata)||detectedCities[1].phrase;
-    result.toIata = detectedCities[1].iata;
-  } else if(!result.from && detectedCities.length>=1 && !result.fromIata){
-    // Contexte : si from est déjà dans state, c'est la destination
-    if(state.from){
-      result.to = iataToCity(detectedCities[0].iata)||detectedCities[0].phrase;
-      result.toIata = detectedCities[0].iata;
-    } else {
-      result.from = iataToCity(detectedCities[0].iata)||detectedCities[0].phrase;
-      result.fromIata = detectedCities[0].iata;
-    }
-  }
-
-  return result;
-}
-
-/* ══════════════════════════════════════════════════════════════
-   MOTEUR DE RÉPONSE — generateBotReply
-═══════════════════════════════════════════════════════════════ */
-function generateBotReply(s){
-  if(!s.from){
-    return {
-      text: "D'où partez-vous ?",
-      chips: ['Paris','Abidjan','Dakar','Lomé','Douala']
-    };
-  }
-  if(!s.to){
-    return {
-      text: `Parfait, départ de ${s.from}. Quelle est votre destination ?`,
-      chips: ['Paris','Dubai','Istanbul','New York','Lomé','Abidjan']
-        .filter(c=>normalize(c)!==normalize(s.from))
-    };
-  }
-  if(!s.departureDate){
-    return {
-      text: `${s.from} → ${s.to}, super trajet ! Quelle date de départ ?`,
-      chips: ['Demain','Dans 7 jours','Dans 15 jours','Dans 1 mois']
-    };
-  }
-  // Tout est là
-  return { text: null, chips: [] };
-}
-
-/* ══════════════════════════════════════════════════════════════
-   UI — CHAT RENDERER
-═══════════════════════════════════════════════════════════════ */
-
-function cleanAIResponse(text){
-  return text.replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
-}
-
-function addBotMsg(text, cb){
-  const clean = cleanAIResponse(text);
-  const row = document.createElement('div'); row.className='brow-bot';
-  row.innerHTML=`<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><span class="msg-txt"></span><span class="cursor"></span></div>`;
-  const ts=row.querySelector('.msg-txt'), cur=row.querySelector('.cursor');
-  chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
-  let i=0;
-  (function type(){
-    if(i<clean.length){ ts.textContent+=clean[i++]; chatMsgs.scrollTop=chatMsgs.scrollHeight; setTimeout(type,13); }
-    else { cur.style.display='none'; if(cb) cb(); }
-  })();
-}
-
-function addChips(chips, onSelect){
-  if(!chips||!chips.length) return;
-  const row = document.createElement('div'); row.className='chips-row'; row.id='chips-row-active';
-  row.innerHTML = chips.map(c=>`<button class="chip">${c}</button>`).join('');
-  chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
-  row.querySelectorAll('.chip').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      row.remove();
-      onSelect(btn.textContent);
-    });
-  });
-}
-
-function removeChips(){ const el=document.getElementById('chips-row-active'); if(el) el.remove(); }
-
-function addUserMsg(text){
-  const row=document.createElement('div'); row.className='brow-usr';
-  row.innerHTML=`<div class="bubble-usr">${cleanAIResponse(text)}</div>`;
-  chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
-}
-
-function showTyping(){
-  const row=document.createElement('div'); row.className='brow-bot'; row.id='typing';
-  row.innerHTML=`<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-  chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
-}
-
-function hideTyping(){ const el=document.getElementById('typing'); if(el) el.remove(); }
-
-// Synchronise le state vers les inputs classiques
-function syncStateToInputs(){
-  if(state.from) document.getElementById('search-from').value = state.from;
-  if(state.to)   document.getElementById('search-to').value   = state.to;
-  if(state.fromIata) selectedIata.from = state.fromIata;
-  if(state.toIata)   selectedIata.to   = state.toIata;
-  if(state.departureDate){
-    const d = new Date(state.departureDate+'T00:00:00');
-    dpDeptDate = d;
-    document.getElementById('search-depart').value = fmtDate(d);
-  }
-  if(state.returnDate && state.tripType==='roundtrip'){
-    const d = new Date(state.returnDate+'T00:00:00');
-    dpRetDate = d;
-    document.getElementById('search-return').value = fmtDate(d);
-    setTripType('return');
-  }
-  if(state.passengers){
-    document.getElementById('search-pax').value = state.passengers;
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   MOTEUR LOGIQUE — handleUserMessage (DeepSeek + fallback local)
-═══════════════════════════════════════════════════════════════ */
-async function handleUserMessage(message){
-  if(message.length < 2){
-    addBotMsg("Donnez-moi un trajet (ex: Paris → Lomé).");
-    return;
-  }
-
-  showTyping();
-
-  // ── Appel DeepSeek via /api/chat ──
-  let apiSuccess = false;
-  try {
-    const r = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message,
-        context: chatCtx.slice(-12),
-        lang,
-        collected: {
-          from:     state.from,
-          to:       state.to,
-          dates:    state.departureDate,
-          return_date: state.returnDate,
-          passengers: String(state.passengers||'')
-        },
-        tripType: state.tripType === 'roundtrip' ? 'return' : 'oneway'
-      })
-    });
-
-    if(r.ok){
-      const data = await r.json();
-
-      // Mise à jour state depuis la réponse DeepSeek
-      if(data.collected){
-        const c = data.collected;
-        if(c.from && c.from !== 'null'){
-          state.from = c.from;
-          state.fromIata = cityToIata(c.from) || await resolveIata(c.from);
-        }
-        if(c.to && c.to !== 'null'){
-          state.to = c.to;
-          state.toIata = cityToIata(c.to) || await resolveIata(c.to);
-        }
-        if(c.dates && c.dates !== 'null')       state.departureDate = normalizeDate(c.dates);
-        if(c.return_date && c.return_date !== 'null') state.returnDate = normalizeDate(c.return_date);
-        if(c.passengers && c.passengers !== 'null')   state.passengers = parseInt(c.passengers)||1;
-      }
-
-      hideTyping();
-
-      if(data.ready === true){
-        // DeepSeek dit que tout est prêt
-        if(data.reply) addBotMsg(data.reply);
-        chatCtx.push({role:'assistant', content: data.reply||''});
-        syncStateToInputs();
-        setTimeout(showResults, 900);
-        apiSuccess = true;
-        return;
-      }
-
-      if(data.reply){
-        // Réponse DeepSeek normale
-        addBotMsg(data.reply, ()=>{
-          // Chips contextuelles selon état actuel
-          const {chips} = generateBotReply(state);
-          if(chips.length && !state.from) addChips(chips, v=>processInput(v));
-          else if(chips.length && !state.to) addChips(chips, v=>processInput(v));
-        });
-        chatCtx.push({role:'assistant', content: data.reply});
-        syncStateToInputs();
-
-        // Vérification locale : si state complet après mise à jour DeepSeek
-        if(state.from && state.to && state.departureDate){
-          setTimeout(()=>{
-            if(!chatDone){
-              syncStateToInputs();
-              showResults();
-            }
-          }, 2200);
-        }
-        apiSuccess = true;
-        return;
-      }
-    }
-  } catch(e){
-    // API injoignable → fallback
-    console.warn('DeepSeek unavailable, using local parser:', e.message);
-  }
-
-  // ── FALLBACK : parser local si DeepSeek indisponible ──
-  hideTyping();
-  if(!apiSuccess){
-    const parsed = parseMessage(message);
-    if(parsed.from)          { state.from=parsed.from; state.fromIata=parsed.fromIata||cityToIata(parsed.from); }
-    if(parsed.to)            { state.to=parsed.to;     state.toIata=parsed.toIata||cityToIata(parsed.to); }
-    if(parsed.departureDate) state.departureDate = parsed.departureDate;
-    if(parsed.returnDate)    state.returnDate    = parsed.returnDate;
-    if(parsed.tripType)      state.tripType      = parsed.tripType;
-    if(parsed.passengers)    state.passengers    = parsed.passengers;
-
-    syncStateToInputs();
-
-    const { text, chips } = generateBotReply(state);
-    if(text === null){
-      showResults();
-    } else {
-      addBotMsg(text, ()=>{ if(chips.length) addChips(chips, v=>processInput(v)); });
-      chatCtx.push({role:'assistant', content:text});
-    }
-  }
-}
-
-/* ─── Normalise une chaîne de date vers YYYY-MM-DD ─── */
 function normalizeDate(str){
-  if(!str) return null;
-  // Déjà ISO
+  if(!str||str==='null') return null;
   if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-  // Essai parseDate local
   const local = parseDate(str);
   if(local) return local;
-  // Essai Date native
   const d = new Date(str);
-  if(!isNaN(d.getTime())) return d.toISOString().split('T')[0];
-  return null;
+  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+}
+
+function fmtDateLabel(iso){
+  if(!iso) return '';
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SHOW RESULTS — buildAviasalesLink
+   AVIASALES LINK BUILDER
+   Format: /search/{FROM}{DDMM}{TO}{PAXN}
+   ou:     /search/{FROM}{DDMM}{TO}{DDMM}{PAXN} (aller-retour)
 ═══════════════════════════════════════════════════════════════ */
-function buildAviasalesLink(s){
-  const fi = s.fromIata || 'XXX';
-  const ti = s.toIata   || 'XXX';
-  let dep = '';
-  if(s.departureDate){
-    const d = new Date(s.departureDate+'T00:00:00');
-    dep = `${String(d.getDate()).padStart(2,'0')}${String(d.getMonth()+1).padStart(2,'0')}`;
-  } else {
-    const d = new Date(); d.setDate(d.getDate()+7);
-    dep = `${String(d.getDate()).padStart(2,'0')}${String(d.getMonth()+1).padStart(2,'0')}`;
+function generateAviasalesLink(s){
+  const fi  = (s.fromIata||'').toUpperCase();
+  const ti  = (s.toIata||'').toUpperCase();
+  if(!fi || !ti) return null;
+
+  const pax    = parseInt(s.passengers)||1;
+  const depISO = s.departureDate || (() => { const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split('T')[0]; })();
+
+  let url = `https://www.aviasales.com/search?origin=${fi}&destination=${ti}&depart_date=${depISO}&adults=${pax}`;
+  if(s.returnDate && (s.tripType==='roundtrip'||s.tripType==='return')){
+    url += `&return_date=${s.returnDate}`;
   }
-  const pax = s.passengers || 1;
-  let url = `https://www.aviasales.com/search/${fi}${dep}${ti}${pax}`;
-  if(s.returnDate && s.tripType==='roundtrip'){
-    const r = new Date(s.returnDate+'T00:00:00');
-    const ret = `${String(r.getDate()).padStart(2,'0')}${String(r.getMonth()+1).padStart(2,'0')}`;
-    url = `https://www.aviasales.com/search/${fi}${dep}${ti}${ret}${pax}`;
-  }
+
   return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   UI — CHAT RENDERER (textContent partout, jamais innerHTML pour le texte)
+═══════════════════════════════════════════════════════════════ */
+function _clean(text){ return (text||'').replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim(); }
+
+function addBotMsg(text, cb){
+  const clean = _clean(text);
+  const row = document.createElement('div');
+  row.className = 'brow-bot';
+  // Structure HTML fixe — le texte sera injecté via textContent
+  const av = document.createElement('div'); av.className='bot-av';
+  av.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg>';
+  const bubble = document.createElement('div'); bubble.className='bubble-bot';
+  const ts  = document.createElement('span'); ts.className='msg-txt';
+  const cur = document.createElement('span'); cur.className='cursor';
+  bubble.appendChild(ts); bubble.appendChild(cur);
+  row.appendChild(av); row.appendChild(bubble);
+  chatMsgs.appendChild(row);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  let i=0;
+  (function type(){
+    if(i<clean.length){
+      ts.textContent += clean[i++];
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+      setTimeout(type,13);
+    } else {
+      cur.style.display='none';
+      if(cb) cb();
+    }
+  })();
+}
+
+function addUserMsg(text){
+  const clean = _clean(text);
+  const row = document.createElement('div'); row.className='brow-usr';
+  const bubble = document.createElement('div'); bubble.className='bubble-usr';
+  bubble.textContent = clean; // textContent — jamais innerHTML pour l'input user
+  row.appendChild(bubble);
+  chatMsgs.appendChild(row);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+}
+
+function addChips(chips, onSelect){
+  if(!chips?.length) return;
+  removeChips();
+  const row = document.createElement('div');
+  row.className='chips-row'; row.id='chips-row-active';
+  chips.forEach(label=>{
+    const btn = document.createElement('button');
+    btn.className='chip';
+    btn.textContent = label;
+    btn.addEventListener('click',()=>{ row.remove(); onSelect(label); });
+    row.appendChild(btn);
+  });
+  chatMsgs.appendChild(row);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+}
+
+function removeChips(){ document.getElementById('chips-row-active')?.remove(); }
+
+function showTyping(){
+  hideTyping();
+  const row=document.createElement('div'); row.className='brow-bot'; row.id='typing';
+  row.innerHTML='<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  chatMsgs.appendChild(row); chatMsgs.scrollTop=chatMsgs.scrollHeight;
+}
+
+function hideTyping(){ document.getElementById('typing')?.remove(); }
+
+/* ══════════════════════════════════════════════════════════════
+   SYNC STATE → champs de recherche classiques
+═══════════════════════════════════════════════════════════════ */
+function syncStateToInputs(){
+  if(state.from)     document.getElementById('search-from').value = state.from;
+  if(state.to)       document.getElementById('search-to').value   = state.to;
+  if(state.fromIata) selectedIata.from = state.fromIata;
+  if(state.toIata)   selectedIata.to   = state.toIata;
+  if(state.departureDate){
+    dpDeptDate = new Date(state.departureDate+'T00:00:00');
+    document.getElementById('search-depart').value = fmtDate(dpDeptDate);
+  }
+  if(state.returnDate && (state.tripType==='roundtrip'||state.tripType==='return')){
+    dpRetDate = new Date(state.returnDate+'T00:00:00');
+    document.getElementById('search-return').value = fmtDate(dpRetDate);
+    setTripType('return');
+  }
+  document.getElementById('search-pax').value = state.passengers||1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   generateBotReply — questions de guidage local
+═══════════════════════════════════════════════════════════════ */
+function generateBotReply(s){
+  if(!s.from) return {
+    text:  "D'où partez-vous ?",
+    chips: ['Paris','Abidjan','Dakar','Lomé','Douala','Moscou']
+  };
+  if(!s.to) return {
+    text:  `Parfait, départ de ${s.from} ✈️ Quelle est votre destination ?`,
+    chips: ['Paris','Dubai','Istanbul','New York','Lomé','Abidjan','Bangkok','Bali']
+           .filter(c=>normalize(c)!==normalize(s.from))
+  };
+  if(!s.departureDate) return {
+    text:  `${s.from} → ${s.to}, super trajet ! Quelle date de départ ?`,
+    chips: ['Demain','Dans 7 jours','Dans 15 jours','Dans 1 mois']
+  };
+  return { text:null, chips:[] };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SHOW RESULTS
+═══════════════════════════════════════════════════════════════ */
 function showResults(){
+  if(chatDone) return;
+
+  // Résoudre IATA si manquants
+  if(!state.fromIata && state.from) state.fromIata = findIata(state.from);
+  if(!state.toIata   && state.to)   state.toIata   = findIata(state.to);
+
+  // Guard : impossible de générer un lien sans IATA
+  const link = generateAviasalesLink(state);
+  if(!link){
+    addBotMsg("Je n'ai pas encore votre départ et destination. Pouvez-vous préciser ?");
+    return;
+  }
+
   chatDone = true;
-  const fi = state.fromIata || 'XXX';
-  const ti = state.toIata   || 'XXX';
-  aviasalesLnk.href = buildAviasalesLink(state);
-  // Fallback aussi sur buildAviasalesURL existant
-  try { aviasalesLnk.href = buildAviasalesURL(fi, ti); } catch(_){}
+  aviasalesLnk.href = link;
 
-  const fromLabel = state.from || fi;
-  const toLabel   = state.to   || ti;
-  const dateLabel = state.departureDate
-    ? new Date(state.departureDate+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})
-    : '';
+  console.log('[Midzo] STATE:', JSON.stringify(state, null, 2));
+  console.log('[Midzo] LINK:', link);
 
-  const msg = `✅ J'ai trouvé des vols pour votre trajet !\n${fromLabel} → ${toLabel}${dateLabel ? ' · '+dateLabel : ''}${state.passengers>1 ? ' · '+state.passengers+' passagers' : ''}`;
+  const fromLabel = state.from || state.fromIata;
+  const toLabel   = state.to   || state.toIata;
+  const dateStr   = state.departureDate ? fmtDateLabel(state.departureDate) : '';
+  const paxStr    = state.passengers > 1 ? ` · ${state.passengers} passagers` : '';
+
+  const msg = `✅ Vols trouvés !\n${fromLabel} → ${toLabel}${dateStr ? ' · '+dateStr : ''}${paxStr}`;
   addBotMsg(msg);
-  chatCtx.push({role:'assistant',content:msg});
+  chatCtx.push({role:'assistant', content:msg});
 
   resultMsgEl.textContent = `Vols ${fromLabel} → ${toLabel} trouvés`;
   resultCtaEl.classList.add('show');
@@ -1347,60 +1320,235 @@ function showResults(){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   POINT D'ENTRÉE — processInput
+   handleAIResponse — traite la réponse structurée de DeepSeek
+═══════════════════════════════════════════════════════════════ */
+async function handleAIResponse(data){
+  // 1. Merge collected dans state
+  if(data.collected){
+    const c = data.collected;
+
+    if(c.from && c.from !== 'null' && c.from !== 'undefined'){
+      state.from    = c.from;
+      state.fromIata = findIata(c.from) || await resolveIata(c.from) || state.fromIata;
+    }
+    if(c.to && c.to !== 'null' && c.to !== 'undefined'){
+      state.to    = c.to;
+      state.toIata = findIata(c.to) || await resolveIata(c.to) || state.toIata;
+    }
+    if(c.dates && c.dates !== 'null')
+      state.departureDate = normalizeDate(c.dates) || state.departureDate;
+    if(c.return_date && c.return_date !== 'null')
+      state.returnDate = normalizeDate(c.return_date);
+    if(c.passengers && c.passengers !== 'null')
+      state.passengers = Math.max(1, parseInt(c.passengers)||1);
+    if(c.budget && c.budget !== 'null')
+      state.budget = c.budget;
+
+    console.log('[Midzo] STATE UPDATED:', JSON.stringify(state));
+  }
+
+  // 2. Afficher la réponse textuelle
+  const reply = (data.reply||'').trim();
+  if(reply){
+    addBotMsg(reply, ()=>{
+      // Chips contextuelles uniquement si info manquante
+      const {chips} = generateBotReply(state);
+      if(chips.length && (!state.from || !state.to)) addChips(chips, v=>processInput(v));
+    });
+    chatCtx.push({role:'assistant', content:reply});
+    syncStateToInputs();
+  }
+
+  // 3. Déclencher résultats
+  if(data.ready === true){
+    setTimeout(showResults, reply ? 900 : 0);
+    return;
+  }
+
+  // 4. Vérification locale — si state complet mais DeepSeek n'a pas mis ready:true
+  if(state.fromIata && state.toIata && state.departureDate && !chatDone){
+    setTimeout(()=>{ if(!chatDone) showResults(); }, 1500);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PARSER LOCAL — extraction sans API (fallback)
+═══════════════════════════════════════════════════════════════ */
+function parsePassengers(text){
+  const n = normalize(text);
+  const m = n.match(/(\d+)\s*(passager|voyageur|adulte|personne|pax|ticket)/);
+  if(m) return parseInt(m[1]);
+  return null;
+}
+
+function parseTripType(text){
+  const n = normalize(text);
+  if(/aller.simple|sans.retour|one.way|pas.de.retour/.test(n)) return 'oneway';
+  if(/aller.retour|retour|round.trip/.test(n)) return 'roundtrip';
+  return null;
+}
+
+function parseMessage(message){
+  const result = {};
+  const n = normalize(message);
+
+  const tt = parseTripType(message); if(tt) result.tripType=tt;
+  const pax = parsePassengers(message); if(pax) result.passengers=pax;
+  const date = parseDate(message); if(date) result.departureDate=date;
+
+  // Patterns directionnels prioritaires
+  const arrow = message.match(/([A-ZÀ-Ö][a-zà-ö]+(?:\s[A-ZÀ-Ö][a-zà-ö]+)?)\s*(?:→|->|–|vers|pour)\s*([A-ZÀ-Ö][a-zà-ö]+(?:\s[A-ZÀ-Ö][a-zà-ö]+)?)/);
+  if(arrow){
+    const ia=findIata(arrow[1]), ib=findIata(arrow[2]);
+    if(ia&&ib){ result.from=arrow[1]; result.fromIata=ia; result.to=arrow[2]; result.toIata=ib; return result; }
+  }
+  const deM = message.match(/(?:de|depuis|from|partir de)\s+([A-ZÀ-Öa-zà-ö]+(?:\s[A-ZÀ-Öa-zà-ö]+)?)/i);
+  if(deM){ const ia=findIata(deM[1]); if(ia){ result.from=deM[1]; result.fromIata=ia; } }
+  const aM  = message.match(/(?:^|[àa]|vers|pour|to|destination)\s+([A-ZÀ-Öa-zà-ö]+(?:\s[A-ZÀ-Öa-zà-ö]+)?)/i);
+  if(aM){ const ib=findIata(aM[1]); if(ib){ result.to=aM[1]; result.toIata=ib; } }
+
+  // Scan mot par mot
+  if(!result.from||!result.to){
+    const words = n.split(/\s+/);
+    const STOP = new Set(['pour','vers','depuis','de','a','en','au','aux','le','la','les','je','veux','aller','partir','vol','vols','un','une','des','du','et','avec','pas','retour','simple','demain','juin','mars','avril','mai','juillet','aout','septembre','octobre','novembre','decembre','janvier','fevrier']);
+    const found = [];
+    for(let i=0;i<words.length;i++){
+      for(let len=3;len>=1;len--){
+        if(i+len>words.length) continue;
+        const phrase=words.slice(i,i+len).join(' ');
+        if(STOP.has(phrase)) continue;
+        const iata=findIata(phrase);
+        if(iata&&!found.find(f=>f.iata===iata)){ found.push({phrase,iata}); i+=len-1; break; }
+      }
+    }
+    if(!result.from&&!result.to&&found.length>=2){
+      result.from=iataToLabel(found[0].iata)||found[0].phrase; result.fromIata=found[0].iata;
+      result.to  =iataToLabel(found[1].iata)||found[1].phrase; result.toIata  =found[1].iata;
+    } else if(found.length>=1){
+      if(!result.from&&!state.from){ result.from=iataToLabel(found[0].iata)||found[0].phrase; result.fromIata=found[0].iata; }
+      else if(!result.to&&state.from){ result.to=iataToLabel(found[0].iata)||found[0].phrase; result.toIata=found[0].iata; }
+    }
+  }
+  return result;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   handleUserMessage — DeepSeek + fallback local
+═══════════════════════════════════════════════════════════════ */
+async function handleUserMessage(message){
+  if(message.trim().length < 2){
+    addBotMsg("Donnez-moi un trajet (ex: Paris → Lomé).");
+    return;
+  }
+
+  showTyping();
+
+  try {
+    const r = await fetch('/api/chat', {
+      method:  'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message,
+        context:  chatCtx.slice(-12),
+        lang,
+        collected:{
+          from:        state.from,
+          to:          state.to,
+          dates:       state.departureDate,
+          return_date: state.returnDate,
+          passengers:  String(state.passengers||1)
+        },
+        tripType: (state.tripType==='roundtrip'||state.tripType==='return') ? 'return' : 'oneway'
+      })
+    });
+
+    hideTyping();
+
+    if(r.ok){
+      const data = await r.json();
+      if(data.reply || data.collected){
+        await handleAIResponse(data);
+        return; // sortie propre — pas de fallback
+      }
+    }
+    // Si r.ok=false ou data vide → fallback ci-dessous
+
+  } catch(e){
+    hideTyping();
+    console.warn('[Midzo] DeepSeek unavailable — local fallback:', e.message);
+  }
+
+  // ── FALLBACK parser local ──
+  hideTyping();
+  const parsed = parseMessage(message);
+  if(parsed.from)          { state.from=parsed.from;  state.fromIata=parsed.fromIata; }
+  if(parsed.to)            { state.to=parsed.to;      state.toIata=parsed.toIata; }
+  if(parsed.departureDate) state.departureDate = parsed.departureDate;
+  if(parsed.returnDate)    state.returnDate    = parsed.returnDate;
+  if(parsed.tripType)      state.tripType      = parsed.tripType;
+  if(parsed.passengers)    state.passengers    = parsed.passengers;
+  syncStateToInputs();
+
+  const {text, chips} = generateBotReply(state);
+  if(text === null){
+    showResults();
+  } else {
+    addBotMsg(text, ()=>{ if(chips.length) addChips(chips, v=>processInput(v)); });
+    chatCtx.push({role:'assistant', content:text});
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   POINT D'ENTRÉE UNIQUE — processInput
 ═══════════════════════════════════════════════════════════════ */
 function processInput(text){
-  if(!text || text.trim().length < 2) return;
+  if(!text||text.trim().length<2) return;
   removeChips();
   addUserMsg(text);
   chatCtx.push({role:'user', content:text});
   handleUserMessage(text);
 }
 
-async function launchSearch(){
-  showResults();
-}
-
-async function resetChat(){
-  state = { from:null, fromIata:null, to:null, toIata:null, departureDate:null, returnDate:null, tripType:'oneway', passengers:1 };
-  selectedIata.from=''; selectedIata.to='';
-  dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false;
-  resultCtaEl.classList.remove('show'); chatMsgs.innerHTML='';
-
-  // Message de bienvenue
-  const welcome = "Bonjour ! Je suis Sofia 👋 Dites-moi votre trajet — par exemple : \"Paris → Abidjan, 15 juin\"";
-  addBotMsg(welcome, ()=>{
-    addChips(['Paris → Lomé','Paris → Abidjan','Paris → Dakar','Paris → Dubai'], v => processInput(v));
-  });
-  chatCtx.push({role:'assistant', content:welcome});
-  chatInput.disabled=false; chatSendBtn.disabled=false; chatInput.value='';
-
-  // Désactiver send si vide
-  chatSendBtn.disabled = true;
-}
-
-async function handleSend(){
+function handleSend(){
   const text = chatInput.value.trim();
   if(!text) return;
   chatInput.value='';
+  chatSendBtn.disabled=true;
   processInput(text);
 }
 
+async function launchSearch(){ showResults(); }
+
+async function resetChat(){
+  state = {from:null,fromIata:null,to:null,toIata:null,departureDate:null,returnDate:null,passengers:1,budget:null,tripType:'oneway'};
+  selectedIata.from=''; selectedIata.to='';
+  dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false;
+  resultCtaEl.classList.remove('show');
+  chatMsgs.innerHTML='';
+  chatInput.value=''; chatInput.disabled=false;
+  chatSendBtn.disabled=true;
+
+  const welcome = "Bonjour ! Je suis Sofia 👋 Dites-moi votre trajet — ex: \"Paris → Abidjan, 15 juin\"";
+  addBotMsg(welcome, ()=>{
+    addChips(['Paris → Lomé','Paris → Abidjan','Paris → Dakar','Paris → Dubai'], v=>processInput(v));
+  });
+  chatCtx.push({role:'assistant', content:welcome});
+}
 
 function fillAndScroll(from, to, toIata){
   if(from) document.getElementById('search-from').value=from;
-  if(to){ document.getElementById('search-to').value=to; if(toIata) selectedIata.to=toIata; }
+  if(to)  { document.getElementById('search-to').value=to; if(toIata) selectedIata.to=toIata; }
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
   setTimeout(async()=>{
-    state = { from:null, fromIata:null, to:null, toIata:null, departureDate:null, returnDate:null, tripType:'oneway', passengers:1 };
+    state={from:null,fromIata:null,to:null,toIata:null,departureDate:null,returnDate:null,passengers:1,budget:null,tripType:'oneway'};
     chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
     if(to){
-      state.to = to; state.toIata = toIata || cityToIata(to) || await resolveIata(to);
-      selectedIata.to = state.toIata || '';
-      const m = `Super choix ! De quelle ville partez-vous pour ${to} ?`;
-      const chips = ['Paris','Abidjan','Dakar','Lomé','Douala'].filter(c=>normalize(c)!==normalize(to));
-      chatCtx = [{role:'assistant',content:m}];
-      addBotMsg(m, ()=>addChips(chips, v=>processInput(v)));
+      state.to=to; state.toIata=toIata||findIata(to)||await resolveIata(to);
+      selectedIata.to=state.toIata||'';
+      const chips=['Paris','Abidjan','Dakar','Lomé','Douala','Moscou'].filter(c=>normalize(c)!==normalize(to));
+      const m=`Super choix ! De quelle ville partez-vous pour ${to} ?`;
+      chatCtx=[{role:'assistant',content:m}];
+      addBotMsg(m,()=>addChips(chips,v=>processInput(v)));
     }
   },500);
 }
