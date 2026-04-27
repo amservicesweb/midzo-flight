@@ -78,8 +78,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--sky); col
 .trip-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
 
 /* La barre de recherche */
-.search-fields { display: flex; align-items: center; gap: 8px; overflow: visible; position: relative; }
-.sf-group { display: flex; align-items: center; flex: 2; border: 1.5px solid var(--border); border-radius: 10px; overflow: visible; position: relative; transition: border-color .15s, box-shadow .15s; }
+.search-fields { display: flex; align-items: center; gap: 8px; overflow: visible; }
+.sf-group { display: flex; align-items: center; flex: 2; border: 1.5px solid var(--border); border-radius: 10px; overflow: visible; transition: border-color .15s, box-shadow .15s; }
 .sf-group:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(7,112,227,.1); z-index: 5; }
 .sf { flex: 1; padding: 10px 16px; height: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; cursor: text; min-width: 0; }
 .sf:not(:first-child) { border-left: 1px solid var(--border); }
@@ -647,13 +647,14 @@ async function resolveIata(cityName){
   const sync=getIataCode(cityName);
   if(sync!=='XXX') return sync;
   try{
-    const r=await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
+    const r=await fetch('/api/cities?q='+encodeURIComponent(cityName));
     if(!r.ok) return 'XXX';
     const d=await r.json();
     if(d.locations&&d.locations.length>0) return d.locations[0].iata;
   }catch(e){}
   return 'XXX';
 }
+
 
 function renderAcList(list,results,input,fieldKey){
   if(!results.length){list.style.display='none';return;}
@@ -832,17 +833,11 @@ function addUserMessage(text){ const row=document.createElement('div'); row.clas
 function showTypingIndicator(){ const row=document.createElement('div'); row.className='bubble-row-bot'; row.id='typing-indicator'; row.innerHTML=`<div class="bot-av"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`; messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
 function removeTypingIndicator(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 function addChips(options){ const row=document.createElement('div'); row.className='bubble-row-bot'; const chips=document.createElement('div'); chips.className='chips-row'; options.forEach(opt=>{ const c=document.createElement('button'); c.className='chip'; c.textContent=opt; c.onclick=()=>{ chips.remove(); row.remove(); inputField.value=opt; handleUserInput(); }; chips.appendChild(c); }); row.appendChild(chips); messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
-async function launchSearch(){
-  // Resolve IATA — autocomplete > fallback > async API lookup
-  const fromIata = (selectedIata.from && selectedIata.from!=='XXX') ? selectedIata.from
-    : (collectedData.fromIata && collectedData.fromIata!=='XXX') ? collectedData.fromIata
-    : await resolveIata(collectedData.from);
-  const toIata = (selectedIata.to && selectedIata.to!=='XXX') ? selectedIata.to
-    : (collectedData.toIata && collectedData.toIata!=='XXX') ? collectedData.toIata
-    : await resolveIata(collectedData.to);
-
+async async function launchSearch(){
+  const fromIata=(selectedIata.from&&selectedIata.from!=='XXX')?selectedIata.from:(collectedData.fromIata&&collectedData.fromIata!=='XXX')?collectedData.fromIata:await resolveIata(collectedData.from);
+  const toIata=(selectedIata.to&&selectedIata.to!=='XXX')?selectedIata.to:(collectedData.toIata&&collectedData.toIata!=='XXX')?collectedData.toIata:await resolveIata(collectedData.to);
   if(!fromIata||!toIata||fromIata==='XXX'||toIata==='XXX'||!collectedData.from||!collectedData.to){
-    const msg={fr:"Désolée, je n'ai pas pu identifier les aéroports. Pouvez-vous préciser les villes ?",en:"Sorry, I couldn't identify the airports. Could you clarify the cities?",ru:"Извините, не удалось определить аэропорты. Уточните города."};
+    const msg={fr:"Désolée, je n'ai pas pu identifier les aéroports. Pouvez-vous préciser les villes ?",en:"Sorry, couldn't identify the airports. Could you clarify the cities?",ru:"Не удалось определить аэропорты. Уточните города."};
     addBotMessage(msg[currentLang]||msg.fr); return;
   }
   const pax=parseInt(collectedData.passengers)||1;
