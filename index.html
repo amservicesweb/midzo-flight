@@ -720,10 +720,10 @@ function setTripType(type){
   tripType=type;
   const btnR=document.getElementById('btn-return'), btnO=document.getElementById('btn-oneway'), retField=document.getElementById('return-date-field');
   btnR.classList.toggle('active',type==='return'); btnO.classList.toggle('active',type==='oneway');
-  if(retField) retField.style.display=type==='return'?'':'none';
-  if(type==='oneway'){ dpEnd=null; const rd=document.getElementById('search-return-date'); if(rd) rd.value=''; }
-  const grid=document.getElementById('search-grid-wrap');
-  if(grid) grid.style.gridTemplateColumns=type==='return'?'1fr 1fr 1fr 1fr 1fr 140px':'1fr 1fr 1fr 1fr 140px';
+  if(retField){
+    if(type==='return'){ retField.classList.remove('hidden-field'); retField.style.display=''; }
+    else { retField.classList.add('hidden-field'); dpEnd=null; const rd=document.getElementById('search-return-date'); if(rd) rd.value=''; }
+  }
 }
 
 // ── SEARCH SUBMIT ─────────────────────────────────────────────────────────────
@@ -731,9 +731,77 @@ function swapCities(){ const f=document.getElementById('search-from'),t2=documen
 function generateAviasalesLink(fromIata,toIata){ let departDate=''; if(dpStart){const y=dpStart.getFullYear(),m=String(dpStart.getMonth()+1).padStart(2,'0'),d=String(dpStart.getDate()).padStart(2,'0');departDate=`${y}-${m}-${d}`;}else{const d=new Date();d.setDate(d.getDate()+7);departDate=d.toISOString().split('T')[0];} let returnDate=''; if(dpEnd&&tripType==='return'){const y=dpEnd.getFullYear(),m=String(dpEnd.getMonth()+1).padStart(2,'0'),d=String(dpEnd.getDate()).padStart(2,'0');returnDate=`${y}-${m}-${d}`;} const adults=parseInt(document.getElementById('search-pax')?.value)||1; let url=`https://www.aviasales.com/search?origin=${fromIata}&destination=${toIata}&depart_date=${departDate}&adults=${adults}`; if(returnDate) url+=`&return_date=${returnDate}`; return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`; }
 
 document.getElementById('hero-search-btn').addEventListener('click',()=>{
-  const from=document.getElementById('search-from').value.trim(),to=document.getElementById('search-to').value.trim();
-  if(!from||!to){ const msg={fr:'Veuillez indiquer une ville de départ et une destination.',en:'Please enter a departure city and destination.',ru:'Пожалуйста, укажите город отправления и пункт назначения.'}; alert(msg[currentLang]||msg.fr); return; }
-  fillAndScroll(from,to,'');
+  const from  = document.getElementById('search-from').value.trim();
+  const to    = document.getElementById('search-to').value.trim();
+  const dates = document.getElementById('search-dates').value.trim();
+  const ret   = document.getElementById('search-return-date')?.value.trim() || '';
+  const pax   = document.getElementById('search-pax')?.value || '1';
+
+  if(!from||!to){
+    const msg={fr:'Veuillez indiquer une ville de départ et une destination.',en:'Please enter a departure city and destination.',ru:'Пожалуйста, укажите город отправления и пункт назначения.'};
+    alert(msg[currentLang]||msg.fr); return;
+  }
+
+  // Pré-remplir collectedData avec tout ce qui est dans la barre
+  collectedData = {
+    from: from,
+    fromIata: selectedIata.from || getIataCode(from),
+    to: to,
+    toIata: selectedIata.to || getIataCode(to),
+    dates: dates || (ret ? dates + ' → ' + ret : ''),
+    returnDate: ret,
+    passengers: pax,
+    budget: ''
+  };
+
+  // Scroll vers le chat
+  const agentEl = document.getElementById('agent-section');
+  if(agentEl){ const top=agentEl.getBoundingClientRect().top+window.pageYOffset-80; window.scrollTo({top,behavior:'smooth'}); }
+
+  setTimeout(()=>{
+    window.chatComplete = false;
+    resultCta.classList.remove('show');
+    messagesDiv.innerHTML = '';
+    chatContext = [];
+
+    // Si on a départ + destination + date → lancer directement la recherche
+    if(from && to && dates){
+      const searchMsg = {
+        fr: `🔍 Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)...`,
+        en: `🔍 Searching best flights ${from} → ${to} for ${pax} passenger(s)...`,
+        ru: `🔍 Ищу лучшие рейсы ${from} → ${to} для ${pax} пассажир(ов)...`
+      };
+      addBotMessage(searchMsg[currentLang]||searchMsg.fr, ()=>{
+        setTimeout(()=>{ launchSearch(); }, 600);
+      });
+    } else {
+      // Sinon démarrer la conversation avec les infos déjà connues
+      const knownParts = [];
+      if(from) knownParts.push(currentLang==='ru'?`из ${from}`:`from ${from}`);
+      if(to)   knownParts.push(currentLang==='ru'?`в ${to}`:`to ${to}`);
+      const msgs = {
+        fr: from && to
+          ? `Parfait ! Vous partez de **${from}** vers **${to}** pour ${pax} passager(s). Quelles sont vos dates de voyage ?`
+          : from
+          ? `Départ depuis **${from}** — quelle est votre destination ?`
+          : `Bonjour ! Dites-moi votre ville de départ.`,
+        en: from && to
+          ? `Great! Flying from **${from}** to **${to}** for ${pax} passenger(s). What are your travel dates?`
+          : from
+          ? `Departing from **${from}** — where would you like to go?`
+          : `Hello! Where are you flying from?`,
+        ru: from && to
+          ? `Отлично! Рейс из **${from}** в **${to}** для ${pax} пассажир(ов). Какие у вас даты?`
+          : from
+          ? `Вылет из **${from}** — куда летите?`
+          : `Привет! Откуда вы летите?`
+      };
+      const preMsg = msgs[currentLang]||msgs.fr;
+      chatContext = [{role:'assistant', content: preMsg}];
+      addBotMessage(preMsg);
+      if(!dates) addChips(['1','2','3','4+'].map(()=>'').length ? [] : []);
+    }
+  }, 400);
 });
 
 // ── CHATBOT ───────────────────────────────────────────────────────────────────
@@ -774,7 +842,22 @@ window.fillAndScroll=function(from,to,dates,toIata){
   if(dates) document.getElementById('search-dates').value=dates;
   const agentEl=document.getElementById('agent-section');
   if(agentEl){ const top=agentEl.getBoundingClientRect().top+window.pageYOffset-80; window.scrollTo({top,behavior:'smooth'}); }
-  setTimeout(()=>{ collectedData={from:'',fromIata:'',to:'',toIata:'',dates:'',returnDate:'',passengers:'1',budget:''}; window.chatComplete=false; resultCta.classList.remove('show'); messagesDiv.innerHTML=''; if(to){ collectedData.to=toDisplay; if(toIata){collectedData.toIata=toIata;selectedIata.to=toIata;} const msgs={fr:`Super choix ! ${toDisplay} est une destination magnifique. De quelle ville partez-vous ?`,en:`Great choice! ${toDisplay} is a wonderful destination. Where are you flying from?`,ru:`Отличный выбор! ${toDisplay} — прекрасное направление. Откуда вы летите?`}; const preMsg=msgs[currentLang]||msgs.fr; chatContext=[{role:'assistant',content:preMsg}]; addBotMessage(preMsg); } },500);
+  setTimeout(()=>{
+    // Reset proprement
+    collectedData={from:'',fromIata:'',to:toDisplay,toIata:toIata||'',dates:dates||'',returnDate:'',passengers:'1',budget:''};
+    if(toIata) selectedIata.to=toIata;
+    window.chatComplete=false; resultCta.classList.remove('show'); messagesDiv.innerHTML=''; chatContext=[];
+    if(to){
+      const msgs={
+        fr:`Super choix ! ${toDisplay} est une destination magnifique. De quelle ville partez-vous ?`,
+        en:`Great choice! ${toDisplay} is a wonderful destination. Where are you flying from?`,
+        ru:`Отличный выбор! ${toDisplay} — прекрасное направление. Откуда вы летите?`
+      };
+      const preMsg=msgs[currentLang]||msgs.fr;
+      chatContext=[{role:'assistant',content:preMsg}];
+      addBotMessage(preMsg);
+    }
+  },500);
 };
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
