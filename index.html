@@ -301,7 +301,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--sky); col
         <span class="logo-sub">FLIGHT</span>
       </span>
     </a>
-    <nav class="nav-tabs" style="display:none;" id="nav-tabs-row">
+    <nav class="nav-tabs" id="nav-tabs-row">
       <button class="nav-tab active">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="currentColor"/></svg>
         <span data-i18n="nav_flights">Vols</span>
@@ -315,7 +315,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--sky); col
       <button class="nav-tab" onclick="openModal('modal-about')" data-i18n="nav_contact">Contact</button>
     </nav>
     <div class="nav-right">
-      <div class="ai-pill" style="display:none;" id="ai-pill-badge">
+      <div class="ai-pill" id="ai-pill-badge">
         <div class="ai-dot"></div>
         <span data-i18n="ai_status">Agent disponible</span>
       </div>
@@ -327,7 +327,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--sky); col
           <button data-lang="ru" class="lang-opt">🇷🇺 Русский</button>
         </div>
       </div>
-      <button class="btn btn-ghost" onclick="openModal('modal-newsletter')" data-i18n="newsletter_btn" style="display:none;" id="nav-nl-btn">Recevoir les offres</button>
+      <button class="btn btn-ghost" onclick="openModal('modal-newsletter')" data-i18n="newsletter_btn" id="nav-nl-btn">Recevoir les offres</button>
       <a href="#agent-section" class="btn btn-primary" data-i18n="cta_start">Rechercher</a>
     </div>
   </div>
@@ -634,32 +634,24 @@ const FALLBACK_CITIES=[{city:"Paris",country:"France",iata:"CDG",flag:"🇫🇷"
 const cityCache={}, selectedIata={from:'',to:''};
 function searchFallback(q){ const nq=q.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); return FALLBACK_CITIES.filter(c=>{const cn=c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); return cn.startsWith(nq)||c.iata.toLowerCase().startsWith(nq)||cn.includes(nq);}).slice(0,8); }
 async function fetchCitiesFromAPI(q){ const ck=q.toLowerCase(); if(cityCache[ck]) return cityCache[ck]; try{ const r=await fetch(`/api/cities?q=${encodeURIComponent(q)}&lang=${currentLang}`); if(!r.ok) throw new Error(); const d=await r.json(); if(d.locations?.length){ cityCache[ck]=d.locations; return d.locations; } }catch(e){} return null; }
-// Sync fallback lookup (instantaneous, for already-known cities)
 function getIataCode(cn){
   if(!cn) return 'XXX';
-  const q = cn.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const match = FALLBACK_CITIES.find(c=>{
-    const n=c.city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    return n===q || c.iata.toLowerCase()===q || n.startsWith(q) || q.startsWith(n);
-  });
-  if(match) return match.iata;
+  const q=cn.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const m=FALLBACK_CITIES.find(c=>{ const n=c.city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); return n===q||c.iata.toLowerCase()===q||n.startsWith(q)||q.startsWith(n); });
+  if(m) return m.iata;
   if(/^[A-Z]{3}$/.test(cn.trim())) return cn.trim();
   return 'XXX';
 }
-
-// Async IATA lookup via /api/cities (searches full 7000+ airports.json)
 async function resolveIata(cityName){
   if(!cityName) return 'XXX';
-  // Check sync first
-  const sync = getIataCode(cityName);
-  if(sync !== 'XXX') return sync;
-  // Query the API
-  try {
-    const r = await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
+  const sync=getIataCode(cityName);
+  if(sync!=='XXX') return sync;
+  try{
+    const r=await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
     if(!r.ok) return 'XXX';
-    const d = await r.json();
-    if(d.locations && d.locations.length > 0) return d.locations[0].iata;
-  } catch(e){}
+    const d=await r.json();
+    if(d.locations&&d.locations.length>0) return d.locations[0].iata;
+  }catch(e){}
   return 'XXX';
 }
 
@@ -757,6 +749,9 @@ function setTripType(type){
 function swapCities(){ const f=document.getElementById('search-from'),t2=document.getElementById('search-to'),tmp=f.value; f.value=t2.value; t2.value=tmp; const ti=selectedIata.from; selectedIata.from=selectedIata.to; selectedIata.to=ti; }
 function generateAviasalesLink(fromIata,toIata){ let departDate=''; if(dpStart){const y=dpStart.getFullYear(),m=String(dpStart.getMonth()+1).padStart(2,'0'),d=String(dpStart.getDate()).padStart(2,'0');departDate=`${y}-${m}-${d}`;}else{const d=new Date();d.setDate(d.getDate()+7);departDate=d.toISOString().split('T')[0];} let returnDate=''; if(dpEnd&&tripType==='return'){const y=dpEnd.getFullYear(),m=String(dpEnd.getMonth()+1).padStart(2,'0'),d=String(dpEnd.getDate()).padStart(2,'0');returnDate=`${y}-${m}-${d}`;} const adults=parseInt(document.getElementById('search-pax')?.value)||1; let url=`https://www.aviasales.com/search?origin=${fromIata}&destination=${toIata}&depart_date=${departDate}&adults=${adults}`; if(returnDate) url+=`&return_date=${returnDate}`; return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`; }
 
+let chatContext=[], collectedData={from:'',fromIata:'',to:'',toIata:'',dates:'',returnDate:'',passengers:'1',budget:''};
+window.chatComplete=false;
+const messagesDiv=document.getElementById('chat-messages'), inputField=document.getElementById('chat-input'), sendBtn=document.getElementById('chat-send'), resultCta=document.getElementById('result-cta-container'), aviasalesLink=document.getElementById('aviasales-link'), resultMsg=document.getElementById('result-message');
 document.getElementById('hero-search-btn').addEventListener('click',()=>{
   const from  = document.getElementById('search-from').value.trim();
   const to    = document.getElementById('search-to').value.trim();
@@ -832,47 +827,45 @@ document.getElementById('hero-search-btn').addEventListener('click',()=>{
 });
 
 // ── CHATBOT ───────────────────────────────────────────────────────────────────
-let chatContext=[], collectedData={from:'',fromIata:'',to:'',toIata:'',dates:'',returnDate:'',passengers:'1',budget:''};
-window.chatComplete=false;
-const messagesDiv=document.getElementById('chat-messages'), inputField=document.getElementById('chat-input'), sendBtn=document.getElementById('chat-send'), resultCta=document.getElementById('result-cta-container'), aviasalesLink=document.getElementById('aviasales-link'), resultMsg=document.getElementById('result-message');
 function addBotMessage(text,cb){ const row=document.createElement('div'); row.className='bubble-row-bot'; row.innerHTML=`<div class="bot-av"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><span class="bot-text"></span><span class="typing-cursor"></span></div>`; const ts=row.querySelector('.bot-text'),cur=row.querySelector('.typing-cursor'); messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; let i=0; (function type(){ if(i<text.length){ts.textContent+=text[i++];messagesDiv.scrollTop=messagesDiv.scrollHeight;setTimeout(type,14);}else{cur.style.display='none';if(cb)cb();} })(); }
 function addUserMessage(text){ const row=document.createElement('div'); row.className='bubble-row-user'; row.innerHTML=`<div class="bubble-user">${text}</div>`; messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
 function showTypingIndicator(){ const row=document.createElement('div'); row.className='bubble-row-bot'; row.id='typing-indicator'; row.innerHTML=`<div class="bot-av"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`; messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
 function removeTypingIndicator(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 function addChips(options){ const row=document.createElement('div'); row.className='bubble-row-bot'; const chips=document.createElement('div'); chips.className='chips-row'; options.forEach(opt=>{ const c=document.createElement('button'); c.className='chip'; c.textContent=opt; c.onclick=()=>{ chips.remove(); row.remove(); inputField.value=opt; handleUserInput(); }; chips.appendChild(c); }); row.appendChild(chips); messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
 async function launchSearch(){
-  // Resolve IATA codes — use selectedIata (autocomplete) first, then async API lookup
-  const fromIata = selectedIata.from && selectedIata.from !== 'XXX'
-    ? selectedIata.from
-    : (collectedData.fromIata && collectedData.fromIata !== 'XXX'
-        ? collectedData.fromIata
-        : await resolveIata(collectedData.from));
+  // Resolve IATA — autocomplete > fallback > async API lookup
+  const fromIata = (selectedIata.from && selectedIata.from!=='XXX') ? selectedIata.from
+    : (collectedData.fromIata && collectedData.fromIata!=='XXX') ? collectedData.fromIata
+    : await resolveIata(collectedData.from);
+  const toIata = (selectedIata.to && selectedIata.to!=='XXX') ? selectedIata.to
+    : (collectedData.toIata && collectedData.toIata!=='XXX') ? collectedData.toIata
+    : await resolveIata(collectedData.to);
 
-  const toIata = selectedIata.to && selectedIata.to !== 'XXX'
-    ? selectedIata.to
-    : (collectedData.toIata && collectedData.toIata !== 'XXX'
-        ? collectedData.toIata
-        : await resolveIata(collectedData.to));
-
-  if(!fromIata || !toIata || fromIata==='XXX' || toIata==='XXX' || !collectedData.from || !collectedData.to){
-    // Can't resolve IATA — tell user
-    const msg = {fr:'Désolée, je n'ai pas pu identifier les aéroports. Pouvez-vous préciser les villes de départ et d'arrivée ?', en:'Sorry, I could not identify the airports. Could you clarify the departure and arrival cities?', ru:'Извините, не удалось определить аэропорты. Уточните города отправления и назначения.'};
-    addBotMessage(msg[currentLang]||msg.fr);
-    return;
+  if(!fromIata||!toIata||fromIata==='XXX'||toIata==='XXX'||!collectedData.from||!collectedData.to){
+    const msg={fr:"Désolée, je n'ai pas pu identifier les aéroports. Pouvez-vous préciser les villes ?",en:"Sorry, I couldn't identify the airports. Could you clarify the cities?",ru:"Извините, не удалось определить аэропорты. Уточните города."};
+    addBotMessage(msg[currentLang]||msg.fr); return;
   }
-
-  const pax = parseInt(collectedData.passengers) || 1;
-  let departDate = '';
-  let returnDate = '';
-
-  if(dpStart){
-    const y=dpStart.getFullYear(),m=String(dpStart.getMonth()+1).padStart(2,'0'),d=String(dpStart.getDate()).padStart(2,'0');
-    departDate=`${y}-${m}-${d}`;
+  const pax=parseInt(collectedData.passengers)||1;
+  let departDate='',returnDate='';
+  if(dpStart){const y=dpStart.getFullYear(),m=String(dpStart.getMonth()+1).padStart(2,'0'),d=String(dpStart.getDate()).padStart(2,'0');departDate=`${y}-${m}-${d}`;}
+  else{const d=new Date();d.setDate(d.getDate()+7);departDate=d.toISOString().split('T')[0];}
+  if(dpEnd&&tripType==='return'){const y=dpEnd.getFullYear(),m=String(dpEnd.getMonth()+1).padStart(2,'0'),d=String(dpEnd.getDate()).padStart(2,'0');returnDate=`${y}-${m}-${d}`;}
+  else if(collectedData.returnDate&&tripType==='return'){returnDate=collectedData.returnDate;}
+  let url=`https://www.aviasales.com/search?origin=${fromIata}&destination=${toIata}&depart_date=${departDate}&adults=${pax}`;
+  if(returnDate) url+=`&return_date=${returnDate}`;
+  const affiliateUrl=`https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
+  aviasalesLink.href=affiliateUrl; resultMsg.textContent=t('ai_result_prefix'); resultCta.classList.add('show'); window.chatComplete=true;
+}-${m}-${d}`;
+  } else if(collectedData.dates){
+    // Use today + 7 days as fallback if we have a date string but can't parse it
+    const d=new Date(); d.setDate(d.getDate()+7);
+    departDate=d.toISOString().split('T')[0];
   } else {
     const d=new Date(); d.setDate(d.getDate()+7);
     departDate=d.toISOString().split('T')[0];
   }
 
+  // Return date: calendar picker > Sofia collected > none
   if(dpEnd && tripType==='return'){
     const y=dpEnd.getFullYear(),m=String(dpEnd.getMonth()+1).padStart(2,'0'),d=String(dpEnd.getDate()).padStart(2,'0');
     returnDate=`${y}-${m}-${d}`;
@@ -969,7 +962,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('scroll',()=>{ document.querySelector('.nav').style.boxShadow=window.scrollY>10?'0 4px 24px rgba(0,0,0,.07)':'none'; });
   // Nav responsive show
   const ntr=document.getElementById('nav-tabs-row'), aib=document.getElementById('ai-pill-badge'), nnb=document.getElementById('nav-nl-btn');
-  function updateNavVisibility(){ if(window.innerWidth>=1024){if(ntr)ntr.style.display='flex';if(aib)aib.style.display='flex';if(nnb)nnb.style.display='inline-flex';}else{if(ntr)ntr.style.display='none';if(aib)aib.style.display='none';if(nnb)nnb.style.display='none';} }
+  function updateNavVisibility(){ if(ntr)ntr.style.display='flex'; if(aib)aib.style.display='flex'; if(nnb)nnb.style.display='inline-flex'; }
   updateNavVisibility(); window.addEventListener('resize',updateNavVisibility);
   // Lang dropdown
   const lt=document.getElementById('lang-toggle'), lm=document.getElementById('lang-menu');
