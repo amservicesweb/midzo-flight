@@ -66,20 +66,20 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--sky); col
 
 /* ── SEARCH CARD — Skyscanner style ── */
 .search-card-wrap { max-width: 1280px; margin: -2.5rem auto 0; padding: 0 1.5rem; position: relative; z-index: 100; }
-.search-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.12); }
+.search-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.12); overflow: visible; }
 .search-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 1.25rem; }
 .search-tab { display: flex; align-items: center; gap: 7px; padding: 16px 18px; font-size: .9rem; font-weight: 600; color: var(--muted); border: none; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; background: none; font-family: inherit; transition: all .15s; }
 .search-tab:hover { color: var(--text); }
 .search-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
 .search-tab .badge { font-size: .6rem; font-weight: 700; background: #f0f0f0; color: #aaa; border-radius: 4px; padding: 2px 6px; text-transform: uppercase; }
-.search-body { padding: 1.5rem; }
+.search-body { padding: 1.5rem; overflow: visible; }
 .trip-toggle { display: flex; gap: 8px; margin-bottom: 1.25rem; }
 .trip-btn { display: flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 100px; font-size: .82rem; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: #fff; color: var(--muted); font-family: inherit; transition: all .15s; }
 .trip-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
 
 /* La barre de recherche */
-.search-fields { display: flex; align-items: center; gap: 8px; }
-.sf-group { display: flex; align-items: center; flex: 2; border: 1.5px solid var(--border); border-radius: 10px; overflow: visible; transition: border-color .15s, box-shadow .15s; }
+.search-fields { display: flex; align-items: center; gap: 8px; overflow: visible; position: relative; }
+.sf-group { display: flex; align-items: center; flex: 2; border: 1.5px solid var(--border); border-radius: 10px; overflow: visible; position: relative; transition: border-color .15s, box-shadow .15s; }
 .sf-group:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(7,112,227,.1); z-index: 5; }
 .sf { flex: 1; padding: 10px 16px; height: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; cursor: text; min-width: 0; }
 .sf:not(:first-child) { border-left: 1px solid var(--border); }
@@ -115,7 +115,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--sky); col
 @media(max-width: 1024px) { .search-fields { flex-wrap: wrap; } .sf-group,.sf-dates { flex: 1 1 100%; } .sf-pax-wrap { flex: 1; width: auto; } .search-btn-main { flex: 1; } .swap-btn { display: none; } }
 
 /* Autocomplete */
-.autocomplete-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.12); z-index: 400; overflow: hidden; max-height: 220px; overflow-y: auto; }
+.autocomplete-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.12); z-index: 9999; overflow: hidden; max-height: 220px; overflow-y: auto; }
 .autocomplete-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; font-size: .85rem; transition: background .1s; }
 .autocomplete-item:hover, .autocomplete-item.active { background: var(--blue-light); }
 .ac-iata { font-size: .68rem; font-weight: 700; color: #fff; background: var(--blue); border-radius: 5px; padding: 2px 6px; flex-shrink: 0; }
