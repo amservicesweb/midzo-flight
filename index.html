@@ -852,18 +852,20 @@ function launchSearch(){
   window.chatComplete=true;
 }
 async function resetChat(){
-  collectedData={from:'',fromIata:'',to:'',toIata:'',dates:'',returnDate:'',passengers:'1',budget:''};
-  chatContext=[];
+  // Reset TOUT — aucune donnée de la session précédente ne survit
+  collectedData = {from:'',fromIata:'',to:'',toIata:'',dates:'',returnDate:'',passengers:'1',budget:''};
+  selectedIata.from = '';
+  selectedIata.to   = '';
+  chatContext = [];
   resultCta.classList.remove('show');
-  window.chatComplete=false;
-  messagesDiv.innerHTML='';
-  // Reset calendar so old dates don't contaminate new search
-  dpStart=null; dpEnd=null;
-  document.getElementById('search-dates').value='';
-  const rd=document.getElementById('search-return-date'); if(rd) rd.value='';
-  const first=t('agent_q1');
+  window.chatComplete = false;
+  messagesDiv.innerHTML = '';
+  dpStart = null; dpEnd = null;
+  const sf = document.getElementById('search-dates'); if(sf) sf.value='';
+  const rd = document.getElementById('search-return-date'); if(rd) rd.value='';
+  const first = t('agent_q1');
   addBotMessage(first);
-  chatContext.push({role:'assistant',content:first});
+  chatContext.push({role:'assistant', content:first});
   inputField.disabled=false; sendBtn.disabled=false; inputField.value='';
 }
 async function handleUserInput(){
