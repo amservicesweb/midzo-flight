@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Midzo Flight · Votre agence de voyage IA</title>
+    <meta name="description" content="Trouvez les meilleurs vols avec Sofia, votre agente de voyage IA. Comparez 728+ compagnies en temps réel. Disponible en français, anglais et russe.">
+    <meta name="keywords" content="vol pas cher, billet avion, agence voyage IA, comparateur vols, Midzo Flight">
+    <meta property="og:title" content="Midzo Flight · Votre agence de voyage IA">
+    <meta property="og:description" content="Votre agent de voyage IA disponible 24h/24. Comparez 728+ compagnies.">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1198,9 +1204,14 @@ async function resetChat(){
 }
 
 function launchSearch(){
-    const fromIata = collectedData.fromIata || selectedIata.from || getIataCode(collectedData.from);
-    const toIata   = collectedData.toIata   || selectedIata.to   || getIataCode(collectedData.to);
-    if(!fromIata || !toIata) return;
+    // Priority: user-selected IATA (autocomplete) > AI-extracted > text lookup
+    const fromIata = selectedIata.from || collectedData.fromIata || getIataCode(collectedData.from);
+    const toIata   = selectedIata.to   || collectedData.toIata   || getIataCode(collectedData.to);
+
+    if(!fromIata || !toIata || !collectedData.from || !collectedData.to){
+        // Not enough info yet — ask AI to continue
+        return;
+    }
     const url = generateAviasalesLink(fromIata, toIata, collectedData.dates);
     aviasalesLink.href = url;
     resultMsg.textContent = t('ai_result_prefix');
@@ -1244,8 +1255,20 @@ async function handleUserInput(){
     removeTypingIndicator();
 
     if(!response || !response.reply){
-        const fallback = {fr:'Désolée, une erreur est survenue. Réessayez ?', en:"Sorry, something went wrong. Try again?", ru:'Произошла ошибка. Попробуйте ещё раз?'};
-        addBotMessage(fallback[currentLang] || fallback.fr);
+        // Smart fallback — guide user to provide missing info
+        const hasSome = collectedData.from || collectedData.to;
+        const fallbacks = {
+            fr: hasSome
+                ? `Dites-moi ${!collectedData.from?'votre ville de départ':''} ${!collectedData.to?'et votre destination':''} ${!collectedData.dates?'et vos dates':''}.`.replace(/  +/g,' ')
+                : "Bonjour ! Dites-moi d'où vous partez et où vous voulez aller.",
+            en: hasSome
+                ? `Please tell me ${!collectedData.from?'your departure city':''} ${!collectedData.to?'and destination':''} ${!collectedData.dates?'and travel dates':''}.`.replace(/  +/g,' ')
+                : "Hello! Tell me where you're flying from and where you want to go.",
+            ru: hasSome
+                ? `Пожалуйста, укажите ${!collectedData.from?'город отправления':''} ${!collectedData.to?'и направление':''} ${!collectedData.dates?'и даты':''}.`.replace(/  +/g,' ')
+                : 'Привет! Скажите откуда и куда хотите лететь.'
+        };
+        addBotMessage(fallbacks[currentLang] || fallbacks.fr);
         inputField.disabled = false; sendBtn.disabled = false;
         return;
     }
@@ -1253,10 +1276,18 @@ async function handleUserInput(){
     const reply = response.reply;
 
     // Merge collected data from backend
+    // IMPORTANT: never overwrite a IATA code already selected via autocomplete
     if(response.collected){
         const c = response.collected;
-        if(c.from){ collectedData.from = c.from; collectedData.fromIata = getIataCode(c.from); }
-        if(c.to)  { collectedData.to   = c.to;   collectedData.toIata   = getIataCode(c.to); }
+        if(c.from){
+            collectedData.from = c.from;
+            // Only set IATA from text lookup if user didn't select from autocomplete
+            if(!selectedIata.from) collectedData.fromIata = getIataCode(c.from);
+        }
+        if(c.to){
+            collectedData.to = c.to;
+            if(!selectedIata.to) collectedData.toIata = getIataCode(c.to);
+        }
         if(c.dates) collectedData.dates = c.dates;
         if(c.passengers) collectedData.passengers = c.passengers;
         if(c.budget) collectedData.budget = c.budget;
@@ -1337,49 +1368,65 @@ window.initChatbot = function(){
     setTimeout(()=>setTripType('return'), 100);
 };
 
-// Fill search bar from flash deals / destinations
+// Fill search bar from destinations / city cards
 window.fillAndScroll = function(from, to, dates, toIata){
-    // Translated city name for display
     const cityNames = {
-        'Paris':   {fr:'Paris',   en:'Paris',    ru:'Париж'},
-        'Dubai':   {fr:'Dubai',   en:'Dubai',    ru:'Дубай'},
-        'New York':{fr:'New York',en:'New York', ru:'Нью-Йорк'},
-        'Abidjan': {fr:'Abidjan', en:'Abidjan',  ru:'Абиджан'},
-        'Bangkok': {fr:'Bangkok', en:'Bangkok',  ru:'Бангкок'},
+        'Paris':   {fr:'Paris',    en:'Paris',    ru:'Париж'},
+        'Dubai':   {fr:'Dubai',    en:'Dubai',    ru:'Дубай'},
+        'New York':{fr:'New York', en:'New York', ru:'Нью-Йорк'},
+        'Abidjan': {fr:'Abidjan',  en:'Abidjan',  ru:'Абиджан'},
+        'Bangkok': {fr:'Bangkok',  en:'Bangkok',  ru:'Бангкок'},
     };
     const toDisplay = (cityNames[to] && cityNames[to][currentLang]) || to;
 
     if(from) document.getElementById('search-from').value = from;
     if(to){
         document.getElementById('search-to').value = toDisplay;
+        // Set IATA — only if provided directly (never overwrite a user-selected one)
         if(toIata) selectedIata.to = toIata;
     }
     if(dates) document.getElementById('search-dates').value = dates;
 
     document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
+
     setTimeout(()=>{
-        messagesDiv.innerHTML='';
+        // Reset chat properly — no userData/chatStep references
+        collectedData = {from:'', fromIata:'', to:'', toIata:'', dates:'', returnDate:'', passengers:'1', budget:''};
+        window.chatComplete = false;
+        resultCta.classList.remove('show');
+        messagesDiv.innerHTML = '';
+
         if(to){
+            // Pre-fill collectedData with the destination
+            collectedData.to = toDisplay;
+            if(toIata){
+                collectedData.toIata = toIata;
+                selectedIata.to = toIata;
+            }
+
             const msgs = {
                 fr: `Super choix ! ${toDisplay} est une destination magnifique. De quelle ville partez-vous ?`,
                 en: `Great choice! ${toDisplay} is a wonderful destination. Where are you flying from?`,
                 ru: `Отличный выбор! ${toDisplay} — прекрасное направление. Откуда вы летите?`
             };
-            const preMsg = msgs[currentLang] || msgs['fr'];
-            userData.to = toDisplay;
-            if(toIata) selectedIata.to = toIata;
-            chatStep = 0;
-            chatContext = [{role:'assistant', content:preMsg}];
+            const preMsg = msgs[currentLang] || msgs.fr;
+            chatContext = [{role:'assistant', content: preMsg}];
             addBotMessage(preMsg);
         }
-    }, 600);
+    }, 500);
 };
 
-// Hero search button
+// Hero search button — with validation
 document.getElementById('hero-search-btn').addEventListener('click', ()=>{
     const from  = document.getElementById('search-from').value.trim();
     const to    = document.getElementById('search-to').value.trim();
     const dates = document.getElementById('search-dates').value.trim();
+
+    if(!from || !to){
+        const msg = {fr:'Veuillez indiquer une ville de départ et une destination.', en:'Please enter a departure city and destination.', ru:'Пожалуйста, укажите город отправления и пункт назначения.'};
+        alert(msg[currentLang] || msg.fr);
+        return;
+    }
     fillAndScroll(from, to, dates);
 });
 </script>
