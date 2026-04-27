@@ -634,7 +634,34 @@ const FALLBACK_CITIES=[{city:"Paris",country:"France",iata:"CDG",flag:"🇫🇷"
 const cityCache={}, selectedIata={from:'',to:''};
 function searchFallback(q){ const nq=q.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); return FALLBACK_CITIES.filter(c=>{const cn=c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); return cn.startsWith(nq)||c.iata.toLowerCase().startsWith(nq)||cn.includes(nq);}).slice(0,8); }
 async function fetchCitiesFromAPI(q){ const ck=q.toLowerCase(); if(cityCache[ck]) return cityCache[ck]; try{ const r=await fetch(`/api/cities?q=${encodeURIComponent(q)}&lang=${currentLang}`); if(!r.ok) throw new Error(); const d=await r.json(); if(d.locations?.length){ cityCache[ck]=d.locations; return d.locations; } }catch(e){} return null; }
-function getIataCode(cn){ if(!cn) return 'XXX'; const q=cn.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); const f=FALLBACK_CITIES.find(c=>{ const n=c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); return n===q||c.iata.toLowerCase()===q; }); return f?f.iata:cn.substring(0,3).toUpperCase(); }
+// Sync fallback lookup (instantaneous, for already-known cities)
+function getIataCode(cn){
+  if(!cn) return 'XXX';
+  const q = cn.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const match = FALLBACK_CITIES.find(c=>{
+    const n=c.city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    return n===q || c.iata.toLowerCase()===q || n.startsWith(q) || q.startsWith(n);
+  });
+  if(match) return match.iata;
+  if(/^[A-Z]{3}$/.test(cn.trim())) return cn.trim();
+  return 'XXX';
+}
+
+// Async IATA lookup via /api/cities (searches full 7000+ airports.json)
+async function resolveIata(cityName){
+  if(!cityName) return 'XXX';
+  // Check sync first
+  const sync = getIataCode(cityName);
+  if(sync !== 'XXX') return sync;
+  // Query the API
+  try {
+    const r = await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
+    if(!r.ok) return 'XXX';
+    const d = await r.json();
+    if(d.locations && d.locations.length > 0) return d.locations[0].iata;
+  } catch(e){}
+  return 'XXX';
+}
 
 function renderAcList(list,results,input,fieldKey){
   if(!results.length){list.style.display='none';return;}
@@ -813,31 +840,39 @@ function addUserMessage(text){ const row=document.createElement('div'); row.clas
 function showTypingIndicator(){ const row=document.createElement('div'); row.className='bubble-row-bot'; row.id='typing-indicator'; row.innerHTML=`<div class="bot-av"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`; messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
 function removeTypingIndicator(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 function addChips(options){ const row=document.createElement('div'); row.className='bubble-row-bot'; const chips=document.createElement('div'); chips.className='chips-row'; options.forEach(opt=>{ const c=document.createElement('button'); c.className='chip'; c.textContent=opt; c.onclick=()=>{ chips.remove(); row.remove(); inputField.value=opt; handleUserInput(); }; chips.appendChild(c); }); row.appendChild(chips); messagesDiv.appendChild(row); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
-function launchSearch(){
-  const fromIata = selectedIata.from || collectedData.fromIata || getIataCode(collectedData.from);
-  const toIata   = selectedIata.to   || collectedData.toIata   || getIataCode(collectedData.to);
-  if(!fromIata || !toIata || !collectedData.from || !collectedData.to) return;
+async function launchSearch(){
+  // Resolve IATA codes — use selectedIata (autocomplete) first, then async API lookup
+  const fromIata = selectedIata.from && selectedIata.from !== 'XXX'
+    ? selectedIata.from
+    : (collectedData.fromIata && collectedData.fromIata !== 'XXX'
+        ? collectedData.fromIata
+        : await resolveIata(collectedData.from));
 
-  // Build dates from collectedData (chat) — these override the calendar picker
+  const toIata = selectedIata.to && selectedIata.to !== 'XXX'
+    ? selectedIata.to
+    : (collectedData.toIata && collectedData.toIata !== 'XXX'
+        ? collectedData.toIata
+        : await resolveIata(collectedData.to));
+
+  if(!fromIata || !toIata || fromIata==='XXX' || toIata==='XXX' || !collectedData.from || !collectedData.to){
+    // Can't resolve IATA — tell user
+    const msg = {fr:'Désolée, je n'ai pas pu identifier les aéroports. Pouvez-vous préciser les villes de départ et d'arrivée ?', en:'Sorry, I could not identify the airports. Could you clarify the departure and arrival cities?', ru:'Извините, не удалось определить аэропорты. Уточните города отправления и назначения.'};
+    addBotMessage(msg[currentLang]||msg.fr);
+    return;
+  }
+
   const pax = parseInt(collectedData.passengers) || 1;
-
-  // Parse dates from collectedData.dates string if dpStart not set by picker
   let departDate = '';
   let returnDate = '';
 
   if(dpStart){
     const y=dpStart.getFullYear(),m=String(dpStart.getMonth()+1).padStart(2,'0'),d=String(dpStart.getDate()).padStart(2,'0');
     departDate=`${y}-${m}-${d}`;
-  } else if(collectedData.dates){
-    // Use today + 7 days as fallback if we have a date string but can't parse it
-    const d=new Date(); d.setDate(d.getDate()+7);
-    departDate=d.toISOString().split('T')[0];
   } else {
     const d=new Date(); d.setDate(d.getDate()+7);
     departDate=d.toISOString().split('T')[0];
   }
 
-  // Return date: calendar picker > Sofia collected > none
   if(dpEnd && tripType==='return'){
     const y=dpEnd.getFullYear(),m=String(dpEnd.getMonth()+1).padStart(2,'0'),d=String(dpEnd.getDate()).padStart(2,'0');
     returnDate=`${y}-${m}-${d}`;
