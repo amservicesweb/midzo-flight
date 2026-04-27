@@ -1,5 +1,24 @@
-// api/chat.js — Backend Vercel — DeepSeek · Conversation IA pure
-// Variable d'environnement Vercel : DEEPSEEK_API_KEY
+// api/chat.js — Backend Vercel sécurisé — DeepSeek
+// Variable d'environnement : DEEPSEEK_API_KEY
+
+// ── Rate limiting en mémoire (reset à chaque cold start Vercel) ──────────────
+const rateLimitMap = new Map();
+function checkRateLimit(ip) {
+    const now = Date.now();
+    const windowMs = 60 * 1000; // 1 minute
+    const maxRequests = 20;     // 20 messages/minute par IP
+    const entry = rateLimitMap.get(ip) || { count: 0, resetAt: now + windowMs };
+    if(now > entry.resetAt) { entry.count = 0; entry.resetAt = now + windowMs; }
+    entry.count++;
+    rateLimitMap.set(ip, entry);
+    return entry.count <= maxRequests;
+}
+
+// ── Simple response cache (évite appels dupliqués) ────────────────────────────
+const responseCache = new Map();
+function getCacheKey(message, lang) {
+    return `${lang}:${message.toLowerCase().trim().substring(0, 50)}`;
+}
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -8,13 +27,33 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+    // ── Rate limiting ─────────────────────────────────────────────────────────
+    const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'unknown';
+    if(!checkRateLimit(ip)){
+        return res.status(429).json({ error: 'Too many requests', reply: null });
+    }
+
+    // ── Input validation ──────────────────────────────────────────────────────
     const { message, context = [], lang = 'fr', collected = {} } = req.body;
-    if (!message) return res.status(400).json({ error: 'Missing message' });
+    if(!message || typeof message !== 'string') {
+        return res.status(400).json({ error: 'Missing or invalid message' });
+    }
+    if(message.length > 500) {
+        return res.status(400).json({ error: 'Message too long' });
+    }
+    if(!['fr','en','ru'].includes(lang)) {
+        return res.status(400).json({ error: 'Invalid language' });
+    }
 
-    const langNames = { fr: 'français', en: 'English', ru: 'русский' };
-    const forcedLang = langNames[lang] || 'français';
+    // ── API key check ─────────────────────────────────────────────────────────
+    const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY;
+    if(!DEEPSEEK_KEY) {
+        return res.status(500).json({ error: 'API not configured', reply: null });
+    }
 
-    // État actuel des données collectées pour contexte
+    // ── Build system prompt ───────────────────────────────────────────────────
+    const langNames = { fr:'français', en:'English', ru:'русский' };
+    const forcedLang = langNames[lang];
     const alreadyKnown = [];
     if(collected.from) alreadyKnown.push(`departure: ${collected.from}`);
     if(collected.to)   alreadyKnown.push(`destination: ${collected.to}`);
@@ -22,32 +61,21 @@ export default async function handler(req, res) {
     if(collected.passengers) alreadyKnown.push(`passengers: ${collected.passengers}`);
     const knownStr = alreadyKnown.length ? `\nAlready collected: ${alreadyKnown.join(', ')}` : '';
 
-    const SYSTEM_PROMPT = `You are Sofia, a senior travel agent at Midzo Flight. You are warm, human, expert in travel and passionate about destinations worldwide.
+    const SYSTEM_PROMPT = `You are Sofia, a senior travel agent at Midzo Flight. Warm, human, expert in travel.
 
-CRITICAL: You MUST ALWAYS respond in ${forcedLang} — no exceptions, regardless of what language the user writes in.
+CRITICAL: Always respond in ${forcedLang} only — no exceptions.
 ${knownStr}
 
-PERSONALITY:
-- Warm, friendly, enthusiastic about travel. Like a real human travel agent.
-- Natural, concise responses (2-3 sentences max).
-- Light comments on destinations ("Dubai in winter — perfect choice, the weather is ideal!").
-- Can suggest alternatives, give travel tips, visa info, best seasons.
+PERSONALITY: Friendly, concise (2-3 sentences), enthusiastic. Give destination tips, visa info, best seasons when relevant. You can also help choose a destination if the user is undecided.
 
-TRAVEL EXPERTISE: You can advise on destinations, best travel periods, visa requirements, local tips, itinerary ideas, price tips, luggage, insurance.
+MISSION: Through natural conversation, collect: departure city, destination, travel dates, passengers, budget (optional).
 
-MISSION: Through natural conversation, collect these details to find the best flight:
-1. Departure city
-2. Destination  
-3. Travel dates (departure + return if round trip)
-4. Number of passengers
-5. Budget (optional, ask last)
-
-RESPONSE FORMAT: You MUST respond with a JSON object (no markdown, no backticks, just raw JSON):
+RESPONSE FORMAT — return ONLY valid JSON, no markdown:
 {
-  "reply": "Your conversational message to the user",
+  "reply": "Your message to the user in ${forcedLang}",
   "collected": {
-    "from": "city name or null",
-    "to": "city name or null", 
+    "from": "city or null",
+    "to": "city or null",
     "dates": "dates string or null",
     "passengers": "number as string or null",
     "budget": "budget or null"
@@ -57,19 +85,12 @@ RESPONSE FORMAT: You MUST respond with a JSON object (no markdown, no backticks,
   "suggest_passengers": false
 }
 
-Set "ready": true ONLY when you have at minimum: from, to, and dates.
-Set "suggest_destinations": true when you want to show destination chips to the user.
-Set "suggest_passengers": true when asking how many passengers.
-Only include fields in "collected" that were mentioned in THIS message or previous context.
-If a field is not known, set it to null.
-
-RULES:
-- Stay in travel/flight domain. If off-topic, redirect with humor.
-- Never break character.
-- When ready, your reply should be something like "Perfect! I'm searching for the best deals..." (in ${forcedLang}).`;
-
-    const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY;
-    if (!DEEPSEEK_KEY) return res.status(500).json({ error: 'DEEPSEEK_API_KEY not configured' });
+Set "ready": true ONLY when you have from, to, AND dates.
+Set "suggest_destinations": true when you want to show destination suggestions.
+Set "suggest_passengers": true when asking about passengers.
+Only include newly extracted fields in "collected" — set others to null.
+If off-topic (not travel related), redirect with humor and set all collected fields to null.
+When ready, your reply should say you're searching (in ${forcedLang}).`;
 
     try {
         const r = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -86,41 +107,53 @@ RULES:
                     { role: 'user', content: message }
                 ],
                 temperature: 0.8,
-                max_tokens: 400,
+                max_tokens: 350,
                 response_format: { type: 'json_object' }
             })
         });
 
+        if(!r.ok) {
+            const err = await r.text();
+            console.error('DeepSeek HTTP error:', r.status, err);
+            return res.status(502).json({ error: 'AI service error', reply: null });
+        }
+
         const d = await r.json();
         const raw = d?.choices?.[0]?.message?.content;
-        if (!raw) return res.status(500).json({ error: 'Empty response' });
+        if(!raw) return res.status(500).json({ error: 'Empty AI response', reply: null });
 
-        // Parse JSON response from AI
         let parsed;
         try {
             parsed = JSON.parse(raw);
         } catch(e) {
-            // If AI didn't return valid JSON, extract reply text and return basic structure
-            const replyMatch = raw.match(/"reply"\s*:\s*"([^"]+)"/);
+            // Fallback: extract reply text if JSON parsing fails
+            const match = raw.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)"/);
             parsed = {
-                reply: replyMatch ? replyMatch[1] : raw.replace(/[{}"]/g,'').trim(),
-                collected: {},
-                ready: false,
-                suggest_destinations: false,
-                suggest_passengers: false
+                reply: match ? match[1].replace(/\\n/g,'\n').replace(/\\"/g,'"') : raw,
+                collected: {}, ready: false,
+                suggest_destinations: false, suggest_passengers: false
             };
         }
 
-        return res.status(200).json({
-            reply: parsed.reply || '',
-            collected: parsed.collected || {},
+        // Sanitize output
+        const response = {
+            reply: String(parsed.reply || '').substring(0, 600),
+            collected: {
+                from: parsed.collected?.from || null,
+                to: parsed.collected?.to || null,
+                dates: parsed.collected?.dates || null,
+                passengers: parsed.collected?.passengers || null,
+                budget: parsed.collected?.budget || null
+            },
             ready: parsed.ready === true,
             suggest_destinations: parsed.suggest_destinations === true,
             suggest_passengers: parsed.suggest_passengers === true
-        });
+        };
+
+        return res.status(200).json(response);
 
     } catch(e) {
         console.error('DeepSeek error:', e.message);
-        return res.status(500).json({ error: 'AI unavailable' });
+        return res.status(500).json({ error: 'AI unavailable', reply: null });
     }
 }
