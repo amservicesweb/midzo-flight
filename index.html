@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Midzo Flight · Trouvez votre vol au meilleur prix</title>
-<meta name="description" content="Comparez des centaines de vols avec l'agent IA Sofia. 728+ compagnies en temps réel.">
+<title id="page-title">Midzo Flight · Trouvez votre vol au meilleur prix</title>
+<meta name="description" id="page-desc" content="Comparez des centaines de vols avec l'agent IA Sofia. 728+ compagnies en temps réel.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -279,13 +279,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
       </span>
     </a>
     <nav class="nav-tabs" id="nav-tabs">
-      <button class="nav-tab active"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0770e3"/></svg>Vols</button>
-      <button class="nav-tab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8"/></svg>Hôtels<span class="badge-soon">bientôt</span></button>
-      <a href="#agent-section" class="nav-tab">Agent IA</a>
-      <button class="nav-tab" onclick="openModal('about')">Contact</button>
+      <button class="nav-tab active"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0770e3"/></svg><span id="nav-flights">Vols</span></button>
+      <button class="nav-tab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8"/></svg><span id="nav-hotels">Hôtels</span><span class="badge-soon" id="nav-soon">bientôt</span></button>
+      <a href="#agent-section" class="nav-tab" id="nav-agent">Agent IA</a>
+      <button class="nav-tab" onclick="openModal('about')" id="nav-contact">Contact</button>
     </nav>
     <div class="nav-right">
-      <div class="ai-pill" id="ai-pill"><div class="ai-dot"></div>Sofia disponible</div>
+      <div class="ai-pill" id="ai-pill"><div class="ai-dot"></div><span id="sofia-status">Sofia disponible</span></div>
       <div class="lang-wrap">
         <button class="lang-btn" id="lang-btn"><span id="lang-flag">🇫🇷</span></button>
         <div class="lang-dd" id="lang-dd">
@@ -294,8 +294,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
           <button class="lang-opt" data-lang="ru">🇷🇺 Русский</button>
         </div>
       </div>
-      <button class="btn btn-ghost" onclick="openModal('newsletter')">Alertes prix</button>
-      <a href="#agent-section" class="btn btn-primary">Rechercher</a>
+      <button class="btn btn-ghost" onclick="openModal('newsletter')" id="btn-alerts">Alertes prix</button>
+      <a href="#agent-section" class="btn btn-primary" id="btn-search-nav">Rechercher</a>
     </div>
   </div>
 </header>
@@ -305,9 +305,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
   <div class="hero-bg"></div>
   <div class="hero-ov"></div>
   <div class="hero-txt">
-    <div class="hero-eyebrow"><svg width="7" height="7" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><path d="M6 3v3l2 1" stroke="rgba(255,255,255,.8)" stroke-width="1.2" stroke-linecap="round"/></svg>Recherchez · Comparez · Voyagez</div>
-    <h1 class="hero-title">Trouvez votre vol<br>au meilleur prix</h1>
-    <p class="hero-sub">Midzo compare des centaines de compagnies en quelques secondes. Aucun frais. Aucune surprise.</p>
+    <div class="hero-eyebrow"><svg width="7" height="7" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><path d="M6 3v3l2 1" stroke="rgba(255,255,255,.8)" stroke-width="1.2" stroke-linecap="round"/></svg><span id="hero-eyebrow">Recherchez · Comparez · Voyagez</span></div>
+    <h1 class="hero-title" id="hero-title">Trouvez votre vol<br>au meilleur prix</h1>
+    <p class="hero-sub" id="hero-sub">Midzo compare des centaines de compagnies en quelques secondes. Aucun frais. Aucune surprise.</p>
   </div>
 </section>
 
@@ -315,17 +315,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 <div class="sc-wrap">
   <div class="sc">
     <div class="sc-tabs">
-      <button class="sc-tab active"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0770e3"/></svg>Vols</button>
-      <button class="sc-tab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8"/></svg>Hôtels<span class="badge-soon">bientôt</span></button>
+      <button class="sc-tab active"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="#0770e3"/></svg><span id="sc-tab-flights">Vols</span></button>
+      <button class="sc-tab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8"/></svg><span id="sc-tab-hotels">Hôtels</span><span class="badge-soon" id="sc-soon">bientôt</span></button>
     </div>
     <div class="sc-body">
       <div class="trip-toggle">
-        <button id="btn-return" class="trip-btn active" onclick="setTripType('return')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Aller-retour</button>
-        <button id="btn-oneway" class="trip-btn" onclick="setTripType('oneway')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Aller simple</button>
+        <button id="btn-return" class="trip-btn active" onclick="setTripType('return')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="btn-return-txt">Aller-retour</span></button>
+        <button id="btn-oneway" class="trip-btn" onclick="setTripType('oneway')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="btn-oneway-txt">Aller simple</span></button>
       </div>
       <div class="sb" id="sb">
         <div class="sb-field" style="overflow:visible;">
-          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="10" r="3" stroke="#0770e3" stroke-width="2"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#0770e3" stroke-width="2"/></svg>Départ</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="10" r="3" stroke="#0770e3" stroke-width="2"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#0770e3" stroke-width="2"/></svg><span id="lbl-from">Départ</span></label>
           <input type="text" id="search-from" autocomplete="off" placeholder="Ex: Paris">
           <div class="ac-list" id="ac-from"></div>
         </div>
@@ -335,12 +335,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
           </button>
         </div>
         <div class="sb-field" style="overflow:visible;">
-          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="10" r="3" stroke="#0770e3" stroke-width="2"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#0770e3" stroke-width="2"/></svg>Destination</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="10" r="3" stroke="#0770e3" stroke-width="2"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#0770e3" stroke-width="2"/></svg><span id="lbl-to">Destination</span></label>
           <input type="text" id="search-to" autocomplete="off" placeholder="Ex: Dubai">
           <div class="ac-list" id="ac-to"></div>
         </div>
         <div class="sb-field" id="sf-depart" style="cursor:pointer;overflow:visible;" onclick="openDP('depart')">
-          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0770e3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg>Aller</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0770e3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg><span id="lbl-depart">Aller</span></label>
           <input type="text" id="search-depart" placeholder="Date aller" readonly>
           <div class="dp-wrap" id="dp-depart" onclick="event.stopPropagation()">
             <div class="dp-hd"><button class="dp-nav" id="dp-d-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button><span class="dp-month" id="dp-d-month"></span><button class="dp-nav" id="dp-d-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
@@ -349,7 +349,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
           </div>
         </div>
         <div class="sb-field" id="sf-return" style="cursor:pointer;overflow:visible;" onclick="openDP('return')">
-          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0770e3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg>Retour</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0770e3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg><span id="lbl-return">Retour</span></label>
           <input type="text" id="search-return" placeholder="Date retour" readonly>
           <div class="dp-wrap" id="dp-return" onclick="event.stopPropagation()">
             <div class="dp-hd"><button class="dp-nav" id="dp-r-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button><span class="dp-month" id="dp-r-month"></span><button class="dp-nav" id="dp-r-next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
@@ -358,7 +358,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
           </div>
         </div>
         <div class="sb-field" style="flex:0 0 110px;">
-          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="9" cy="7" r="4" stroke="#0770e3" stroke-width="2"/><path d="M1 21v-2a4 4 0 014-4h8a4 4 0 014 4v2" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg>Passagers</label>
+          <label><svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="9" cy="7" r="4" stroke="#0770e3" stroke-width="2"/><path d="M1 21v-2a4 4 0 014-4h8a4 4 0 014 4v2" stroke="#0770e3" stroke-width="2" stroke-linecap="round"/></svg><span id="lbl-pax">Passagers</span></label>
           <input type="number" id="search-pax" value="1" min="1" max="9">
         </div>
         <button class="sb-submit" id="btn-search">Rechercher</button>
@@ -369,13 +369,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 
 <!-- ══ DESTINATIONS ══ -->
 <div class="section">
-  <h2 class="section-title">Où voulez-vous aller ?</h2>
+  <h2 class="section-title" id="dest-title">Où voulez-vous aller ?</h2>
   <div class="dest-grid">
-    <div class="dest-card" onclick="fillAndScroll('','Paris','CDG')"><img class="dest-img" src="images/paris.jpg" alt="Paris" onerror="this.src='https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=500&q=80'"><div class="dest-info"><div class="dest-name">Paris</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','Dubai','DXB')"><img class="dest-img" src="images/dubai.jpg" alt="Dubaï" onerror="this.src='https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80'"><div class="dest-info"><div class="dest-name">Dubaï</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','New York','JFK')"><img class="dest-img" src="images/newyork.jpg" alt="New York" onerror="this.src='https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=500&q=80'"><div class="dest-info"><div class="dest-name">New York</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','Abidjan','ABJ')"><img class="dest-img" src="images/abidjan.jpg" alt="Abidjan" onerror="this.src='https://images.unsplash.com/photo-1580746738098-adb2af4f7d39?w=500&q=80'"><div class="dest-info"><div class="dest-name">Abidjan</div><div class="dest-cta">Explorer →</div></div></div>
-    <div class="dest-card" onclick="fillAndScroll('','Bangkok','BKK')"><img class="dest-img" src="images/bangkok.jpg" alt="Bangkok" onerror="this.src='https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=500&q=80'"><div class="dest-info"><div class="dest-name">Bangkok</div><div class="dest-cta">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Paris','CDG')"><img class="dest-img" src="images/paris.jpg" alt="Paris" onerror="this.src='https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=500&q=80'"><div class="dest-info"><div class="dest-name">Paris</div><div class="dest-cta" data-i18n="explore">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Dubai','DXB')"><img class="dest-img" src="images/dubai.jpg" alt="Dubaï" onerror="this.src='https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80'"><div class="dest-info"><div class="dest-name">Dubaï</div><div class="dest-cta" data-i18n="explore">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','New York','JFK')"><img class="dest-img" src="images/newyork.jpg" alt="New York" onerror="this.src='https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=500&q=80'"><div class="dest-info"><div class="dest-name">New York</div><div class="dest-cta" data-i18n="explore">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Abidjan','ABJ')"><img class="dest-img" src="images/abidjan.jpg" alt="Abidjan" onerror="this.src='https://images.unsplash.com/photo-1580746738098-adb2af4f7d39?w=500&q=80'"><div class="dest-info"><div class="dest-name">Abidjan</div><div class="dest-cta" data-i18n="explore">Explorer →</div></div></div>
+    <div class="dest-card" onclick="fillAndScroll('','Bangkok','BKK')"><img class="dest-img" src="images/bangkok.jpg" alt="Bangkok" onerror="this.src='https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=500&q=80'"><div class="dest-info"><div class="dest-name">Bangkok</div><div class="dest-cta" data-i18n="explore">Explorer →</div></div></div>
   </div>
 </div>
 
@@ -385,21 +385,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
     <div class="agent-av"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="rgba(255,255,255,.8)" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="rgba(255,255,255,.8)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="1.5" fill="rgba(255,255,255,.8)"/></svg></div>
     <div>
       <div class="agent-name" id="agent-name">Sofia · Agent de voyage IA</div>
-      <div class="agent-sub">Powered by Midzo Flight</div>
-      <div class="agent-status"><span style="width:6px;height:6px;border-radius:50%;background:#00d26a;display:inline-block;animation:ping 2s infinite;"></span> Sofia disponible</div>
+      <div class="agent-sub" id="agent-sub">Powered by Midzo Flight</div>
+      <div class="agent-status"><span style="width:6px;height:6px;border-radius:50%;background:#00d26a;display:inline-block;animation:ping 2s infinite;"></span> <span id="agent-status-txt">Sofia disponible</span></div>
     </div>
     <div class="agent-tags">
-      <span class="agent-tag">✓ 728 compagnies</span>
-      <span class="agent-tag">✓ Prix en temps réel</span>
-      <span class="agent-tag">✓ Disponible 24h/24</span>
+      <span class="agent-tag" id="tag-airlines">✓ 728 compagnies</span>
+      <span class="agent-tag" id="tag-realtime">✓ Prix en temps réel</span>
+      <span class="agent-tag" id="tag-24h">✓ Disponible 24h/24</span>
     </div>
   </div>
   <div class="chat-box">
     <div id="chat-msgs"></div>
     <div style="padding:8px 12px 0;">
-      <a href="https://wa.me/79961792326?text=Bonjour%20Midzo" target="_blank" class="wa-btn">
+      <a href="https://wa.me/79961792326?text=Bonjour%20Midzo" target="_blank" class="wa-btn" id="wa-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-        Parler à un agent WhatsApp
+        <span id="wa-btn-txt">Parler à un agent WhatsApp</span>
       </a>
     </div>
     <div class="chat-input-row">
@@ -408,7 +408,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
     </div>
     <div id="result-cta" class="result-cta">
       <span id="result-msg" style="font-weight:600;font-size:.84rem;color:var(--text);"></span>
-      <a href="#" target="_blank" id="aviasales-link" class="btn btn-primary" style="font-size:.82rem;">Voir les vols</a>
+      <a href="#" target="_blank" id="aviasales-link" class="btn btn-primary" style="font-size:.82rem;" data-i18n-key="see-flights">Voir les vols</a>
     </div>
   </div>
 </div>
@@ -421,29 +421,29 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
         <span style="font-weight:800;font-size:1rem;color:#fff;">MIDZO</span>
         <span style="font-size:.57rem;font-weight:700;color:var(--blue);background:rgba(7,112,227,.18);border-radius:4px;padding:2px 5px;">FLIGHT</span>
       </div>
-      <p style="font-size:.83rem;max-width:250px;line-height:1.6;margin-bottom:1.1rem;">Comparez des centaines de vols. Réservez au meilleur prix.</p>
+      <p style="font-size:.83rem;max-width:250px;line-height:1.6;margin-bottom:1.1rem;" id="footer-tagline">Comparez des centaines de vols. Réservez au meilleur prix.</p>
       <div style="margin-bottom:1.1rem;">
         <a href="https://t.me/midzoflight_bot" target="_blank" class="soc-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.56-.44.7-.88.43l-2.42-1.79-1.16 1.12c-.13.13-.24.24-.49.24l.17-2.46 4.47-4.04c.19-.17-.04-.27-.3-.1L7.74 15.4l-2.38-.74c-.52-.16-.53-.52.11-.77l9.29-3.58c.43-.16.81.1.68.49z" fill="rgba(255,255,255,.65)"/></svg></a>
         <a href="https://wa.me/79961792326" target="_blank" class="soc-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,.65)"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
       </div>
-      <p class="foot-col-title">Newsletter</p>
-      <div class="nl-row"><input type="email" class="nl-input" placeholder="Votre email"><button class="nl-btn">OK</button></div>
+      <p class="foot-col-title" id="footer-newsletter-title">Newsletter</p>
+      <div class="nl-row"><input type="email" class="nl-input" id="nl-email-input" placeholder="Votre email"><button class="nl-btn" id="nl-btn-txt">OK</button></div>
     </div>
     <div>
-      <p class="foot-col-title">Navigation</p>
-      <a href="#" class="foot-link">Vols</a>
-      <a href="#agent-section" class="foot-link">Agent IA</a>
+      <p class="foot-col-title" id="footer-nav-title">Navigation</p>
+      <a href="#" class="foot-link" id="footer-link-flights">Vols</a>
+      <a href="#agent-section" class="foot-link" id="footer-link-agent">Agent IA</a>
       <a href="https://t.me/midzoflight_bot" target="_blank" class="foot-link">@midzoflight_bot</a>
     </div>
     <div>
-      <p class="foot-col-title">Légal</p>
-      <a href="#" class="foot-link" onclick="event.preventDefault();openModal('about')">À propos</a>
-      <a href="#" class="foot-link" onclick="event.preventDefault();openModal('faq')">FAQ</a>
-      <a href="#" class="foot-link" onclick="event.preventDefault();openModal('privacy')">Confidentialité</a>
-      <a href="mailto:kwami.wampah@yahoo.com" class="foot-link">Contact</a>
+      <p class="foot-col-title" id="footer-legal-title">Légal</p>
+      <a href="#" class="foot-link" id="footer-about" onclick="event.preventDefault();openModal('about')">À propos</a>
+      <a href="#" class="foot-link" id="footer-faq" onclick="event.preventDefault();openModal('faq')">FAQ</a>
+      <a href="#" class="foot-link" id="footer-privacy" onclick="event.preventDefault();openModal('privacy')">Confidentialité</a>
+      <a href="mailto:kwami.wampah@yahoo.com" class="foot-link" id="footer-contact">Contact</a>
     </div>
   </div>
-  <div class="footer-bottom"><div class="footer-bottom-inner"><p>© 2026 Midzo Flight · Tous droits réservés.</p></div></div>
+  <div class="footer-bottom"><div class="footer-bottom-inner"><p id="footer-copy">© 2026 Midzo Flight · Tous droits réservés.</p></div></div>
 </footer>
 
 <script>
@@ -467,7 +467,340 @@ const resultMsgEl = document.getElementById('result-msg');
 ═══════════════════════════════════════════════════════════════ */
 function openModal(id){ document.getElementById('modal-'+id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeModal(id){ document.getElementById('modal-'+id).classList.remove('open'); document.body.style.overflow=''; }
-function subscribeNewsletter(){ const e=document.getElementById('sub-email').value; if(!e)return; alert('Merci ! Vous recevrez nos meilleures offres sur '+e); closeModal('newsletter'); }
+
+function subscribeNewsletter(){
+  const e=document.getElementById('sub-email').value;
+  if(!e) return;
+  const msg = lang==='en' ? 'Thank you! You will receive our best deals at '+e
+            : lang==='ru' ? 'Спасибо! Лучшие предложения придут на '+e
+            : 'Merci ! Vous recevrez nos meilleures offres sur '+e;
+  alert(msg);
+  closeModal('newsletter');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   i18n — dictionnaire complet FR / EN / RU
+═══════════════════════════════════════════════════════════════ */
+const T = {
+  fr: {
+    pageTitle:      'Midzo Flight · Trouvez votre vol au meilleur prix',
+    pageDesc:       'Comparez des centaines de vols avec l\'agent IA Sofia. 728+ compagnies en temps réel.',
+    navFlights:     'Vols',
+    navHotels:      'Hôtels',
+    navSoon:        'bientôt',
+    navAgent:       'Agent IA',
+    navContact:     'Contact',
+    sofiaStatus:    'Sofia disponible',
+    btnAlerts:      'Alertes prix',
+    btnSearchNav:   'Rechercher',
+    heroEyebrow:    'Recherchez · Comparez · Voyagez',
+    heroTitle:      'Trouvez votre vol<br>au meilleur prix',
+    heroSub:        'Midzo compare des centaines de compagnies en quelques secondes. Aucun frais. Aucune surprise.',
+    scTabFlights:   'Vols',
+    scTabHotels:    'Hôtels',
+    scSoon:         'bientôt',
+    btnReturn:      'Aller-retour',
+    btnOneway:      'Aller simple',
+    lblFrom:        'Départ',
+    lblTo:          'Destination',
+    lblDepart:      'Aller',
+    lblReturn:      'Retour',
+    lblPax:         'Passagers',
+    phFrom:         'Ex: Paris',
+    phTo:           'Ex: Dubai',
+    phDepart:       'Date aller',
+    phReturn:       'Date retour',
+    dpClear:        'Effacer',
+    dpApply:        'Appliquer',
+    btnSearch:      'Rechercher',
+    destTitle:      'Où voulez-vous aller ?',
+    explore:        'Explorer →',
+    agentName:      'Sofia · Agent de voyage IA',
+    agentSub:       'Powered by Midzo Flight',
+    agentStatusTxt: 'Sofia disponible',
+    tagAirlines:    '✓ 728 compagnies',
+    tagRealtime:    '✓ Prix en temps réel',
+    tag24h:         '✓ Disponible 24h/24',
+    waBtnTxt:       'Parler à un agent WhatsApp',
+    chatPlaceholder:'Répondez ici...',
+    chatSend:       'Envoyer',
+    seeFlights:     'Voir les vols',
+    footerTagline:  'Comparez des centaines de vols. Réservez au meilleur prix.',
+    footerNewsletter:'Newsletter',
+    nlEmail:        'Votre email',
+    footerNav:      'Navigation',
+    footerLinkFlights:'Vols',
+    footerLinkAgent: 'Agent IA',
+    footerLegal:    'Légal',
+    footerAbout:    'À propos',
+    footerFaq:      'FAQ',
+    footerPrivacy:  'Confidentialité',
+    footerContact:  'Contact',
+    footerCopy:     '© 2026 Midzo Flight · Tous droits réservés.',
+    alertCity:      'Veuillez indiquer une ville de départ et une destination.',
+    chatSearching:  (from,to,pax) => `Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)…`,
+    chatWelcome:    'Bonjour ! Je suis Sofia 👋 Dites-moi votre trajet — ex: "Paris → Abidjan, 15 juin"',
+    chatWelcomeChips: ['Paris → Lomé','Paris → Abidjan','Paris → Dakar','Paris → Dubai'],
+    chatDestChips:  (to) => ['Paris','Abidjan','Dakar','Lomé','Douala','Moscou'].filter(c=>normalize(c)!==normalize(to)),
+    chatDestQ:      (to) => `Super choix ! De quelle ville partez-vous pour ${to} ?`,
+    botNoFrom:      "D'où partez-vous ?",
+    botFromChips:   ['Paris','Abidjan','Dakar','Lomé','Douala','Moscou'],
+    botNoTo:        (from) => `Parfait, départ de ${from} ✈️ Quelle est votre destination ?`,
+    botToChips:     ['Paris','Dubai','Istanbul','New York','Lomé','Abidjan','Bangkok','Bali'],
+    botNoDate:      (from,to) => `${from} → ${to}, super trajet ! Quelle date de départ ?`,
+    botDateChips:   ['Demain','Dans 7 jours','Dans 15 jours','Dans 1 mois'],
+    botFound:       (from,to,date,pax) => `✅ Vols trouvés !\n${from} → ${to}${date?' · '+date:''}${pax>1?' · '+pax+' passagers':''}`,
+    botFoundMsg:    (from,to) => `Vols ${from} → ${to} trouvés`,
+    botNoCity:      'Donnez-moi un trajet (ex: Paris → Lomé).',
+    botCityUnknown: (city) => `Je ne reconnais pas "${city}". Essayez : Paris, Abidjan, Lomé, Dubai…`,
+    botNoIata:      "Je n'ai pas encore votre départ et destination. Pouvez-vous préciser ?",
+    newSearchIntent: /\b(autre|nouveau|nouvelle|different|changer|recommencer|reset|new|other|другой|новый|снова)\b/,
+    modalAbout:     'À propos de Midzo Flight',
+    modalFaq:       'Questions fréquentes',
+    modalPrivacy:   'Confidentialité',
+  },
+  en: {
+    pageTitle:      'Midzo Flight · Find your flight at the best price',
+    pageDesc:       'Compare hundreds of flights with AI agent Sofia. 728+ airlines in real time.',
+    navFlights:     'Flights',
+    navHotels:      'Hotels',
+    navSoon:        'soon',
+    navAgent:       'AI Agent',
+    navContact:     'Contact',
+    sofiaStatus:    'Sofia available',
+    btnAlerts:      'Price alerts',
+    btnSearchNav:   'Search',
+    heroEyebrow:    'Search · Compare · Travel',
+    heroTitle:      'Find your flight<br>at the best price',
+    heroSub:        'Midzo compares hundreds of airlines in seconds. No fees. No surprises.',
+    scTabFlights:   'Flights',
+    scTabHotels:    'Hotels',
+    scSoon:         'soon',
+    btnReturn:      'Round trip',
+    btnOneway:      'One way',
+    lblFrom:        'From',
+    lblTo:          'To',
+    lblDepart:      'Depart',
+    lblReturn:      'Return',
+    lblPax:         'Passengers',
+    phFrom:         'Ex: London',
+    phTo:           'Ex: Dubai',
+    phDepart:       'Departure date',
+    phReturn:       'Return date',
+    dpClear:        'Clear',
+    dpApply:        'Apply',
+    btnSearch:      'Search',
+    destTitle:      'Where do you want to go?',
+    explore:        'Explore →',
+    agentName:      'Sofia · AI Travel Agent',
+    agentSub:       'Powered by Midzo Flight',
+    agentStatusTxt: 'Sofia available',
+    tagAirlines:    '✓ 728 airlines',
+    tagRealtime:    '✓ Real-time prices',
+    tag24h:         '✓ Available 24/7',
+    waBtnTxt:       'Chat with a WhatsApp agent',
+    chatPlaceholder:'Reply here...',
+    chatSend:       'Send',
+    seeFlights:     'See flights',
+    footerTagline:  'Compare hundreds of flights. Book at the best price.',
+    footerNewsletter:'Newsletter',
+    nlEmail:        'Your email',
+    footerNav:      'Navigation',
+    footerLinkFlights:'Flights',
+    footerLinkAgent: 'AI Agent',
+    footerLegal:    'Legal',
+    footerAbout:    'About',
+    footerFaq:      'FAQ',
+    footerPrivacy:  'Privacy',
+    footerContact:  'Contact',
+    footerCopy:     '© 2026 Midzo Flight · All rights reserved.',
+    alertCity:      'Please enter a departure city and a destination.',
+    chatSearching:  (from,to,pax) => `Searching best flights from ${from} → ${to} for ${pax} passenger(s)…`,
+    chatWelcome:    'Hello! I\'m Sofia 👋 Tell me your trip — e.g. "Paris → Abidjan, June 15"',
+    chatWelcomeChips: ['Paris → Lomé','Paris → Abidjan','Paris → Dakar','Paris → Dubai'],
+    chatDestChips:  (to) => ['Paris','Abidjan','Dakar','Lomé','Douala','Moscow'].filter(c=>normalize(c)!==normalize(to)),
+    chatDestQ:      (to) => `Great choice! Where are you flying from to ${to}?`,
+    botNoFrom:      'Where are you departing from?',
+    botFromChips:   ['Paris','Abidjan','Dakar','Lomé','Douala','Moscow'],
+    botNoTo:        (from) => `Great, departing from ${from} ✈️ Where would you like to go?`,
+    botToChips:     ['Paris','Dubai','Istanbul','New York','Lomé','Abidjan','Bangkok','Bali'],
+    botNoDate:      (from,to) => `${from} → ${to}, great route! What is your departure date?`,
+    botDateChips:   ['Tomorrow','In 7 days','In 15 days','In 1 month'],
+    botFound:       (from,to,date,pax) => `✅ Flights found!\n${from} → ${to}${date?' · '+date:''}${pax>1?' · '+pax+' passengers':''}`,
+    botFoundMsg:    (from,to) => `Flights ${from} → ${to} found`,
+    botNoCity:      'Give me a route (e.g. Paris → Lomé).',
+    botCityUnknown: (city) => `I don't recognize "${city}". Try: Paris, Abidjan, Lomé, Dubai…`,
+    botNoIata:      "I don't have your departure and destination yet. Can you specify?",
+    newSearchIntent: /\b(another|new|different|change|restart|reset|другой|новый|снова|autre|nouveau)\b/,
+    modalAbout:     'About Midzo Flight',
+    modalFaq:       'Frequently asked questions',
+    modalPrivacy:   'Privacy Policy',
+  },
+  ru: {
+    pageTitle:      'Midzo Flight · Найдите рейс по лучшей цене',
+    pageDesc:       'Сравните сотни рейсов с ИИ-агентом Софией. 728+ авиакомпаний в реальном времени.',
+    navFlights:     'Рейсы',
+    navHotels:      'Отели',
+    navSoon:        'скоро',
+    navAgent:       'ИИ-агент',
+    navContact:     'Контакт',
+    sofiaStatus:    'София доступна',
+    btnAlerts:      'Оповещения о ценах',
+    btnSearchNav:   'Найти',
+    heroEyebrow:    'Ищите · Сравнивайте · Путешествуйте',
+    heroTitle:      'Найдите рейс<br>по лучшей цене',
+    heroSub:        'Midzo сравнивает сотни авиакомпаний за секунды. Без комиссий. Без сюрпризов.',
+    scTabFlights:   'Рейсы',
+    scTabHotels:    'Отели',
+    scSoon:         'скоро',
+    btnReturn:      'Туда-обратно',
+    btnOneway:      'В одну сторону',
+    lblFrom:        'Откуда',
+    lblTo:          'Куда',
+    lblDepart:      'Туда',
+    lblReturn:      'Обратно',
+    lblPax:         'Пассажиры',
+    phFrom:         'Напр: Москва',
+    phTo:           'Напр: Дубай',
+    phDepart:       'Дата вылета',
+    phReturn:       'Дата возврата',
+    dpClear:        'Очистить',
+    dpApply:        'Применить',
+    btnSearch:      'Найти',
+    destTitle:      'Куда хотите полететь?',
+    explore:        'Смотреть →',
+    agentName:      'София · ИИ-агент по путешествиям',
+    agentSub:       'Powered by Midzo Flight',
+    agentStatusTxt: 'София доступна',
+    tagAirlines:    '✓ 728 авиакомпаний',
+    tagRealtime:    '✓ Цены в реальном времени',
+    tag24h:         '✓ Доступно 24/7',
+    waBtnTxt:       'Написать агенту в WhatsApp',
+    chatPlaceholder:'Ответьте здесь...',
+    chatSend:       'Отправить',
+    seeFlights:     'Смотреть рейсы',
+    footerTagline:  'Сравните сотни рейсов. Забронируйте по лучшей цене.',
+    footerNewsletter:'Рассылка',
+    nlEmail:        'Ваш email',
+    footerNav:      'Навигация',
+    footerLinkFlights:'Рейсы',
+    footerLinkAgent: 'ИИ-агент',
+    footerLegal:    'Юридическое',
+    footerAbout:    'О нас',
+    footerFaq:      'FAQ',
+    footerPrivacy:  'Конфиденциальность',
+    footerContact:  'Контакт',
+    footerCopy:     '© 2026 Midzo Flight · Все права защищены.',
+    alertCity:      'Укажите город отправления и пункт назначения.',
+    chatSearching:  (from,to,pax) => `Ищу лучшие рейсы ${from} → ${to} для ${pax} пассажира(ов)…`,
+    chatWelcome:    'Привет! Я София 👋 Скажите мне ваш маршрут — напр: "Москва → Париж, 15 июня"',
+    chatWelcomeChips: ['Москва → Париж','Москва → Дубай','Москва → Стамбул','Москва → Ломе'],
+    chatDestChips:  (to) => ['Москва','Париж','Дубай','Стамбул','Ломе','Абиджан'].filter(c=>normalize(c)!==normalize(to)),
+    chatDestQ:      (to) => `Отличный выбор! Из какого города вы летите в ${to}?`,
+    botNoFrom:      'Откуда вы вылетаете?',
+    botFromChips:   ['Москва','Париж','Абиджан','Дакар','Дубай','Стамбул'],
+    botNoTo:        (from) => `Отлично, вылет из ${from} ✈️ Куда желаете полететь?`,
+    botToChips:     ['Париж','Дубай','Стамбул','Нью-Йорк','Бали','Бангкок'],
+    botNoDate:      (from,to) => `${from} → ${to}, отличный маршрут! Какая дата вылета?`,
+    botDateChips:   ['Завтра','Через 7 дней','Через 15 дней','Через 1 месяц'],
+    botFound:       (from,to,date,pax) => `✅ Рейсы найдены!\n${from} → ${to}${date?' · '+date:''}${pax>1?' · '+pax+' пассажира':''}`,
+    botFoundMsg:    (from,to) => `Рейсы ${from} → ${to} найдены`,
+    botNoCity:      'Укажите маршрут (напр: Москва → Париж).',
+    botCityUnknown: (city) => `Я не знаю "${city}". Попробуйте: Москва, Париж, Дубай, Ломе…`,
+    botNoIata:      'Мне ещё нужны город отправления и пункт назначения. Уточните, пожалуйста.',
+    newSearchIntent: /\b(другой|новый|снова|другие|изменить|заново|another|new|autre|nouveau|другой маршрут)\b/,
+    modalAbout:     'О Midzo Flight',
+    modalFaq:       'Частые вопросы',
+    modalPrivacy:   'Конфиденциальность',
+  }
+};
+
+function t(key, ...args){
+  const d = T[lang]||T.fr;
+  const v = d[key];
+  if(typeof v === 'function') return v(...args);
+  return v !== undefined ? v : (T.fr[key]||key);
+}
+
+function applyLang(l){
+  lang = l;
+  const d = T[l]||T.fr;
+
+  // Page
+  document.title = d.pageTitle;
+  document.getElementById('page-desc')?.setAttribute('content', d.pageDesc);
+
+  // Nav
+  document.getElementById('nav-flights').textContent   = d.navFlights;
+  document.getElementById('nav-hotels').textContent    = d.navHotels;
+  document.getElementById('nav-soon').textContent      = d.navSoon;
+  document.getElementById('nav-agent').textContent     = d.navAgent;
+  document.getElementById('nav-contact').textContent   = d.navContact;
+  document.getElementById('sofia-status').textContent  = d.sofiaStatus;
+  document.getElementById('btn-alerts').textContent    = d.btnAlerts;
+  document.getElementById('btn-search-nav').textContent= d.btnSearchNav;
+
+  // Hero
+  document.getElementById('hero-eyebrow').textContent = d.heroEyebrow;
+  document.getElementById('hero-title').innerHTML     = d.heroTitle;
+  document.getElementById('hero-sub').textContent     = d.heroSub;
+
+  // Search card
+  document.getElementById('sc-tab-flights').textContent = d.scTabFlights;
+  document.getElementById('sc-tab-hotels').textContent  = d.scTabHotels;
+  document.getElementById('sc-soon').textContent        = d.scSoon;
+  document.getElementById('btn-return-txt').textContent = d.btnReturn;
+  document.getElementById('btn-oneway-txt').textContent = d.btnOneway;
+  document.getElementById('lbl-from').textContent   = d.lblFrom;
+  document.getElementById('lbl-to').textContent     = d.lblTo;
+  document.getElementById('lbl-depart').textContent = d.lblDepart;
+  document.getElementById('lbl-return').textContent = d.lblReturn;
+  document.getElementById('lbl-pax').textContent    = d.lblPax;
+  document.getElementById('search-from').placeholder  = d.phFrom;
+  document.getElementById('search-to').placeholder    = d.phTo;
+  document.getElementById('search-depart').placeholder= d.phDepart;
+  document.getElementById('search-return').placeholder= d.phReturn;
+  document.querySelectorAll('.dp-clear').forEach(b=> b.textContent = d.dpClear);
+  document.querySelectorAll('.dp-apply').forEach(b=> b.textContent = d.dpApply);
+  document.getElementById('btn-search').textContent = d.btnSearch;
+
+  // Destinations
+  document.getElementById('dest-title').textContent = d.destTitle;
+  document.querySelectorAll('[data-i18n="explore"]').forEach(el=> el.textContent = d.explore);
+
+  // Agent
+  document.getElementById('agent-name').textContent       = d.agentName;
+  document.getElementById('agent-sub').textContent        = d.agentSub;
+  document.getElementById('agent-status-txt').textContent = d.agentStatusTxt;
+  document.getElementById('ai-pill').querySelector('span:last-child,#sofia-status').textContent = d.sofiaStatus;
+  document.getElementById('tag-airlines').textContent  = d.tagAirlines;
+  document.getElementById('tag-realtime').textContent  = d.tagRealtime;
+  document.getElementById('tag-24h').textContent       = d.tag24h;
+  document.getElementById('wa-btn-txt').textContent    = d.waBtnTxt;
+  document.getElementById('chat-input').placeholder   = d.chatPlaceholder;
+  document.getElementById('chat-send').textContent    = d.chatSend;
+  document.getElementById('aviasales-link').textContent= d.seeFlights;
+
+  // Footer
+  document.getElementById('footer-tagline').textContent       = d.footerTagline;
+  document.getElementById('footer-newsletter-title').textContent = d.footerNewsletter;
+  document.getElementById('nl-email-input').placeholder        = d.nlEmail;
+  document.getElementById('footer-nav-title').textContent      = d.footerNav;
+  document.getElementById('footer-link-flights').textContent   = d.footerLinkFlights;
+  document.getElementById('footer-link-agent').textContent     = d.footerLinkAgent;
+  document.getElementById('footer-legal-title').textContent    = d.footerLegal;
+  document.getElementById('footer-about').textContent          = d.footerAbout;
+  document.getElementById('footer-faq').textContent            = d.footerFaq;
+  document.getElementById('footer-privacy').textContent        = d.footerPrivacy;
+  document.getElementById('footer-contact').textContent        = d.footerContact;
+  document.getElementById('footer-copy').textContent           = d.footerCopy;
+
+  // Modals
+  document.getElementById('modal-about-title').textContent   = d.modalAbout;
+  document.getElementById('modal-faq-title').textContent     = d.modalFaq;
+  document.getElementById('modal-privacy-title').textContent = d.modalPrivacy;
+  rebuildModals(l);
+}
 
 function rebuildModals(l){
   document.getElementById('modal-about-title').textContent = l==='en'?'About Midzo Flight':l==='ru'?'О Midzo Flight':'À propos de Midzo Flight';
@@ -767,7 +1100,7 @@ document.getElementById('btn-search').addEventListener('click', async()=>{
   const from=document.getElementById('search-from').value.trim();
   const to=document.getElementById('search-to').value.trim();
   const pax=parseInt(document.getElementById('search-pax').value)||1;
-  if(!from||!to){ alert('Veuillez indiquer une ville de départ et une destination.'); return; }
+  if(!from||!to){ alert(t('alertCity')); return; }
   if(!selectedIata.from) selectedIata.from = findIata(from) || await resolveIata(from);
   if(!selectedIata.to)   selectedIata.to   = findIata(to)   || await resolveIata(to);
   state = {
@@ -781,7 +1114,7 @@ document.getElementById('btn-search').addEventListener('click', async()=>{
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
   setTimeout(async()=>{
     chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
-    addBotMsg(`Recherche des meilleurs vols ${from} → ${to} pour ${pax} passager(s)…`);
+    addBotMsg(t('chatSearching', from, to, pax));
     setTimeout(()=>showResults(), 800);
     chatInput.disabled=false; chatSendBtn.disabled=true;
   },400);
@@ -1267,17 +1600,16 @@ function syncStateToInputs(){
 ═══════════════════════════════════════════════════════════════ */
 function generateBotReply(s){
   if(!s.from) return {
-    text:  "D'où partez-vous ?",
-    chips: ['Paris','Abidjan','Dakar','Lomé','Douala','Moscou']
+    text:  t('botNoFrom'),
+    chips: t('botFromChips')
   };
   if(!s.to) return {
-    text:  `Parfait, départ de ${s.from} ✈️ Quelle est votre destination ?`,
-    chips: ['Paris','Dubai','Istanbul','New York','Lomé','Abidjan','Bangkok','Bali']
-           .filter(c=>normalize(c)!==normalize(s.from))
+    text:  t('botNoTo', s.from),
+    chips: t('botToChips').filter(c=>normalize(c)!==normalize(s.from))
   };
   if(!s.departureDate) return {
-    text:  `${s.from} → ${s.to}, super trajet ! Quelle date de départ ?`,
-    chips: ['Demain','Dans 7 jours','Dans 15 jours','Dans 1 mois']
+    text:  t('botNoDate', s.from, s.to),
+    chips: t('botDateChips')
   };
   return { text:null, chips:[] };
 }
@@ -1288,19 +1620,18 @@ function generateBotReply(s){
 function showResults(){
   if(chatDone) return;
 
-  // Résoudre IATA si manquants
   if(!state.fromIata && state.from) state.fromIata = findIata(state.from);
   if(!state.toIata   && state.to)   state.toIata   = findIata(state.to);
 
-  // Guard : impossible de générer un lien sans IATA
   const link = generateAviasalesLink(state);
   if(!link){
-    addBotMsg("Je n'ai pas encore votre départ et destination. Pouvez-vous préciser ?");
+    addBotMsg(t('botNoIata'));
     return;
   }
 
   chatDone = true;
   aviasalesLnk.href = link;
+  aviasalesLnk.textContent = t('seeFlights');
 
   console.log('[Midzo] STATE:', JSON.stringify(state, null, 2));
   console.log('[Midzo] LINK:', link);
@@ -1308,13 +1639,11 @@ function showResults(){
   const fromLabel = state.from || state.fromIata;
   const toLabel   = state.to   || state.toIata;
   const dateStr   = state.departureDate ? fmtDateLabel(state.departureDate) : '';
-  const paxStr    = state.passengers > 1 ? ` · ${state.passengers} passagers` : '';
+  const msg = t('botFound', fromLabel, toLabel, dateStr, state.passengers);
 
-  const msg = `✅ Vols trouvés !\n${fromLabel} → ${toLabel}${dateStr ? ' · '+dateStr : ''}${paxStr}`;
   addBotMsg(msg);
   chatCtx.push({role:'assistant', content:msg});
-
-  resultMsgEl.textContent = `Vols ${fromLabel} → ${toLabel} trouvés`;
+  resultMsgEl.textContent = t('botFoundMsg', fromLabel, toLabel);
   resultCtaEl.classList.add('show');
   syncStateToInputs();
 }
@@ -1365,9 +1694,12 @@ async function handleAIResponse(data){
     return;
   }
 
-  // 4. Vérification locale — si state complet mais DeepSeek n'a pas mis ready:true
-  if(state.fromIata && state.toIata && state.departureDate && !chatDone){
-    setTimeout(()=>{ if(!chatDone) showResults(); }, 1500);
+  // 4. Vérification locale — state complet = from + to + date + IATA résolus
+  const hasAll = state.fromIata && state.toIata && state.departureDate;
+  // Ne pas bloquer sur return_date si tripType est oneway
+  const returnOk = state.tripType !== 'roundtrip' || state.returnDate;
+  if(hasAll && returnOk && !chatDone){
+    setTimeout(()=>{ if(!chatDone) showResults(); }, 1200);
   }
 }
 
@@ -1437,8 +1769,21 @@ function parseMessage(message){
 ═══════════════════════════════════════════════════════════════ */
 async function handleUserMessage(message){
   if(message.trim().length < 2){
-    addBotMsg("Donnez-moi un trajet (ex: Paris → Lomé).");
+    addBotMsg(t('botNoCity'));
     return;
+  }
+
+  // ── Détection "nouveau trajet" — reset state propre ──
+  const n0 = normalize(message);
+  const isNewSearch = t('newSearchIntent').test(n0);
+
+  if(isNewSearch && chatDone){
+    // Reset state SANS vider le chat
+    state = {from:null,fromIata:null,to:null,toIata:null,departureDate:null,returnDate:null,passengers:1,budget:null,tripType:'oneway'};
+    chatDone = false;
+    resultCtaEl.classList.remove('show');
+    aviasalesLnk.href = '#';
+    // Laisser DeepSeek répondre normalement avec state vide
   }
 
   showTyping();
@@ -1458,7 +1803,7 @@ async function handleUserMessage(message){
           return_date: state.returnDate,
           passengers:  String(state.passengers||1)
         },
-        tripType: (state.tripType==='roundtrip'||state.tripType==='return') ? 'return' : 'oneway'
+        tripType: state.tripType === 'roundtrip' ? 'return' : 'oneway'
       })
     });
 
@@ -1528,9 +1873,9 @@ async function resetChat(){
   chatInput.value=''; chatInput.disabled=false;
   chatSendBtn.disabled=true;
 
-  const welcome = "Bonjour ! Je suis Sofia 👋 Dites-moi votre trajet — ex: \"Paris → Abidjan, 15 juin\"";
+  const welcome = t('chatWelcome');
   addBotMsg(welcome, ()=>{
-    addChips(['Paris → Lomé','Paris → Abidjan','Paris → Dakar','Paris → Dubai'], v=>processInput(v));
+    addChips(t('chatWelcomeChips'), v=>processInput(v));
   });
   chatCtx.push({role:'assistant', content:welcome});
 }
@@ -1545,8 +1890,8 @@ function fillAndScroll(from, to, toIata){
     if(to){
       state.to=to; state.toIata=toIata||findIata(to)||await resolveIata(to);
       selectedIata.to=state.toIata||'';
-      const chips=['Paris','Abidjan','Dakar','Lomé','Douala','Moscou'].filter(c=>normalize(c)!==normalize(to));
-      const m=`Super choix ! De quelle ville partez-vous pour ${to} ?`;
+      const chips = t('chatDestChips', to);
+      const m = t('chatDestQ', to);
       chatCtx=[{role:'assistant',content:m}];
       addBotMsg(m,()=>addChips(chips,v=>processInput(v)));
     }
@@ -1557,7 +1902,7 @@ function fillAndScroll(from, to, toIata){
    INIT
 ═══════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', ()=>{
-  rebuildModals(lang);
+  applyLang(lang);
   setupAC('search-from','ac-from','from');
   setupAC('search-to','ac-to','to');
   
@@ -1581,7 +1926,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
   chatInput.addEventListener('input', ()=>{ chatSendBtn.disabled = chatInput.value.trim().length < 2; });
   
   document.getElementById('lang-btn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('lang-dd').classList.toggle('open'); });
-  document.querySelectorAll('.lang-opt').forEach(b=>b.addEventListener('click',()=>{ lang=b.dataset.lang; localStorage.setItem('midzo_lang',lang); rebuildModals(lang); document.getElementById('lang-flag').textContent=lang==='en'?'🇬🇧':lang==='ru'?'🇷🇺':'🇫🇷'; document.getElementById('lang-dd').classList.remove('open'); resetChat(); }));
+  document.querySelectorAll('.lang-opt').forEach(b=>b.addEventListener('click',()=>{
+    const l = b.dataset.lang;
+    localStorage.setItem('midzo_lang', l);
+    applyLang(l);
+    document.getElementById('lang-flag').textContent = l==='en'?'🇬🇧':l==='ru'?'🇷🇺':'🇫🇷';
+    document.getElementById('lang-dd').classList.remove('open');
+    resetChat();
+  }));
   
   window.addEventListener('scroll',()=>{ document.getElementById('site-nav').classList.toggle('scrolled',window.scrollY>8); });
   
