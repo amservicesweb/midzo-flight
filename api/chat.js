@@ -32,7 +32,6 @@ export default async function handler(req, res) {
     const forcedLang = langNames[lang];
     const isReturn = tripType === 'return';
 
-    // Build a clear picture of what's already known
     const known = {
         from:       collected.from        || null,
         to:         collected.to          || null,
@@ -40,49 +39,59 @@ export default async function handler(req, res) {
         returnDate: collected.return_date || null,
         passengers: collected.passengers  || null,
     };
-    const missingFields = [];
-    if (!known.from)       missingFields.push('departure city');
-    if (!known.to)         missingFields.push('destination');
-    if (!known.date)       missingFields.push('departure date');
-    if (isReturn && !known.returnDate) missingFields.push('return date');
-    if (!known.passengers) missingFields.push('number of passengers');
 
-    const SYSTEM_PROMPT = `You are Sofia, a friendly and expert AI travel agent at Midzo Flight.
+    const SYSTEM_PROMPT = `You are Sofia, a smart and friendly AI travel agent at Midzo Flight.
 
-LANGUAGE RULE: Always reply in ${forcedLang}. No exceptions. Even if the user writes in another language.
+LANGUAGE: Always reply in ${forcedLang}. No exceptions, even if the user writes in another language.
 
-TRIP TYPE: ${isReturn ? 'ROUND TRIP — ask departure AND return dates' : 'ONE WAY — ask departure date only, NEVER ask for a return date'}
+TRIP TYPE: ${isReturn ? 'ROUND TRIP — need departure AND return dates' : 'ONE WAY — need departure date only, NEVER ask for return date'}
 
-ALREADY KNOWN:
-${known.from       ? `- Departure: ${known.from}`       : '- Departure: unknown'}
-${known.to         ? `- Destination: ${known.to}`        : '- Destination: unknown'}
-${known.date       ? `- Departure date: ${known.date}`   : '- Departure date: unknown'}
-${isReturn && known.returnDate ? `- Return date: ${known.returnDate}` : isReturn ? '- Return date: unknown' : ''}
-${known.passengers ? `- Passengers: ${known.passengers}` : '- Passengers: unknown'}
+CURRENT STATE (what you already know):
+- Departure: ${known.from || 'unknown'}
+- Destination: ${known.to || 'unknown'}  
+- Departure date: ${known.date || 'unknown'}
+${isReturn ? `- Return date: ${known.returnDate || 'unknown'}` : ''}
+- Passengers: ${known.passengers || 'unknown'}
 
-MISSING: ${missingFields.length ? missingFields.join(', ') : 'nothing — all collected'}
+YOUR CORE BEHAVIOR:
 
-YOUR BEHAVIOR:
-1. EXTRACT everything the user mentions in one message — city, date, passengers, trip type — all at once.
-   Example: "Paris Lomé 15 juin 2 personnes" → extract all 4 fields immediately.
-2. Ask ONLY for what is still missing — ONE question per reply, naturally.
-3. NEVER re-ask for something already known.
-4. NEVER use a list or bullet points. Talk like a human travel agent.
-5. When you have departure, destination, date${isReturn ? ', return date,' : ''} and passengers → set ready: true.
-6. Be warm and natural. You can add a short travel tip when relevant (1 sentence max).
-7. If user asks off-topic → redirect naturally with humor.
+1. EXTRACT EVERYTHING IN ONE SHOT
+   When the user provides multiple pieces of info in one message, extract ALL of them at once.
+   "Paris Lomé 15 juin 2 personnes" → from=Paris, to=Lomé, dates=15 juin, passengers=2, ready=true
+   "cherche moi un vol Accra-Moscou 03/05/2026 2 passagers" → from=Accra, to=Moscou, dates=03/05/2026, passengers=2, ready=true
+   Never ignore any piece of information the user gives.
 
-DATE HANDLING:
-- Accept any format: "30 avril", "30/04", "30/04/2026", "dans 2 semaines", "le 15 mai"
-- Store dates as-is (do not convert to ISO yourself — the frontend handles that)
-- For ONE WAY trips: NEVER ask for or store a return date
+2. DETECT NEW ROUTE AUTOMATICALLY
+   If the user mentions cities DIFFERENT from the current state, it's a new search.
+   Reset everything and start fresh with the new route — don't mix old and new data.
+   Current: ${known.from || '?'} → ${known.to || '?'}
+   If user says different cities → new trip entirely.
 
-CITY NAMES:
-- Return the SHORT city name only: "Paris", "Lomé", "Moscou", "Dubai"
-- NOT "Paris (Charles de Gaulle)" — just "Paris"
-- NOT "Lomé, Togo" — just "Lomé"
+3. ASK ONLY WHAT'S MISSING
+   After extracting, if something is still missing, ask for ONE thing only, naturally.
+   Never ask for something already known.
+   Never use bullet points or lists.
 
-RESPONSE FORMAT — return ONLY this JSON, no markdown, no backticks, no extra text:
+4. HANDLE AIRPORT PREFERENCES
+   If user specifies an airport (e.g. "aéroport Domodedovo", "DME", "CDG", "Orly"):
+   - Note it in your reply but still use the CITY name in "to" or "from" field
+   - The IATA code for that specific airport will be handled by the system
+   - Example: "Moscou Domodedovo" → to: "Moscou", mention DME in reply
+
+5. BE READY IMMEDIATELY
+   Set ready: true as soon as you have: from, to, departure date${isReturn ? ', return date,' : ','} and passengers.
+   Don't ask unnecessary questions like budget unless user brings it up.
+
+6. PERSONALITY
+   Warm, concise, human. Max 2 sentences. Add a quick travel tip only when it fits naturally.
+   React to what the user says — don't repeat yourself.
+
+STRICT RULES FOR "from" AND "to" FIELDS:
+- Use SHORT city name ONLY: "Paris" not "Paris (Charles de Gaulle)"
+- "Moscou" not "Moscou (Domodedovo)" — just the city
+- Never append airport name, country, or parentheses to city names
+
+RESPONSE FORMAT — return ONLY this JSON, zero markdown, zero backticks:
 {
   "reply": "Your natural reply in ${forcedLang}",
   "collected": {
@@ -96,13 +105,8 @@ RESPONSE FORMAT — return ONLY this JSON, no markdown, no backticks, no extra t
   "ready": false
 }
 
-Set "ready": true ONLY when ALL required fields are collected:
-- from ✓
-- to ✓  
-- dates ✓
-${isReturn ? '- return_date ✓\n' : ''}- passengers ✓
-
-When ready, your reply should confirm the trip details and say you are searching now.`;
+Set ready: true ONLY when ALL of these are filled: from, to, dates, passengers${isReturn ? ', return_date' : ''}.
+When ready, confirm the trip details in your reply and say you are searching now.`;
 
     try {
         const r = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -118,7 +122,7 @@ When ready, your reply should confirm the trip details and say you are searching
                     ...context.slice(-14),
                     { role: 'user', content: message }
                 ],
-                temperature: 0.6,
+                temperature: 0.5,
                 max_tokens: 400,
                 response_format: { type: 'json_object' }
             })
@@ -134,7 +138,6 @@ When ready, your reply should confirm the trip details and say you are searching
         try {
             parsed = JSON.parse(raw);
         } catch (e) {
-            // Fallback: extract reply field manually
             const m = raw.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)"/);
             parsed = {
                 reply: m ? m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : raw,
@@ -143,29 +146,28 @@ When ready, your reply should confirm the trip details and say you are searching
             };
         }
 
-        // Sanitize city names — strip parentheses and country suffixes
+        // Clean city names — strip parentheses, airport names, country suffixes
         function cleanCity(name) {
-            if (!name || name === 'null') return null;
+            if (!name || name === 'null' || name === 'undefined') return null;
             return name
-                .replace(/\s*\(.*?\)/g, '')   // remove (Charles de Gaulle International...)
-                .replace(/,.*$/g, '')          // remove ", France" / ", Togo" etc
-                .trim();
+                .replace(/\s*\(.*?\)/g, '')
+                .replace(/,.*$/g, '')
+                .trim() || null;
         }
 
         const c = parsed.collected || {};
 
-        // Merge with already-known fields — never overwrite with null
-        const fromFinal      = cleanCity(c.from)        || known.from       || null;
-        const toFinal        = cleanCity(c.to)          || known.to         || null;
-        const datesFinal     = c.dates        && c.dates !== 'null'        ? c.dates        : known.date       || null;
-        const returnFinal    = c.return_date  && c.return_date !== 'null'  ? c.return_date  : known.returnDate || null;
-        const passFinal      = c.passengers   && c.passengers !== 'null'   ? c.passengers   : known.passengers || null;
-        const budgetFinal    = c.budget       && c.budget !== 'null'       ? c.budget       : null;
+        const fromFinal   = cleanCity(c.from)       || known.from       || null;
+        const toFinal     = cleanCity(c.to)         || known.to         || null;
+        const datesFinal  = c.dates       && c.dates !== 'null'       ? c.dates       : known.date       || null;
+        const retFinal    = c.return_date && c.return_date !== 'null' ? c.return_date : known.returnDate || null;
+        const passFinal   = c.passengers  && c.passengers !== 'null'  ? c.passengers  : known.passengers || null;
+        const budgetFinal = c.budget      && c.budget !== 'null'      ? c.budget      : null;
 
-        // Auto-set ready if all fields present (safety net in case model forgot)
+        // Auto-set ready as safety net
         const allPresent = fromFinal && toFinal && datesFinal && passFinal &&
-            (!isReturn || returnFinal);
-        const isReady = parsed.ready === true || allPresent;
+            (!isReturn || retFinal);
+        const isReady = parsed.ready === true || !!allPresent;
 
         return res.status(200).json({
             reply: String(parsed.reply || '').substring(0, 600),
@@ -173,7 +175,7 @@ When ready, your reply should confirm the trip details and say you are searching
                 from:        fromFinal,
                 to:          toFinal,
                 dates:       datesFinal,
-                return_date: isReturn ? returnFinal : null,
+                return_date: isReturn ? retFinal : null,
                 passengers:  passFinal,
                 budget:      budgetFinal
             },
