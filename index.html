@@ -554,7 +554,7 @@ const T = {
     botNoCity:      'Donnez-moi un trajet (ex: Paris → Lomé).',
     botCityUnknown: (city) => `Je ne reconnais pas "${city}". Essayez : Paris, Abidjan, Lomé, Dubai…`,
     botNoIata:      "Je n'ai pas encore votre départ et destination. Pouvez-vous préciser ?",
-    newSearchIntent: /\b(autre|nouveau|nouvelle|different|changer|recommencer|reset|new|other|другой|новый|снова)\b/,
+    newSearchIntent: /autre|nouveau|nouvelle|different|changer|recommencer|reset|cherche|recherche|другой|новый|снова/,
     modalAbout:     'À propos de Midzo Flight',
     modalFaq:       'Questions fréquentes',
     modalPrivacy:   'Confidentialité',
@@ -631,7 +631,7 @@ const T = {
     botNoCity:      'Give me a route (e.g. Paris → Lomé).',
     botCityUnknown: (city) => `I don't recognize "${city}". Try: Paris, Abidjan, Lomé, Dubai…`,
     botNoIata:      "I don't have your departure and destination yet. Can you specify?",
-    newSearchIntent: /\b(another|new|different|change|restart|reset|другой|новый|снова|autre|nouveau)\b/,
+    newSearchIntent: /another|new|different|change|restart|reset|search|другой|новый|снова|autre|nouveau|cherche/,
     modalAbout:     'About Midzo Flight',
     modalFaq:       'Frequently asked questions',
     modalPrivacy:   'Privacy Policy',
@@ -708,7 +708,7 @@ const T = {
     botNoCity:      'Укажите маршрут (напр: Москва → Париж).',
     botCityUnknown: (city) => `Я не знаю "${city}". Попробуйте: Москва, Париж, Дубай, Ломе…`,
     botNoIata:      'Мне ещё нужны город отправления и пункт назначения. Уточните, пожалуйста.',
-    newSearchIntent: /\b(другой|новый|снова|другие|изменить|заново|another|new|autre|nouveau|другой маршрут)\b/,
+    newSearchIntent: /другой|новый|снова|другие|изменить|заново|another|new|autre|nouveau|cherche|другой маршрут|искать|поиск/,
     modalAbout:     'О Midzo Flight',
     modalFaq:       'Частые вопросы',
     modalPrivacy:   'Конфиденциальность',
@@ -1652,35 +1652,47 @@ function showResults(){
    handleAIResponse — traite la réponse structurée de DeepSeek
 ═══════════════════════════════════════════════════════════════ */
 async function handleAIResponse(data){
-  // 1. Merge collected dans state
-  if(data.collected){
-    const c = data.collected;
+  const c = data.collected || {};
 
-    if(c.from && c.from !== 'null' && c.from !== 'undefined'){
-      state.from    = c.from;
-      state.fromIata = findIata(c.from) || await resolveIata(c.from) || state.fromIata;
-    }
-    if(c.to && c.to !== 'null' && c.to !== 'undefined'){
-      state.to    = c.to;
-      state.toIata = findIata(c.to) || await resolveIata(c.to) || state.toIata;
-    }
-    if(c.dates && c.dates !== 'null')
-      state.departureDate = normalizeDate(c.dates) || state.departureDate;
-    if(c.return_date && c.return_date !== 'null')
-      state.returnDate = normalizeDate(c.return_date);
-    if(c.passengers && c.passengers !== 'null')
-      state.passengers = Math.max(1, parseInt(c.passengers)||1);
-    if(c.budget && c.budget !== 'null')
-      state.budget = c.budget;
+  // ── Détection automatique de nouveau trajet ──
+  // Si DeepSeek retourne un from/to DIFFÉRENT de ce qu'on a déjà
+  // → c'est un nouveau trajet, on reset proprement
+  const newFrom = c.from && c.from !== 'null' && c.from !== 'undefined' ? c.from : null;
+  const newTo   = c.to   && c.to   !== 'null' && c.to   !== 'undefined' ? c.to   : null;
 
-    console.log('[Midzo] STATE UPDATED:', JSON.stringify(state));
+  const routeChanged = (
+    (newFrom && state.from && normalize(newFrom) !== normalize(state.from)) ||
+    (newTo   && state.to   && normalize(newTo)   !== normalize(state.to))
+  );
+
+  if(routeChanged || (chatDone && (newFrom || newTo))){
+    // Nouveau trajet détecté → reset state sans vider le chat
+    state = {from:null,fromIata:null,to:null,toIata:null,departureDate:null,returnDate:null,passengers:1,budget:null,tripType:'oneway'};
+    chatDone = false;
+    resultCtaEl.classList.remove('show');
+    aviasalesLnk.href = '#';
   }
 
-  // 2. Afficher la réponse textuelle
+  // ── Merge collected dans state ──
+  if(newFrom){
+    state.from     = newFrom;
+    state.fromIata = findIata(newFrom) || await resolveIata(newFrom) || state.fromIata;
+  }
+  if(newTo){
+    state.to     = newTo;
+    state.toIata = findIata(newTo) || await resolveIata(newTo) || state.toIata;
+  }
+  if(c.dates        && c.dates        !== 'null') state.departureDate = normalizeDate(c.dates)        || state.departureDate;
+  if(c.return_date  && c.return_date  !== 'null') state.returnDate    = normalizeDate(c.return_date)  || state.returnDate;
+  if(c.passengers   && c.passengers   !== 'null') state.passengers    = Math.max(1, parseInt(c.passengers)||1);
+  if(c.budget       && c.budget       !== 'null') state.budget        = c.budget;
+
+  console.log('[Midzo] STATE:', JSON.stringify(state));
+
+  // ── Afficher la réponse Sofia ──
   const reply = (data.reply||'').trim();
   if(reply){
     addBotMsg(reply, ()=>{
-      // Chips contextuelles uniquement si info manquante
       const {chips} = generateBotReply(state);
       if(chips.length && (!state.from || !state.to)) addChips(chips, v=>processInput(v));
     });
@@ -1688,17 +1700,16 @@ async function handleAIResponse(data){
     syncStateToInputs();
   }
 
-  // 3. Déclencher résultats
+  // ── Déclencher résultats ──
   if(data.ready === true){
-    setTimeout(showResults, reply ? 900 : 0);
+    setTimeout(showResults, reply ? 800 : 0);
     return;
   }
 
-  // 4. Vérification locale — state complet = from + to + date + IATA résolus
-  const hasAll = state.fromIata && state.toIata && state.departureDate;
-  // Ne pas bloquer sur return_date si tripType est oneway
+  // Filet de sécurité local : si tout est là mais ready oublié
+  const allReady = state.fromIata && state.toIata && state.departureDate && state.passengers > 0;
   const returnOk = state.tripType !== 'roundtrip' || state.returnDate;
-  if(hasAll && returnOk && !chatDone){
+  if(allReady && returnOk && !chatDone){
     setTimeout(()=>{ if(!chatDone) showResults(); }, 1200);
   }
 }
@@ -1773,19 +1784,6 @@ async function handleUserMessage(message){
     return;
   }
 
-  // ── Détection "nouveau trajet" — reset state propre ──
-  const n0 = normalize(message);
-  const isNewSearch = t('newSearchIntent').test(n0);
-
-  if(isNewSearch && chatDone){
-    // Reset state SANS vider le chat
-    state = {from:null,fromIata:null,to:null,toIata:null,departureDate:null,returnDate:null,passengers:1,budget:null,tripType:'oneway'};
-    chatDone = false;
-    resultCtaEl.classList.remove('show');
-    aviasalesLnk.href = '#';
-    // Laisser DeepSeek répondre normalement avec state vide
-  }
-
   showTyping();
 
   try {
@@ -1808,23 +1806,25 @@ async function handleUserMessage(message){
     });
 
     hideTyping();
-
-    if(r.ok){
+  if(r.ok){
       const data = await r.json();
       if(data.reply || data.collected){
         await handleAIResponse(data);
-        return; // sortie propre — pas de fallback
+        chatSendBtn.disabled = chatInput.value.trim().length < 2;
+        return;
       }
     }
     // Si r.ok=false ou data vide → fallback ci-dessous
 
   } catch(e){
     hideTyping();
+    chatSendBtn.disabled = chatInput.value.trim().length < 2;
     console.warn('[Midzo] DeepSeek unavailable — local fallback:', e.message);
   }
 
   // ── FALLBACK parser local ──
   hideTyping();
+  chatSendBtn.disabled = chatInput.value.trim().length < 2;
   const parsed = parseMessage(message);
   if(parsed.from)          { state.from=parsed.from;  state.fromIata=parsed.fromIata; }
   if(parsed.to)            { state.to=parsed.to;      state.toIata=parsed.toIata; }
