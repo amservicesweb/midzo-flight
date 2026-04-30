@@ -1820,12 +1820,13 @@ function loadScheduleWidget(fromIata, toIata){
   target.appendChild(script);
 }
 
-function showResults(){
+// Nettoie le label pour l'affichage — garde juste le nom de ville
+function cleanLabel(name){
   if(!name) return '?';
   return name
-    .replace(/\s*\([^)]*\)/g, '')  // supprime (Paris-Orly Airport)
-    .replace(/,.*$/g, '')           // supprime , France
-    .replace(/\s+airport$/i, '')    // supprime trailing "Airport"
+    .replace(/\s*\([^)]*\)/g, '')
+    .replace(/,.*$/g, '')
+    .replace(/\s+airport$/i, '')
     .replace(/\s+international$/i,'')
     .trim() || name;
 }
@@ -1860,7 +1861,6 @@ function showResults(){
   resultCtaEl.classList.add('show');
   syncStateToInputs();
 
-  // Charger le widget Schedule avec le trajet
   loadScheduleWidget(state.fromIata, state.toIata);
 }
 
@@ -1891,11 +1891,11 @@ async function handleAIResponse(data){
 
   // ── Merge collected dans state ──
   if(newFrom){
-    state.from     = newFrom;
+    state.from     = cleanLabel(newFrom);
     state.fromIata = findIata(newFrom) || await resolveIata(newFrom) || state.fromIata;
   }
   if(newTo){
-    state.to     = newTo;
+    state.to     = cleanLabel(newTo);
     state.toIata = findIata(newTo) || await resolveIata(newTo) || state.toIata;
   }
   if(c.dates        && c.dates        !== 'null') state.departureDate = normalizeDate(c.dates)        || state.departureDate;
