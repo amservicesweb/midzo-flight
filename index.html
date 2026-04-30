@@ -9,7 +9,10 @@
 <meta name="apple-mobile-web-app-title" content="Midzo Flight">
 <meta name="theme-color" content="#0770e3">
 <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title id="page-title">Midzo Flight · Trouvez votre vol au meilleur prix</title>
 <meta name="description" id="page-desc" content="Comparez des centaines de vols avec l'agent IA Sofia. 728+ compagnies en temps réel.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2210,6 +2213,21 @@ function fillAndScroll(from, to, toIata){
 }
 
 /* ══════════════════════════════════════════════════════════════
+   HAMBURGER — fonctions globales (appelées depuis onclick HTML)
+═══════════════════════════════════════════════════════════════ */
+function toggleMobileMenu(){
+  const btn  = document.getElementById('hamburger-btn');
+  const menu = document.getElementById('mobile-menu');
+  if(btn && menu){ btn.classList.toggle('open'); menu.classList.toggle('open'); }
+}
+function closeMobileMenu(){
+  const btn  = document.getElementById('hamburger-btn');
+  const menu = document.getElementById('mobile-menu');
+  if(btn)  btn.classList.remove('open');
+  if(menu) menu.classList.remove('open');
+}
+
+/* ══════════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -2233,44 +2251,39 @@ document.addEventListener('DOMContentLoaded', ()=>{
   resetChat();
   chatSendBtn.addEventListener('click', handleSend);
   chatInput.addEventListener('keypress', e=>{ if(e.key==='Enter'){e.preventDefault();handleSend();} });
-  // Désactiver/activer send selon input
   chatInput.addEventListener('input', ()=>{ chatSendBtn.disabled = chatInput.value.trim().length < 2; });
   
   document.getElementById('lang-btn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('lang-dd').classList.toggle('open'); });
-  // ── Hamburger mobile ──
-  function toggleMobileMenu(){
-    const btn  = document.getElementById('hamburger-btn');
-    const menu = document.getElementById('mobile-menu');
-    btn.classList.toggle('open');
-    menu.classList.toggle('open');
-  }
-  function closeMobileMenu(){
-    document.getElementById('hamburger-btn').classList.remove('open');
-    document.getElementById('mobile-menu').classList.remove('open');
-  }
-  // Fermer menu si clic dehors
-  document.addEventListener('click', e=>{
-    if(!e.target.closest('#hamburger-btn') && !e.target.closest('#mobile-menu')){
-      closeMobileMenu();
-    }
-  });
 
-  // ── PWA Service Worker ──
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  }
+  document.querySelectorAll('.lang-opt').forEach(b=>b.addEventListener('click',()=>{
     const l = b.dataset.lang;
     localStorage.setItem('midzo_lang', l);
     applyLang(l);
     document.getElementById('lang-flag').textContent = l==='en'?'🇬🇧':l==='ru'?'🇷🇺':'🇫🇷';
     document.getElementById('lang-dd').classList.remove('open');
+    closeMobileMenu();
     resetChat();
   }));
-  
+
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('#lang-btn')) document.getElementById('lang-dd').classList.remove('open');
+    if(!e.target.closest('#hamburger-btn') && !e.target.closest('#mobile-menu')) closeMobileMenu();
+  });
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
+
   window.addEventListener('scroll',()=>{ document.getElementById('site-nav').classList.toggle('scrolled',window.scrollY>8); });
-  
-  function navResize(){ const w=window.innerWidth; document.getElementById('nav-tabs').style.display=w>=1024?'flex':'none'; document.getElementById('ai-pill').style.display=w>=1200?'flex':'none'; }
-  navResize(); window.addEventListener('resize', navResize);
+  window.addEventListener('resize',()=>{
+    const w = window.innerWidth;
+    document.getElementById('nav-tabs').style.display = w>=1024?'flex':'none';
+    document.getElementById('ai-pill').style.display  = w>=1200?'flex':'none';
+  });
+  // Init resize
+  const _w = window.innerWidth;
+  document.getElementById('nav-tabs').style.display = _w>=1024?'flex':'none';
+  document.getElementById('ai-pill').style.display  = _w>=1200?'flex':'none';
 });
 </script>
 </body>
