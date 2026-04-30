@@ -2,7 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Midzo Flight">
+<meta name="theme-color" content="#0770e3">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title id="page-title">Midzo Flight · Trouvez votre vol au meilleur prix</title>
 <meta name="description" id="page-desc" content="Comparez des centaines de vols avec l'agent IA Sofia. 728+ compagnies en temps réel.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -228,16 +235,54 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 .footer-bottom-inner{max-width:1280px;margin:0 auto;padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
 .footer-bottom p{font-size:.7rem;color:rgba(255,255,255,.18);}
 
+/* ── HAMBURGER ── */
+.hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:40px;height:40px;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;transition:background .15s;}
+.hamburger:hover{background:var(--sky);}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* ── MOBILE MENU DRAWER ── */
+.mobile-menu{display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:499;padding:.5rem 0;}
+.mobile-menu.open{display:block;}
+.mobile-nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:13px 1.5rem;background:none;border:none;cursor:pointer;font-size:.9rem;font-weight:500;color:var(--text);font-family:inherit;text-decoration:none;transition:background .15s;text-align:left;}
+.mobile-nav-item:hover,.mobile-nav-item.active{background:var(--blue-lt);color:var(--blue);}
+.mobile-lang-row{display:flex;gap:8px;padding:12px 1.5rem;border-top:1px solid var(--border);margin-top:4px;}
+.mobile-lang-opt{flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-size:.82rem;font-weight:600;font-family:inherit;transition:all .15s;text-align:center;}
+.mobile-lang-opt:hover{border-color:var(--blue);color:var(--blue);}
+
+/* ── LOGO DESKTOP plus grand ── */
+.logo img{height:48px;width:auto;}
+.logo-word{font-weight:800;font-size:1.25rem;}
+.logo-icon{width:38px;height:38px;border-radius:10px;}
+
+/* ── FIX VIEWPORT KEYBOARD MOBILE ── */
+html{height:-webkit-fill-available;}
+body{min-height:100vh;min-height:-webkit-fill-available;}
+input,textarea,select{font-size:16px!important;}
+*{-webkit-tap-highlight-color:transparent;}
+a,button{touch-action:manipulation;}
+
 @media(max-width:900px){
   .sb{flex-wrap:wrap;}
   .sb-field{min-width:calc(50% - 1px);flex:none;}
   .sb-swap-wrap{display:none;}
   .sb-submit{border-radius:0 0 calc(var(--r)-2px) calc(var(--r)-2px);width:100%;padding:13px;}
-  .nav-tabs,.ai-pill,.btn-ghost{display:none!important;}
+  .nav-tabs,.ai-pill,.btn-ghost,.btn-primary.nav-only{display:none!important;}
+  #btn-search-nav{display:none!important;}
+  .hamburger{display:flex!important;}
+  .logo img{height:50px;}
+  .logo-word{font-size:1.3rem;}
+  .logo-icon{width:40px;height:40px;}
 }
 @media(max-width:540px){
   .sb-field{min-width:100%;}
-  .agent-tags{display:none;}
+  .agent-tags{flex-wrap:wrap;gap:6px;}
+  .hero-title{font-size:clamp(1.6rem,6vw,2.2rem);}
+  .hero-sub{font-size:.85rem;}
+  .chat-wrap{border-radius:12px;}
+  .chat-bottom{position:sticky;bottom:0;background:var(--white);z-index:10;}
 }
 </style>
 </head>
@@ -307,6 +352,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
       </div>
       <button class="btn btn-ghost" onclick="openModal('newsletter')" id="btn-alerts">Alertes prix</button>
       <a href="#agent-section" class="btn btn-primary" id="btn-search-nav">Rechercher</a>
+      <button class="hamburger" id="hamburger-btn" aria-label="Menu" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="mobile-nav-item active" id="m-nav-flights"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="currentColor"/></svg><span id="m-flights">Vols</span></button>
+    <button class="mobile-nav-item" id="m-nav-hotels"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8"/></svg><span id="m-hotels">Hôtels</span></button>
+    <a href="#agent-section" class="mobile-nav-item" id="m-nav-agent" onclick="closeMobileMenu()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="m-agent">Agent IA</span></a>
+    <button class="mobile-nav-item" onclick="openModal('about');closeMobileMenu()" id="m-nav-contact"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" stroke="currentColor" stroke-width="1.8"/><path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="m-contact">Contact</span></button>
+    <button class="mobile-nav-item" onclick="openModal('newsletter');closeMobileMenu()" id="m-nav-alerts"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="m-alerts">Alertes prix</span></button>
+    <div class="mobile-lang-row">
+      <button class="lang-opt mobile-lang-opt" data-lang="fr">🇫🇷 FR</button>
+      <button class="lang-opt mobile-lang-opt" data-lang="en">🇬🇧 EN</button>
+      <button class="lang-opt mobile-lang-opt" data-lang="ru">🇷🇺 RU</button>
     </div>
   </div>
 </header>
@@ -1580,17 +1641,22 @@ function normalizeDate(str){
   if(!str||str==='null') return null;
   // Déjà ISO YYYY-MM-DD
   if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+
+  // Format DD/MM/YY (ex: 21/05/26 → 2026-05-21)
+  const shortYear = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})$/);
+  if(shortYear){
+    const y = parseInt(shortYear[3]) + 2000;
+    return `${y}-${shortYear[2].padStart(2,'0')}-${shortYear[1].padStart(2,'0')}`;
+  }
+
   // Essai parseDate local (retourne déjà ISO)
   const local = parseDate(str);
   if(local) return local;
-  // Essai ISO via split — évite le décalage timezone de new Date()
+
+  // ISO via split — évite le décalage timezone de new Date()
   const iso = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if(iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
-  // Dernier recours : Date native (risque timezone mais mieux que rien)
-  const d = new Date(str);
-  if(!isNaN(d.getTime())){
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  }
+
   return null;
 }
 
@@ -1769,7 +1835,12 @@ async function fetchAndShowPrices(fromIata, toIata){
     const data = await r.json();
 
     if(!data.flights || data.flights.length === 0){
-      addBotMsg(`Pas de tarifs disponibles pour ${fromIata} → ${toIata} en ce moment. Cliquez "Voir les vols" pour chercher sur Aviasales.`);
+      const noFaresMsg = lang==='ru'
+        ? `Нет доступных тарифов для ${fromIata} → ${toIata}. Нажмите "Смотреть рейсы" для поиска на Aviasales.`
+        : lang==='en'
+        ? `No fares available for ${fromIata} → ${toIata} right now. Click "See flights" to search on Aviasales.`
+        : `Pas de tarifs disponibles pour ${fromIata} → ${toIata}. Cliquez "Voir les vols" pour chercher sur Aviasales.`;
+      addBotMsg(noFaresMsg);
       return;
     }
 
@@ -1945,18 +2016,13 @@ async function handleAIResponse(data){
     syncStateToInputs();
   }
 
-  // ── Déclencher résultats ──
+  // ── Déclencher résultats — UNIQUEMENT si data.ready = true (logique dans chat.js) ──
   if(data.ready === true){
     setTimeout(showResults, reply ? 800 : 0);
     return;
   }
-
-  // Filet de sécurité local : si tout est là mais ready oublié
-  const allReady = state.fromIata && state.toIata && state.departureDate && state.passengers > 0;
-  const returnOk = state.tripType !== 'roundtrip' || state.returnDate;
-  if(allReady && returnOk && !chatDone){
-    setTimeout(()=>{ if(!chatDone) showResults(); }, 1200);
-  }
+  // Pas de filet local — on fait confiance à isReady() dans chat.js
+  // Le filet causait des déclenchements prématurés avant la réponse passagers
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2171,7 +2237,28 @@ document.addEventListener('DOMContentLoaded', ()=>{
   chatInput.addEventListener('input', ()=>{ chatSendBtn.disabled = chatInput.value.trim().length < 2; });
   
   document.getElementById('lang-btn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('lang-dd').classList.toggle('open'); });
-  document.querySelectorAll('.lang-opt').forEach(b=>b.addEventListener('click',()=>{
+  // ── Hamburger mobile ──
+  function toggleMobileMenu(){
+    const btn  = document.getElementById('hamburger-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+  }
+  function closeMobileMenu(){
+    document.getElementById('hamburger-btn').classList.remove('open');
+    document.getElementById('mobile-menu').classList.remove('open');
+  }
+  // Fermer menu si clic dehors
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('#hamburger-btn') && !e.target.closest('#mobile-menu')){
+      closeMobileMenu();
+    }
+  });
+
+  // ── PWA Service Worker ──
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
     const l = b.dataset.lang;
     localStorage.setItem('midzo_lang', l);
     applyLang(l);
