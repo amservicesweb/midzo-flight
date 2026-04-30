@@ -1607,17 +1607,28 @@ function parseDate(text){
 
 function normalizeDate(str){
   if(!str||str==='null') return null;
+  // Déjà ISO YYYY-MM-DD
   if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  // Essai parseDate local (retourne déjà ISO)
   const local = parseDate(str);
   if(local) return local;
+  // Essai ISO via split — évite le décalage timezone de new Date()
+  const iso = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  // Dernier recours : Date native (risque timezone mais mieux que rien)
   const d = new Date(str);
-  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+  if(!isNaN(d.getTime())){
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  return null;
 }
 
 function fmtDateLabel(iso){
   if(!iso) return '';
-  const d = new Date(iso+'T00:00:00');
-  return d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  // Parse manuellement pour éviter le décalage UTC
+  const [y,m,d] = iso.split('-').map(Number);
+  const date = new Date(y, m-1, d); // constructeur local, pas UTC
+  return date.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1774,48 +1785,42 @@ function loadScheduleWidget(fromIata, toIata){
   if(!container || !target) return;
   if(!fromIata || !toIata){ container.style.display='none'; return; }
 
-  // Reset complet — le widget Travelpayouts ne se recharge pas si le script existe déjà
-  container.style.display = 'none';
+  // Vider complètement
   target.innerHTML = '';
-  // Supprimer l'ancien script si présent
+  container.style.display = 'none';
   const old = document.getElementById('tp-schedule-script');
   if(old) old.remove();
-  // Supprimer les iframes/divs injectés par le widget précédent
-  document.querySelectorAll('[id^="tp_"][id!="tp_schedule_widget"]').forEach(el=>{
-    if(el.tagName==='IFRAME'||el.tagName==='DIV') el.remove();
-  });
 
-  const params = new URLSearchParams({
-    currency:           'usd',
-    trs:                '523964',
-    shmarker:           '696220',
-    color_button:       '#0770e3',
-    target_host:        'www.aviasales.com/search',
-    locale:             lang==='ru'?'ru':lang==='en'?'en':'fr',
-    powered_by:         'true',
-    origin:             fromIata.toUpperCase(),
-    destination:        toIata.toUpperCase(),
-    with_fallback:      'false',
-    non_direct_flights: 'true',
-    min_lines:          '5',
-    border_radius:      '0',
-    color_background:   '#FFFFFF',
-    color_text:         '#000000',
-    color_border:       '#EFEFEF',
-    promo_id:           '2811',
-    campaign_id:        '100'
-  });
+  const locale = lang==='ru'?'ru':lang==='en'?'en':'fr';
 
+  // Utiliser iframe — plus fiable que script injection pour les widgets TP
+  const iframeUrl = `https://tpembd.com/content?currency=usd&trs=523964&shmarker=696220`
+    + `&color_button=%230770e3&target_host=www.aviasales.com%2Fsearch`
+    + `&locale=${locale}&powered_by=true`
+    + `&origin=${fromIata.toUpperCase()}&destination=${toIata.toUpperCase()}`
+    + `&with_fallback=false&non_direct_flights=true&min_lines=5`
+    + `&border_radius=0&color_background=%23FFFFFF&color_text=%23000000`
+    + `&color_border=%23EFEFEF&promo_id=2811&campaign_id=100`;
+
+  // Méthode 1 : script tag (méthode officielle TP)
   const script = document.createElement('script');
   script.id      = 'tp-schedule-script';
   script.async   = true;
   script.charset = 'utf-8';
-  script.src     = `https://tpembd.com/content?${params.toString()}`;
-  script.onload  = () => {
+  script.src     = iframeUrl;
+  script.onload  = ()=>{
     container.style.display = 'block';
-    setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 300);
+    setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 500);
   };
-  script.onerror = () => console.warn('[Midzo] Widget failed to load');
+  script.onerror = ()=>{
+    // Méthode 2 fallback : iframe directe
+    target.innerHTML = `<iframe src="${iframeUrl}&output=iframe"
+      width="100%" height="420" frameborder="0" scrolling="no"
+      style="border:none;width:100%;min-height:380px;">
+    </iframe>`;
+    container.style.display = 'block';
+    setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 500);
+  };
 
   target.appendChild(script);
 }
