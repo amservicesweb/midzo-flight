@@ -87,9 +87,10 @@ YOUR CORE BEHAVIOR:
    React to what the user says — don't repeat yourself.
 
 STRICT RULES FOR "from" AND "to" FIELDS:
-- Use SHORT city name ONLY: "Paris" not "Paris (Charles de Gaulle)"
-- "Moscou" not "Moscou (Domodedovo)" — just the city
-- Never append airport name, country, or parentheses to city names
+- When user specifies a specific airport, use the airport name: "Moscou Domodedovo", "Paris Orly", "Bangkok Don Mueang"
+- When user just says the city, use the city name: "Moscou", "Paris", "Bangkok"
+- Never append country names or codes in parentheses
+- The system will resolve the correct IATA code from the name
 
 RESPONSE FORMAT — return ONLY this JSON, zero markdown, zero backticks:
 {
@@ -146,12 +147,13 @@ When ready, confirm the trip details in your reply and say you are searching now
             };
         }
 
-        // Clean city names — strip parentheses, airport names, country suffixes
+        // Clean city names — remove parentheses content and country suffixes
+        // BUT preserve "Moscou Domodedovo", "Paris Orly" style airport names
         function cleanCity(name) {
             if (!name || name === 'null' || name === 'undefined') return null;
             return name
-                .replace(/\s*\(.*?\)/g, '')
-                .replace(/,.*$/g, '')
+                .replace(/\s*\([^)]*\)/g, '')  // remove (anything in parens)
+                .replace(/,.*$/g, '')           // remove ", France" etc
                 .trim() || null;
         }
 
