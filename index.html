@@ -1260,8 +1260,34 @@ const CITY_MAP = {
   'tachkent':'TAS','tashkent':'TAS','tas':'TAS',
   'minsk':'MSQ','msq':'MSQ',
   'kiev':'KBP','kyiv':'KBP','kbp':'KBP',
-  // Océanie
-  'sydney':'SYD','syd':'SYD',
+  // Îles et destinations touristiques
+  'maldives':'MLE','male':'MLE','mle':'MLE','maledives':'MLE',
+  'ile maurice':'MRU','mauritius':'MRU','mru':'MRU',
+  'reunion':'RUN','la reunion':'RUN','run':'RUN',
+  'seychelles':'SEZ','sez':'SEZ','mahe':'SEZ',
+  'zanzibar':'ZNZ','znz':'ZNZ',
+  'bali':'DPS','denpasar':'DPS','dps':'DPS',
+  'phuket':'HKT','hkt':'HKT',
+  'koh samui':'USM','usm':'USM','samui':'USM',
+  'krabi':'KBV','kbv':'KBV',
+  'langkawi':'LGK','lgk':'LGK',
+  'cebu':'CEB','ceb':'CEB',
+  'boracay':'MPH','mph':'MPH',
+  'cancun':'CUN','cun':'CUN',
+  'montego bay':'MBJ','mbj':'MBJ','jamaique':'MBJ','jamaica':'MBJ',
+  'havane':'HAV','havana':'HAV','hav':'HAV','cuba':'HAV',
+  'punta cana':'PUJ','puj':'PUJ',
+  'tenerife':'TFS','tfs':'TFS',
+  'gran canaria':'LPA','lpa':'LPA',
+  'ibiza':'IBZ','ibz':'IBZ',
+  'mykonos':'JMK','jmk':'JMK',
+  'santorin':'JTR','santorini':'JTR','jtr':'JTR',
+  'rhodes':'RHO','rho':'RHO',
+  'crete':'HER','heraklion':'HER','her':'HER',
+  'chypre':'PFO','paphos':'PFO','pfo':'PFO',
+  'malte':'MLA','malta':'MLA','mla':'MLA',
+  'palma de majorque':'PMI','majorque':'PMI','mallorca':'PMI','pmi':'PMI',
+  'madere':'FNC','madeira':'FNC','fnc':'FNC',
   'melbourne':'MEL','mel':'MEL',
   'brisbane':'BNE','bne':'BNE',
   'auckland':'AKL','akl':'AKL',
@@ -1820,15 +1846,22 @@ function cleanLabel(name){
     .trim() || name;
 }
 
-function showResults(){
+async function showResults(){
   if(chatDone) return;
 
+  // Résolution IATA — synchro d'abord
   if(!state.fromIata && state.from) state.fromIata = findIata(state.from);
   if(!state.toIata   && state.to)   state.toIata   = findIata(state.to);
 
+  // Si encore manquant → essai async via /api/cities
+  if(!state.fromIata && state.from) state.fromIata = await resolveIata(state.from);
+  if(!state.toIata   && state.to)   state.toIata   = await resolveIata(state.to);
+
   const link = generateAviasalesLink(state);
   if(!link){
-    addBotMsg(t('botNoIata'));
+    // Ne pas afficher le message d'erreur si Sofia a déjà répondu
+    // — juste logger silencieusement
+    console.warn('[Midzo] Cannot generate link — missing IATA:', state);
     return;
   }
 
