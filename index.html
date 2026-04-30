@@ -1096,8 +1096,7 @@ function buildAviasalesURL(fromIata, toIata){
     path += ret;
   }
   path += pax;
-  const url = `https://www.aviasales.com/search/${path}`;
-  return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
+  return `https://www.aviasales.com/search/${path}?marker=696220`;
 }
 
 document.getElementById('btn-search').addEventListener('click', async()=>{
@@ -1621,8 +1620,8 @@ function generateAviasalesLink(s){
 
   path += pax;
 
-  const url = `https://www.aviasales.com/search/${path}`;
-  return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
+  const url = `https://www.aviasales.com/search/${path}?marker=696220`;
+  return url;
 }
 
 /* ══════════════════════════════════════════════════════════════
