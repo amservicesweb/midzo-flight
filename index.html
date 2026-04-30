@@ -410,6 +410,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
       <span id="result-msg" style="font-weight:600;font-size:.84rem;color:var(--text);"></span>
       <a href="#" target="_blank" id="aviasales-link" class="btn btn-primary" style="font-size:.82rem;" data-i18n-key="see-flights">Voir les vols</a>
     </div>
+    <!-- ══ SCHEDULE WIDGET ══ -->
+    <div id="tp-widget-container" style="display:none;padding:0;margin-top:4px;border-top:1px solid rgba(7,112,227,.1);">
+      <div id="tp-widget-inner"></div>
+    </div>
   </div>
 </div>
 
@@ -1753,8 +1757,53 @@ function generateBotReply(s){
 /* ══════════════════════════════════════════════════════════════
    SHOW RESULTS
 ═══════════════════════════════════════════════════════════════ */
-// Nettoie le label pour l'affichage — garde juste le nom de ville
-function cleanLabel(name){
+// Charge le Schedule Widget Travelpayouts avec le trajet actuel
+function loadScheduleWidget(fromIata, toIata, depDate){
+  const container = document.getElementById('tp-widget-container');
+  const inner     = document.getElementById('tp-widget-inner');
+  if(!container || !inner) return;
+
+  // Vider le widget précédent
+  inner.innerHTML = '';
+  container.style.display = 'none';
+
+  if(!fromIata || !toIata) return;
+
+  // Paramètres du widget
+  const params = new URLSearchParams({
+    currency:        'usd',
+    trs:             '523964',
+    shmarker:        '696220',
+    color_button:    '#0770e3',
+    target_host:     'www.aviasales.com/search',
+    locale:          lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'fr',
+    powered_by:      'true',
+    origin:          fromIata.toUpperCase(),
+    destination:     toIata.toUpperCase(),
+    with_fallback:   'false',
+    non_direct_flights: 'true',
+    min_lines:       '5',
+    border_radius:   '0',
+    color_background:'#FFFFFF',
+    color_text:      '#000000',
+    color_border:    '#EFEFEF',
+    promo_id:        '2811',
+    campaign_id:     '100'
+  });
+
+  const script = document.createElement('script');
+  script.async   = true;
+  script.charset = 'utf-8';
+  script.src     = `https://tpembd.com/content?${params.toString()}`;
+
+  inner.appendChild(script);
+  container.style.display = 'block';
+
+  // Scroll vers le widget
+  setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'start'}), 800);
+}
+
+function showResults(){
   if(!name) return '?';
   return name
     .replace(/\s*\([^)]*\)/g, '')  // supprime (Paris-Orly Airport)
@@ -1793,6 +1842,9 @@ function showResults(){
   resultMsgEl.textContent = t('botFoundMsg', fromLabel, toLabel);
   resultCtaEl.classList.add('show');
   syncStateToInputs();
+
+  // Charger le widget Schedule avec le trajet
+  loadScheduleWidget(state.fromIata, state.toIata, state.departureDate);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2020,6 +2072,8 @@ async function resetChat(){
   selectedIata.from=''; selectedIata.to='';
   dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false;
   resultCtaEl.classList.remove('show');
+  const _wc = document.getElementById('tp-widget-container');
+  if(_wc){ _wc.style.display='none'; document.getElementById('tp-widget-inner').innerHTML=''; }
   chatMsgs.innerHTML='';
   chatInput.value=''; chatInput.disabled=false;
   chatSendBtn.disabled=true;
