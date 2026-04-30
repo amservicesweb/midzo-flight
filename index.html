@@ -928,68 +928,6 @@ const CITIES = [
 ];
 const cityCache = {};
 
-/* ─── resolveIata : cherche d'abord local, puis /api/cities ─── */
-async function resolveIata(cityName){
-  if(!cityName) return 'XXX';
-  const nq = cityName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  if(cityCache[nq]) return cityCache[nq];
-
-  // 1. Cherche dans CITY_MAP (parser local)
-  if(CITY_MAP[nq]){ cityCache[nq]=CITY_MAP[nq]; return CITY_MAP[nq]; }
-
-  // 2. Cherche dans la liste CITIES (fallback statique)
-  const local = CITIES.find(c =>
-    c.city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') === nq ||
-    c.iata.toLowerCase() === nq
-  );
-  if(local){ cityCache[nq]=local.iata; return local.iata; }
-
-  // 3. Appel /api/cities → airports.json
-  try {
-    const r = await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
-    if(r.ok){
-      const d = await r.json();
-      if(d.locations && d.locations.length > 0){
-        const iata = d.locations[0].iata;
-        cityCache[nq] = iata;
-        return iata;
-      }
-    }
-  } catch(_){}
-
-  // 4. Fallback : 3 premières lettres majuscules
-  const fallback = cityName.substring(0,3).toUpperCase();
-  cityCache[nq] = fallback;
-  return fallback;
-}
-
-/* ─── searchCities : appel /api/cities avec fallback local ─── */
-async function searchCities(q){
-  // Essai API
-  try {
-    const r = await fetch(`/api/cities?q=${encodeURIComponent(q)}`);
-    if(r.ok){
-      const d = await r.json();
-      if(d.locations && d.locations.length > 0){
-        // Normalise format pour renderAC (compatible avec CITIES)
-        return d.locations.map(a => ({
-          city: a.city || a.name || a.iata,
-          country: a.country || '',
-          iata: a.iata,
-          flag: a.flag || countryFlag(a.country_code || a.countryCode || '')
-        }));
-      }
-    }
-  } catch(_){}
-
-  // Fallback local (CITIES array)
-  const nq = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  return CITIES.filter(c =>
-    c.city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').startsWith(nq) ||
-    c.iata.toLowerCase().startsWith(nq)
-  ).slice(0,8);
-}
-
 /* ─── Convertit country_code ISO2 en emoji drapeau ─── */
 function countryFlag(code){
   if(!code || code.length !== 2) return '🌍';
@@ -1468,7 +1406,7 @@ async function resolveIata(cityName){
   if(local){ iataCache[n]=local; return local; }
   // /api/cities fallback
   try {
-    const r = await fetch(`/api/cities?q=${encodeURIComponent(cityName)}`);
+    const r = await fetch(`/api/cities?q=${encodeURIComponent(cityName)}&lang=${lang}`);
     if(r.ok){
       const d = await r.json();
       if(d.locations?.length){
@@ -1485,7 +1423,7 @@ async function resolveIata(cityName){
 ═══════════════════════════════════════════════════════════════ */
 async function searchCities(q){
   try {
-    const r = await fetch(`/api/cities?q=${encodeURIComponent(q)}`);
+    const r = await fetch(`/api/cities?q=${encodeURIComponent(q)}&lang=${lang}`);
     if(r.ok){
       const d = await r.json();
       if(d.locations?.length){
