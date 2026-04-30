@@ -410,9 +410,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
       <span id="result-msg" style="font-weight:600;font-size:.84rem;color:var(--text);"></span>
       <a href="#" target="_blank" id="aviasales-link" class="btn btn-primary" style="font-size:.82rem;" data-i18n-key="see-flights">Voir les vols</a>
     </div>
-    <!-- ══ SCHEDULE WIDGET ══ -->
-    <div id="tp-widget-container" style="display:none;padding:0;margin-top:4px;border-top:1px solid rgba(7,112,227,.1);">
-      <div id="tp_schedule_widget"></div>
+    <!-- ══ FLIGHTS SEARCH FORM WIDGET ══ -->
+    <div id="tp-widget-container" style="padding:0;border-top:1px solid rgba(7,112,227,.1);">
+      <div id="tp_search_form_widget"></div>
+      <script id="tp-search-script" async
+        src="https://tpembd.com/content?currency=usd&trs=523964&shmarker=696220&show_hotels=true&powered_by=true&locale=en&searchUrl=www.aviasales.com%2Fsearch&primary_override=%2332a8dd&color_button=%2332a8dd&color_icons=%2332a8dd&dark=%23262626&light=%23FFFFFF&secondary=%23FFFFFF&special=%23C4C4C4&color_focused=%2332a8dd&border_radius=0&plain=false&promo_id=7879&campaign_id=100"
+        charset="utf-8"></script>
     </div>
   </div>
 </div>
@@ -1779,50 +1782,54 @@ function generateBotReply(s){
    SHOW RESULTS
 ═══════════════════════════════════════════════════════════════ */
 // Charge le Schedule Widget Travelpayouts avec le trajet actuel
-function loadScheduleWidget(fromIata, toIata){
+// Pré-remplit le Flights Search Form widget avec le trajet collecté par Sofia
+function prefillSearchWidget(fromIata, toIata, depDate, retDate, passengers){
+  if(!fromIata || !toIata) return;
+
+  // Le widget Travelpayouts expose une API globale après chargement
+  // On attend qu'elle soit disponible puis on injecte les valeurs
+  const tryPrefill = (attempts) => {
+    if(attempts <= 0) return;
+
+    // Méthode 1 : API officielle TP (si disponible)
+    if(window.TPWidgetAPI && window.TPWidgetAPI.setSearchParams){
+      try {
+        window.TPWidgetAPI.setSearchParams({
+          origin:      fromIata.toUpperCase(),
+          destination: toIata.toUpperCase(),
+          depart_date: depDate || '',
+          return_date: retDate || '',
+          adults:      parseInt(passengers)||1
+        });
+        return;
+      } catch(e){}
+    }
+
+    // Méthode 2 : injection directe dans les inputs du widget
+    const inputs = document.querySelectorAll('#tp_search_form_widget input, #tp-widget-container input');
+    if(inputs.length > 0){
+      inputs.forEach(inp => {
+        const name = (inp.name||inp.placeholder||inp.getAttribute('data-name')||'').toLowerCase();
+        if(/origin|from|departure_city/.test(name))      inp.value = fromIata.toUpperCase();
+        else if(/destination|to/.test(name))              inp.value = toIata.toUpperCase();
+        else if(/depart_date|departure_date|date/.test(name) && !name.includes('return')) inp.value = depDate||'';
+        else if(/return/.test(name))                      inp.value = retDate||'';
+        else if(/adult|passenger|pax/.test(name))         inp.value = parseInt(passengers)||1;
+        inp.dispatchEvent(new Event('input',  {bubbles:true}));
+        inp.dispatchEvent(new Event('change', {bubbles:true}));
+      });
+      return;
+    }
+
+    // Retry si widget pas encore chargé
+    setTimeout(()=> tryPrefill(attempts-1), 400);
+  };
+
+  tryPrefill(8);
+
+  // Scroll vers le widget
   const container = document.getElementById('tp-widget-container');
-  const target    = document.getElementById('tp_schedule_widget');
-  if(!container || !target) return;
-  if(!fromIata || !toIata){ container.style.display='none'; return; }
-
-  // Vider complètement
-  target.innerHTML = '';
-  container.style.display = 'none';
-  const old = document.getElementById('tp-schedule-script');
-  if(old) old.remove();
-
-  const locale = lang==='ru'?'ru':lang==='en'?'en':'fr';
-
-  // Utiliser iframe — plus fiable que script injection pour les widgets TP
-  const iframeUrl = `https://tpembd.com/content?currency=usd&trs=523964&shmarker=696220`
-    + `&color_button=%230770e3&target_host=www.aviasales.com%2Fsearch`
-    + `&locale=${locale}&powered_by=true`
-    + `&origin=${fromIata.toUpperCase()}&destination=${toIata.toUpperCase()}`
-    + `&with_fallback=true&non_direct_flights=true&min_lines=5`
-    + `&border_radius=0&color_background=%23FFFFFF&color_text=%23000000`
-    + `&color_border=%23EFEFEF&promo_id=2811&campaign_id=100`;
-
-  // Méthode 1 : script tag (méthode officielle TP)
-  const script = document.createElement('script');
-  script.id      = 'tp-schedule-script';
-  script.async   = true;
-  script.charset = 'utf-8';
-  script.src     = iframeUrl;
-  script.onload  = ()=>{
-    container.style.display = 'block';
-    setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 500);
-  };
-  script.onerror = ()=>{
-    // Méthode 2 fallback : iframe directe
-    target.innerHTML = `<iframe src="${iframeUrl}&output=iframe"
-      width="100%" height="420" frameborder="0" scrolling="no"
-      style="border:none;width:100%;min-height:380px;">
-    </iframe>`;
-    container.style.display = 'block';
-    setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 500);
-  };
-
-  target.appendChild(script);
+  if(container) setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 600);
 }
 
 // Nettoie le label pour l'affichage — garde juste le nom de ville
@@ -1866,7 +1873,7 @@ function showResults(){
   resultCtaEl.classList.add('show');
   syncStateToInputs();
 
-  loadScheduleWidget(state.fromIata, state.toIata);
+  prefillSearchWidget(state.fromIata, state.toIata, state.departureDate, state.returnDate, state.passengers);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2095,9 +2102,7 @@ async function resetChat(){
   dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false;
   resultCtaEl.classList.remove('show');
   const _wc = document.getElementById('tp-widget-container');
-  if(_wc){ _wc.style.display='none'; document.getElementById('tp_schedule_widget').innerHTML=''; }
-  const _os = document.getElementById('tp-schedule-script');
-  if(_os) _os.remove();
+  if(_wc) _wc.style.display = 'block'; // widget toujours visible
   chatMsgs.innerHTML='';
   chatInput.value=''; chatInput.disabled=false;
   chatSendBtn.disabled=true;
@@ -2161,6 +2166,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     applyLang(l);
     document.getElementById('lang-flag').textContent = l==='en'?'🇬🇧':l==='ru'?'🇷🇺':'🇫🇷';
     document.getElementById('lang-dd').classList.remove('open');
+    // Mettre à jour la locale du widget
+    const script = document.getElementById('tp-search-script');
+    if(script){
+      const locale = l==='ru'?'ru':l==='en'?'en':'fr';
+      script.src = script.src.replace(/locale=[a-z]+/, `locale=${locale}`);
+    }
     resetChat();
   }));
   
