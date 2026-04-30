@@ -1,4 +1,4 @@
-// api/chat.js — DeepSeek · Natural extraction · Midzo Flight
+// api/chat.js — Sofia · Agent de voyage IA · Midzo Flight
 const rateLimitMap = new Map();
 function checkRateLimit(ip) {
     const now = Date.now(), win = 60000, max = 30;
@@ -7,6 +7,20 @@ function checkRateLimit(ip) {
     e.c++;
     rateLimitMap.set(ip, e);
     return e.c <= max;
+}
+
+// ── isReady : logique côté code, pas dans le prompt ──
+function isReady(collected, isReturn) {
+    const ok = !!(collected.from && collected.to && collected.dates && collected.passengers);
+    if (!ok) return false;
+    if (isReturn && !collected.return_date) return false;
+    return true;
+}
+
+// ── Nettoie les noms de villes retournés par le modèle ──
+function cleanCity(name) {
+    if (!name || name === 'null' || name === 'undefined') return null;
+    return name.replace(/\s*\([^)]*\)/g, '').replace(/,.*$/g, '').trim() || null;
 }
 
 export default async function handler(req, res) {
@@ -28,9 +42,8 @@ export default async function handler(req, res) {
     const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY;
     if (!DEEPSEEK_KEY) return res.status(500).json({ error: 'API not configured', reply: null });
 
-    const langNames = { fr: 'français', en: 'English', ru: 'русский' };
-    const forcedLang = langNames[lang];
     const isReturn = tripType === 'return';
+    const langMap = { fr: 'French', en: 'English', ru: 'Russian' };
 
     const known = {
         from:       collected.from        || null,
@@ -40,71 +53,73 @@ export default async function handler(req, res) {
         passengers: collected.passengers  || null,
     };
 
-    const SYSTEM_PROMPT = `You are Sofia, a smart and friendly AI travel agent at Midzo Flight.
+    // ── Prompt Sofia — naturel, sans logique de formulaire ──
+    const SOFIA_PROMPT = `You are Sofia, an intelligent AI travel agent for Midzo Flight.
 
-LANGUAGE: Always reply in ${forcedLang}. No exceptions, even if the user writes in another language.
+Your goal: help the user find flights naturally, like a real human travel agent.
 
-TRIP TYPE: ${isReturn ? 'ROUND TRIP — need departure AND return dates' : 'ONE WAY — need departure date only, NEVER ask for return date'}
+LANGUAGE: Always reply in ${langMap[lang]}. No exceptions.
 
-CURRENT STATE (what you already know):
-- Departure: ${known.from || 'unknown'}
-- Destination: ${known.to || 'unknown'}
-- Departure date: ${known.date || 'unknown'}
-${isReturn ? `- Return date: ${known.returnDate || 'unknown'}` : ''}
-- Passengers: ${known.passengers || 'unknown'}
+BEHAVIOR:
+- Speak like a real travel agent, not a form
+- Be natural, fluid, and helpful
+- Keep responses short but human (2 sentences max)
+- Confirm understanding when needed
+- You can suggest a quick travel tip (1 short sentence max)
 
-CRITICAL RULES:
+DO NOT:
+- Sound robotic or list-like
+- Ask multiple questions at once
+- Repeat questions already answered
+- Use bullet points in replies
 
-1. EXTRACT EVERYTHING AT ONCE
-   Parse the entire message and extract ALL information simultaneously.
-   "Paris Lomé 15 juin 2 personnes" → all 4 fields at once, ready: true immediately.
-   "Sochi Saint-Pétersbourg 26 mai 2 personnes" → from=Sotchi, to=Saint-Pétersbourg, dates=26 mai, passengers=2, ready: true.
-   NEVER ignore information the user has given.
+INTELLIGENCE RULES:
 
-2. SMART CONTEXT — USE WHAT YOU KNOW
-   If departure is already known and user only gives destination + date → fill the rest from context.
-   If state shows from=${known.from||'unknown'} and user says "destination Bangkok 10 juin" → keep from, add to+date.
+1. EXTRACT EVERYTHING NATURALLY
+From the user's message, detect at once: departure city, destination, travel date, return date (if mentioned), passengers.
+"Paris Lomé 15 juin 2 personnes" → extract all fields simultaneously.
+"Sotchi Saint-Pétersbourg 26 mai" → from=Sotchi, to=Saint-Pétersbourg, dates=26 mai.
 
-3. DETECT ROUTE CHANGE
-   If user mentions cities DIFFERENT from current state → it's a new trip, reset and start fresh.
+2. USE CONTEXT — never ask again for what's already known.
 
-4. ONE QUESTION MAX
-   If something is truly missing after extraction, ask for ONE thing only, naturally, like a human.
-   Example: "Super ! Pour combien de passagers ?" — not a list, not multiple questions.
+3. DETECT NEW SEARCH — if user changes cities, it's a new trip entirely.
 
-5. ACCEPT ALL CITY NAME FORMATS
-   French transliterations: Sotchi=Sochi, Moscou=Moscow, Saint-Pétersbourg=St Petersburg
-   Return them as the user wrote them — the system handles IATA mapping.
+4. MISSING INFO — ask only ONE natural question if something is truly missing.
+Good: "Parfait 👍 Tu voyages à quelle date ?"
+Bad: "Quelle est votre date de départ ?"
 
-6. PASSENGERS DEFAULT
-   If user never mentions passengers, default to 1 and set ready: true if you have from+to+date.
-   Don't ask for passengers if everything else is known — just use 1.
+5. PASSENGERS
+   If not specified AND you have from+to+date → ask naturally before confirming.
+   Example: "Super ✈️ Tu voyages seul ou à plusieurs ?"
+   Once answered or if user seems in a hurry → use their answer or default to 1.
 
-7. BE A TRAVEL AGENT, NOT A FORM
-   Talk naturally. Confirm what you understood. Add value (best season, visa tip) in 1 sentence max.
-   React to the conversation — don't repeat yourself.
+6. When the request is clear, briefly confirm and say you're searching flights.
+Example: "Parfait, je cherche les meilleurs vols pour toi ✈️"
 
-CITY NAME RULES:
-- Return exactly as user wrote: "Sotchi", "Saint-Pétersbourg", "Moscou Domodedovo"
-- Never add country, airport code in parentheses, or extra text
-
-RESPONSE FORMAT — ONLY this JSON, no markdown, no backticks:
+OUTPUT FORMAT — strict JSON only, no markdown, no backticks:
 {
-  "reply": "Your natural reply in ${forcedLang}",
+  "reply": "natural human reply in ${langMap[lang]}",
   "collected": {
-    "from": "city as user wrote or null",
-    "to": "city as user wrote or null",
-    "dates": "date as user wrote or null",
-    "return_date": "${isReturn ? 'return date as user wrote or null' : 'null'}",
+    "from": "city name as user wrote it, or null",
+    "to": "city name as user wrote it, or null",
+    "dates": "departure date as user wrote it, or null",
+    "return_date": "${isReturn ? 'return date or null' : 'null'}",
     "passengers": "number as string or null",
     "budget": "budget or null"
-  },
-  "ready": false
-}
+  }
+}`;
 
-Set ready: true when you have from + to + dates + passengers (use "1" if not specified).
-${isReturn ? 'For round trip also need return_date.' : ''}
-When ready: confirm details naturally and say you are searching.`;
+    // ── Contexte intelligent injecté comme message système séparé ──
+    const tripContext = {
+        role: 'system',
+        content: `Current trip state:
+from: ${known.from || 'unknown'}
+to: ${known.to || 'unknown'}
+date: ${known.date || 'unknown'}
+return: ${known.returnDate || 'unknown'}
+passengers: ${known.passengers || 'unknown'}
+trip_type: ${isReturn ? 'round trip' : 'one way'}`
+    };
 
     try {
         const r = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -116,12 +131,13 @@ When ready: confirm details naturally and say you are searching.`;
             body: JSON.stringify({
                 model: 'deepseek-chat',
                 messages: [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    ...context.slice(-14),
+                    { role: 'system', content: SOFIA_PROMPT },
+                    tripContext,
+                    ...context,
                     { role: 'user', content: message }
                 ],
-                temperature: 0.5,
-                max_tokens: 400,
+                temperature: 0.8,
+                max_tokens: 350,
                 response_format: { type: 'json_object' }
             })
         });
@@ -139,48 +155,39 @@ When ready: confirm details naturally and say you are searching.`;
             const m = raw.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)"/);
             parsed = {
                 reply: m ? m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : raw,
-                collected: {},
-                ready: false
+                collected: {}
             };
-        }
-
-        // Clean city names — remove parentheses content and country suffixes
-        // BUT preserve "Moscou Domodedovo", "Paris Orly" style airport names
-        function cleanCity(name) {
-            if (!name || name === 'null' || name === 'undefined') return null;
-            return name
-                .replace(/\s*\([^)]*\)/g, '')  // remove (anything in parens)
-                .replace(/,.*$/g, '')           // remove ", France" etc
-                .trim() || null;
         }
 
         const c = parsed.collected || {};
 
-        const fromFinal   = cleanCity(c.from)       || known.from       || null;
-        const toFinal     = cleanCity(c.to)         || known.to         || null;
-        const datesFinal  = c.dates       && c.dates !== 'null'       ? c.dates       : known.date       || null;
-        const retFinal    = c.return_date && c.return_date !== 'null' ? c.return_date : known.returnDate || null;
-        // Default passengers to "1" if never specified
-        const passFinal   = (c.passengers && c.passengers !== 'null') ? c.passengers
-                          : known.passengers || (fromFinal && toFinal && datesFinal ? '1' : null);
-        const budgetFinal = c.budget      && c.budget !== 'null'      ? c.budget      : null;
+        // Merge avec known — ne jamais écraser avec null
+        const fromFinal = cleanCity(c.from)       || known.from       || null;
+        const toFinal   = cleanCity(c.to)         || known.to         || null;
+        const datesFinal= c.dates && c.dates !== 'null'             ? c.dates       : known.date       || null;
+        const retFinal  = c.return_date && c.return_date !== 'null' ? c.return_date : known.returnDate || null;
+        // Passengers : default à "1" seulement si tout le reste est collecté
+        const passFinal = (c.passengers && c.passengers !== 'null') ? c.passengers
+                        : known.passengers
+                        || null; // ne pas forcer à 1 prématurément
+        const budgetFinal = c.budget && c.budget !== 'null' ? c.budget : null;
 
-        // Auto-set ready when all core fields present
-        const allPresent = fromFinal && toFinal && datesFinal && passFinal &&
-            (!isReturn || retFinal);
-        const isReady = parsed.ready === true || !!allPresent;
+        const finalCollected = {
+            from:        fromFinal,
+            to:          toFinal,
+            dates:       datesFinal,
+            return_date: isReturn ? retFinal : null,
+            passengers:  passFinal,
+            budget:      budgetFinal
+        };
+
+        // isReady : logique dans le code, pas dans le prompt
+        const ready = isReady(finalCollected, isReturn);
 
         return res.status(200).json({
-            reply: String(parsed.reply || '').substring(0, 600),
-            collected: {
-                from:        fromFinal,
-                to:          toFinal,
-                dates:       datesFinal,
-                return_date: isReturn ? retFinal : null,
-                passengers:  passFinal,
-                budget:      budgetFinal
-            },
-            ready: isReady
+            reply:     String(parsed.reply || '').substring(0, 600),
+            collected: finalCollected,
+            ready
         });
 
     } catch (e) {
