@@ -193,6 +193,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 .wa-btn:hover{background:#1db954;}
 .result-cta{display:none;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.9rem 1.2rem;background:var(--blue-lt);border-top:1px solid rgba(7,112,227,.15);}
 .result-cta.show{display:flex;}
+.prices-bubble { padding: 0 !important; overflow: hidden; min-width: 260px; max-width: 340px; }
+.prices-title { padding: .6rem .9rem; font-size: .78rem; font-weight: 700; color: var(--blue); border-bottom: 1px solid rgba(7,112,227,.1); }
+.price-item { display: flex; justify-content: space-between; align-items: center; padding: .55rem .9rem; text-decoration: none; color: var(--text); border-bottom: 1px solid rgba(0,0,0,.05); transition: background .15s; }
+.price-item:hover { background: rgba(7,112,227,.05); }
+.price-info { display: flex; flex-direction: column; gap: 2px; }
+.price-airline { font-size: .75rem; font-weight: 600; color: var(--text); }
+.price-date { font-size: .7rem; color: var(--muted); }
+.price-stops { font-size: .68rem; color: var(--muted); }
+.price-amount { font-size: .88rem; font-weight: 800; color: var(--blue); white-space: nowrap; }
+.prices-more { display: block; text-align: center; padding: .55rem; font-size: .75rem; font-weight: 600; color: var(--blue); text-decoration: none; background: rgba(7,112,227,.05); }
+.prices-more:hover { background: rgba(7,112,227,.1); }
 
 /* ── CTA FINAL ── */
 .cta-final{background:linear-gradient(135deg,#0a1840,#0c2775);border-radius:18px;padding:3.5rem 2rem;text-align:center;margin:0 1.5rem 4rem;}
@@ -409,13 +420,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
     <div id="result-cta" class="result-cta">
       <span id="result-msg" style="font-weight:600;font-size:.84rem;color:var(--text);"></span>
       <a href="#" target="_blank" id="aviasales-link" class="btn btn-primary" style="font-size:.82rem;" data-i18n-key="see-flights">Voir les vols</a>
-    </div>
-    <!-- ══ FLIGHTS SEARCH FORM WIDGET ══ -->
-    <div id="tp-widget-container" style="padding:0;border-top:1px solid rgba(7,112,227,.1);">
-      <div id="tp_search_form_widget"></div>
-      <script id="tp-search-script" async
-        src="https://tpembd.com/content?currency=usd&trs=523964&shmarker=696220&show_hotels=true&powered_by=true&locale=en&searchUrl=www.aviasales.com%2Fsearch&primary_override=%2332a8dd&color_button=%2332a8dd&color_icons=%2332a8dd&dark=%23262626&light=%23FFFFFF&secondary=%23FFFFFF&special=%23C4C4C4&color_focused=%2332a8dd&border_radius=0&plain=false&promo_id=7879&campaign_id=100"
-        charset="utf-8"></script>
     </div>
   </div>
 </div>
@@ -1782,54 +1786,89 @@ function generateBotReply(s){
    SHOW RESULTS
 ═══════════════════════════════════════════════════════════════ */
 // Charge le Schedule Widget Travelpayouts avec le trajet actuel
-// Pré-remplit le Flights Search Form widget avec le trajet collecté par Sofia
-function prefillSearchWidget(fromIata, toIata, depDate, retDate, passengers){
+// Récupère et affiche les prix réels dans le chat
+async function fetchAndShowPrices(fromIata, toIata){
   if(!fromIata || !toIata) return;
 
-  // Le widget Travelpayouts expose une API globale après chargement
-  // On attend qu'elle soit disponible puis on injecte les valeurs
-  const tryPrefill = (attempts) => {
-    if(attempts <= 0) return;
+  // Message de chargement
+  const loadRow = document.createElement('div');
+  loadRow.className = 'brow-bot'; loadRow.id = 'prices-loading';
+  loadRow.innerHTML = `<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  chatMsgs.appendChild(loadRow);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
 
-    // Méthode 1 : API officielle TP (si disponible)
-    if(window.TPWidgetAPI && window.TPWidgetAPI.setSearchParams){
-      try {
-        window.TPWidgetAPI.setSearchParams({
-          origin:      fromIata.toUpperCase(),
-          destination: toIata.toUpperCase(),
-          depart_date: depDate || '',
-          return_date: retDate || '',
-          adults:      parseInt(passengers)||1
-        });
-        return;
-      } catch(e){}
-    }
+  try {
+    const r = await fetch(`/api/prices?origin=${fromIata}&destination=${toIata}&currency=usd&lang=${lang}`);
+    loadRow.remove();
 
-    // Méthode 2 : injection directe dans les inputs du widget
-    const inputs = document.querySelectorAll('#tp_search_form_widget input, #tp-widget-container input');
-    if(inputs.length > 0){
-      inputs.forEach(inp => {
-        const name = (inp.name||inp.placeholder||inp.getAttribute('data-name')||'').toLowerCase();
-        if(/origin|from|departure_city/.test(name))      inp.value = fromIata.toUpperCase();
-        else if(/destination|to/.test(name))              inp.value = toIata.toUpperCase();
-        else if(/depart_date|departure_date|date/.test(name) && !name.includes('return')) inp.value = depDate||'';
-        else if(/return/.test(name))                      inp.value = retDate||'';
-        else if(/adult|passenger|pax/.test(name))         inp.value = parseInt(passengers)||1;
-        inp.dispatchEvent(new Event('input',  {bubbles:true}));
-        inp.dispatchEvent(new Event('change', {bubbles:true}));
-      });
+    if(!r.ok) throw new Error('API error');
+    const data = await r.json();
+
+    if(!data.flights || data.flights.length === 0){
+      addBotMsg(`Pas de tarifs disponibles pour ${fromIata} → ${toIata} en ce moment. Cliquez "Voir les vols" pour chercher sur Aviasales.`);
       return;
     }
 
-    // Retry si widget pas encore chargé
-    setTimeout(()=> tryPrefill(attempts-1), 400);
-  };
+    // Construire la carte de prix
+    const row = document.createElement('div');
+    row.className = 'brow-bot';
+    const av = document.createElement('div'); av.className='bot-av';
+    av.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg>';
 
-  tryPrefill(8);
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble-bot prices-bubble';
 
-  // Scroll vers le widget
-  const container = document.getElementById('tp-widget-container');
-  if(container) setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 600);
+    const title = document.createElement('div');
+    title.className = 'prices-title';
+    title.textContent = `✈️ Meilleurs tarifs ${fromIata} → ${toIata}`;
+    bubble.appendChild(title);
+
+    data.flights.forEach(f => {
+      const item = document.createElement('a');
+      item.className = 'price-item';
+      item.href = f.link;
+      item.target = '_blank';
+
+      const dateStr = f.departure_at
+        ? new Date(f.departure_at).toLocaleDateString(lang==='ru'?'ru-RU':lang==='en'?'en-GB':'fr-FR', {day:'numeric',month:'short'})
+        : '';
+
+      const stops = f.stops === 0
+        ? (lang==='ru'?'Direct':lang==='en'?'Direct':'Direct')
+        : `${f.stops} ${lang==='ru'?'пересадка':lang==='en'?'stop':'escale'}`;
+
+      item.innerHTML = `
+        <div class="price-info">
+          <span class="price-airline">${f.airline||'✈'}</span>
+          <span class="price-date">${dateStr}</span>
+          <span class="price-stops">${stops}</span>
+        </div>
+        <div class="price-amount">$${f.price}</div>
+      `;
+      bubble.appendChild(item);
+    });
+
+    const more = document.createElement('a');
+    more.className = 'prices-more';
+    more.href = data.search_link;
+    more.target = '_blank';
+    more.textContent = lang==='ru'?'Смотреть все рейсы →':lang==='en'?'See all flights →':'Voir tous les vols →';
+    bubble.appendChild(more);
+
+    row.appendChild(av);
+    row.appendChild(bubble);
+    chatMsgs.appendChild(row);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+  } catch(e) {
+    loadRow.remove();
+    console.warn('[Midzo] Prices fetch failed:', e.message);
+  }
+}
+
+function prefillSearchWidget(fromIata, toIata, depDate, retDate, passengers){
+  const cta = document.getElementById('result-cta');
+  if(cta) setTimeout(()=> cta.scrollIntoView({behavior:'smooth', block:'nearest'}), 400);
 }
 
 // Nettoie le label pour l'affichage — garde juste le nom de ville
@@ -1874,6 +1913,9 @@ function showResults(){
   syncStateToInputs();
 
   prefillSearchWidget(state.fromIata, state.toIata, state.departureDate, state.returnDate, state.passengers);
+
+  // Afficher les prix réels dans le chat
+  setTimeout(()=> fetchAndShowPrices(state.fromIata, state.toIata), 600);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2101,8 +2143,6 @@ async function resetChat(){
   selectedIata.from=''; selectedIata.to='';
   dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false;
   resultCtaEl.classList.remove('show');
-  const _wc = document.getElementById('tp-widget-container');
-  if(_wc) _wc.style.display = 'block'; // widget toujours visible
   chatMsgs.innerHTML='';
   chatInput.value=''; chatInput.disabled=false;
   chatSendBtn.disabled=true;
@@ -2166,12 +2206,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     applyLang(l);
     document.getElementById('lang-flag').textContent = l==='en'?'🇬🇧':l==='ru'?'🇷🇺':'🇫🇷';
     document.getElementById('lang-dd').classList.remove('open');
-    // Mettre à jour la locale du widget
-    const script = document.getElementById('tp-search-script');
-    if(script){
-      const locale = l==='ru'?'ru':l==='en'?'en':'fr';
-      script.src = script.src.replace(/locale=[a-z]+/, `locale=${locale}`);
-    }
     resetChat();
   }));
   
