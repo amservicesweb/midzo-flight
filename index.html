@@ -1642,23 +1642,32 @@ function parseDate(text){
 
 function normalizeDate(str){
   if(!str||str==='null') return null;
-  // Déjà ISO YYYY-MM-DD
-  if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  const s = str.trim();
 
-  // Format DD/MM/YY (ex: 21/05/26 → 2026-05-21)
-  const shortYear = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})$/);
-  if(shortYear){
-    const y = parseInt(shortYear[3]) + 2000;
-    return `${y}-${shortYear[2].padStart(2,'0')}-${shortYear[1].padStart(2,'0')}`;
+  // Déjà ISO YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // Format DD/MM/YYYY (ex: 25/05/2026)
+  const dmy4 = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  if(dmy4) return `${dmy4[3]}-${dmy4[2].padStart(2,'0')}-${dmy4[1].padStart(2,'0')}`;
+
+  // Format DD/MM/YY (ex: 25/05/26)
+  const dmy2 = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2})$/);
+  if(dmy2) return `20${dmy2[3]}-${dmy2[2].padStart(2,'0')}-${dmy2[1].padStart(2,'0')}`;
+
+  // Format DD/MM (ex: 25/05) → année courante ou suivante
+  const dm = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})$/);
+  if(dm){
+    const today = new Date();
+    const yr = today.getFullYear();
+    const candidate = new Date(yr, parseInt(dm[2])-1, parseInt(dm[1]));
+    if(candidate < today) candidate.setFullYear(yr+1);
+    return candidate.toISOString().split('T')[0];
   }
 
-  // Essai parseDate local (retourne déjà ISO)
-  const local = parseDate(str);
+  // Essai parseDate local (texte naturel: "25 mai", "demain"...)
+  const local = parseDate(s);
   if(local) return local;
-
-  // ISO via split — évite le décalage timezone de new Date()
-  const iso = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if(iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
 
   return null;
 }
@@ -1858,7 +1867,10 @@ async function fetchAndShowPrices(fromIata, toIata){
 
     const title = document.createElement('div');
     title.className = 'prices-title';
-    title.textContent = `✈️ Meilleurs tarifs ${fromIata} → ${toIata}`;
+    const pricesLabel = lang==='ru' ? `✈️ Лучшие тарифы ${fromIata} → ${toIata}`
+                      : lang==='en' ? `✈️ Best fares ${fromIata} → ${toIata}`
+                      : `✈️ Meilleurs tarifs ${fromIata} → ${toIata}`;
+    title.textContent = pricesLabel;
     bubble.appendChild(title);
 
     data.flights.forEach(f => {
@@ -1980,6 +1992,7 @@ async function handleAIResponse(data){
     (newTo   && state.to   && normalize(newTo)   !== normalize(state.to))
   );
 
+  // Reset si nouveau trajet OU si chatDone et nouvelles villes détectées
   if(routeChanged || (chatDone && (newFrom || newTo))){
     // Nouveau trajet détecté → reset state sans vider le chat
     state = {from:null,fromIata:null,to:null,toIata:null,departureDate:null,returnDate:null,passengers:1,budget:null,tripType:'oneway'};
@@ -2096,6 +2109,14 @@ async function handleUserMessage(message){
   if(message.trim().length < 2){
     addBotMsg(t('botNoCity'));
     return;
+  }
+
+  // Si chatDone mais l'user continue à parler → il veut un nouveau trajet
+  // On laisse DeepSeek décider, mais on réactive le chat
+  if(chatDone){
+    chatDone = false;
+    resultCtaEl.classList.remove('show');
+    aviasalesLnk.href = '#';
   }
 
   showTyping();
