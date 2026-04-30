@@ -1087,12 +1087,16 @@ function closeDP(which){ document.getElementById('dp-'+which).style.display='non
    AVIASALES LINK
 ═══════════════════════════════════════════════════════════════ */
 function buildAviasalesURL(fromIata, toIata){
-  let dep=''; if(dpDeptDate){ dep=`${dpDeptDate.getFullYear()}-${String(dpDeptDate.getMonth()+1).padStart(2,'0')}-${String(dpDeptDate.getDate()).padStart(2,'0')}`; }
-  else { const d=new Date(); d.setDate(d.getDate()+7); dep=d.toISOString().split('T')[0]; }
-  let ret=''; if(dpRetDate&&tripType==='return'){ ret=`${dpRetDate.getFullYear()}-${String(dpRetDate.getMonth()+1).padStart(2,'0')}-${String(dpRetDate.getDate()).padStart(2,'0')}`; }
-  const pax=parseInt(document.getElementById('search-pax').value)||1;
-  let url=`https://www.aviasales.com/search?origin=${fromIata}&destination=${toIata}&depart_date=${dep}&adults=${pax}`;
-  if(ret) url+=`&return_date=${ret}`;
+  let depDate = dpDeptDate || (() => { const d=new Date(); d.setDate(d.getDate()+7); return d; })();
+  const dep = String(depDate.getDate()).padStart(2,'0') + String(depDate.getMonth()+1).padStart(2,'0');
+  const pax = parseInt(document.getElementById('search-pax').value)||1;
+  let path = `${fromIata}${dep}${toIata}`;
+  if(dpRetDate && tripType==='return'){
+    const ret = String(dpRetDate.getDate()).padStart(2,'0') + String(dpRetDate.getMonth()+1).padStart(2,'0');
+    path += ret;
+  }
+  path += pax;
+  const url = `https://www.aviasales.com/search/${path}`;
   return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
 }
 
@@ -1114,7 +1118,7 @@ document.getElementById('btn-search').addEventListener('click', async()=>{
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
   setTimeout(async()=>{
     chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
-    addBotMsg(t('chatSearching', from, to, pax));
+    addBotMsg(t('chatSearching', cleanLabel(from), cleanLabel(to), pax));
     setTimeout(()=>showResults(), 800);
     chatInput.disabled=false; chatSendBtn.disabled=true;
   },400);
@@ -1591,18 +1595,33 @@ function fmtDateLabel(iso){
    ou:     /search/{FROM}{DDMM}{TO}{DDMM}{PAXN} (aller-retour)
 ═══════════════════════════════════════════════════════════════ */
 function generateAviasalesLink(s){
-  const fi  = (s.fromIata||'').toUpperCase();
-  const ti  = (s.toIata||'').toUpperCase();
+  const fi = (s.fromIata||'').toUpperCase();
+  const ti = (s.toIata||'').toUpperCase();
   if(!fi || !ti) return null;
 
-  const pax    = parseInt(s.passengers)||1;
-  const depISO = s.departureDate || (() => { const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split('T')[0]; })();
+  const pax = parseInt(s.passengers)||1;
 
-  let url = `https://www.aviasales.com/search?origin=${fi}&destination=${ti}&depart_date=${depISO}&adults=${pax}`;
+  // Date départ → DDMM
+  let depDate;
+  if(s.departureDate){
+    depDate = new Date(s.departureDate + 'T00:00:00');
+  } else {
+    depDate = new Date(); depDate.setDate(depDate.getDate()+7);
+  }
+  const dep = String(depDate.getDate()).padStart(2,'0') + String(depDate.getMonth()+1).padStart(2,'0');
+
+  // Construction du chemin
+  let path = `${fi}${dep}${ti}`;
+
   if(s.returnDate && (s.tripType==='roundtrip'||s.tripType==='return')){
-    url += `&return_date=${s.returnDate}`;
+    const retDate = new Date(s.returnDate + 'T00:00:00');
+    const ret = String(retDate.getDate()).padStart(2,'0') + String(retDate.getMonth()+1).padStart(2,'0');
+    path += ret;
   }
 
+  path += pax;
+
+  const url = `https://www.aviasales.com/search/${path}`;
   return `https://tp.media/r?marker=696220&p=4114&u=${encodeURIComponent(url)}`;
 }
 
@@ -1717,6 +1736,17 @@ function generateBotReply(s){
 /* ══════════════════════════════════════════════════════════════
    SHOW RESULTS
 ═══════════════════════════════════════════════════════════════ */
+// Nettoie le label pour l'affichage — garde juste le nom de ville
+function cleanLabel(name){
+  if(!name) return '?';
+  return name
+    .replace(/\s*\([^)]*\)/g, '')  // supprime (Paris-Orly Airport)
+    .replace(/,.*$/g, '')           // supprime , France
+    .replace(/\s+airport$/i, '')    // supprime trailing "Airport"
+    .replace(/\s+international$/i,'')
+    .trim() || name;
+}
+
 function showResults(){
   if(chatDone) return;
 
@@ -1736,8 +1766,8 @@ function showResults(){
   console.log('[Midzo] STATE:', JSON.stringify(state, null, 2));
   console.log('[Midzo] LINK:', link);
 
-  const fromLabel = state.from || state.fromIata;
-  const toLabel   = state.to   || state.toIata;
+  const fromLabel = cleanLabel(state.from || state.fromIata);
+  const toLabel   = cleanLabel(state.to   || state.toIata);
   const dateStr   = state.departureDate ? fmtDateLabel(state.departureDate) : '';
   const msg = t('botFound', fromLabel, toLabel, dateStr, state.passengers);
 
