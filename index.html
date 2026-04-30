@@ -412,7 +412,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
     </div>
     <!-- ══ SCHEDULE WIDGET ══ -->
     <div id="tp-widget-container" style="display:none;padding:0;margin-top:4px;border-top:1px solid rgba(7,112,227,.1);">
-      <div id="tp-widget-inner"></div>
+      <div id="tp_schedule_widget"></div>
     </div>
   </div>
 </div>
@@ -1105,27 +1105,37 @@ function buildAviasalesURL(fromIata, toIata){
 }
 
 document.getElementById('btn-search').addEventListener('click', async()=>{
-  const from=document.getElementById('search-from').value.trim();
-  const to=document.getElementById('search-to').value.trim();
-  const pax=parseInt(document.getElementById('search-pax').value)||1;
+  const from = document.getElementById('search-from').value.trim();
+  const to   = document.getElementById('search-to').value.trim();
+  const pax  = parseInt(document.getElementById('search-pax').value)||1;
   if(!from||!to){ alert(t('alertCity')); return; }
-  if(!selectedIata.from) selectedIata.from = findIata(from) || await resolveIata(from);
-  if(!selectedIata.to)   selectedIata.to   = findIata(to)   || await resolveIata(to);
+
+  // Résolution IATA
+  const fromIata = selectedIata.from || findIata(from) || await resolveIata(from) || from.substring(0,3).toUpperCase();
+  const toIata   = selectedIata.to   || findIata(to)   || await resolveIata(to)   || to.substring(0,3).toUpperCase();
+
   state = {
-    from, fromIata: selectedIata.from || from.substring(0,3).toUpperCase(),
-    to,   toIata:   selectedIata.to   || to.substring(0,3).toUpperCase(),
+    from,      fromIata,
+    to,        toIata,
     departureDate: dpDeptDate ? dpDeptDate.toISOString().split('T')[0] : null,
     returnDate:    dpRetDate  ? dpRetDate.toISOString().split('T')[0]  : null,
     tripType:  tripType==='return' ? 'roundtrip' : 'oneway',
-    passengers: pax, budget: null
+    passengers: pax,
+    budget: null
   };
+
   document.getElementById('agent-section').scrollIntoView({behavior:'smooth'});
-  setTimeout(async()=>{
-    chatDone=false; resultCtaEl.classList.remove('show'); chatMsgs.innerHTML=''; chatCtx=[];
+
+  setTimeout(()=>{
+    chatDone=false;
+    resultCtaEl.classList.remove('show');
+    chatMsgs.innerHTML='';
+    chatCtx=[];
     addBotMsg(t('chatSearching', cleanLabel(from), cleanLabel(to), pax));
     setTimeout(()=>showResults(), 800);
-    chatInput.disabled=false; chatSendBtn.disabled=true;
-  },400);
+    chatInput.disabled=false;
+    chatSendBtn.disabled=true;
+  }, 400);
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -1758,49 +1768,56 @@ function generateBotReply(s){
    SHOW RESULTS
 ═══════════════════════════════════════════════════════════════ */
 // Charge le Schedule Widget Travelpayouts avec le trajet actuel
-function loadScheduleWidget(fromIata, toIata, depDate){
+function loadScheduleWidget(fromIata, toIata){
   const container = document.getElementById('tp-widget-container');
-  const inner     = document.getElementById('tp-widget-inner');
-  if(!container || !inner) return;
+  const target    = document.getElementById('tp_schedule_widget');
+  if(!container || !target) return;
+  if(!fromIata || !toIata){ container.style.display='none'; return; }
 
-  // Vider le widget précédent
-  inner.innerHTML = '';
+  // Reset complet — le widget Travelpayouts ne se recharge pas si le script existe déjà
   container.style.display = 'none';
+  target.innerHTML = '';
+  // Supprimer l'ancien script si présent
+  const old = document.getElementById('tp-schedule-script');
+  if(old) old.remove();
+  // Supprimer les iframes/divs injectés par le widget précédent
+  document.querySelectorAll('[id^="tp_"][id!="tp_schedule_widget"]').forEach(el=>{
+    if(el.tagName==='IFRAME'||el.tagName==='DIV') el.remove();
+  });
 
-  if(!fromIata || !toIata) return;
-
-  // Paramètres du widget
   const params = new URLSearchParams({
-    currency:        'usd',
-    trs:             '523964',
-    shmarker:        '696220',
-    color_button:    '#0770e3',
-    target_host:     'www.aviasales.com/search',
-    locale:          lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'fr',
-    powered_by:      'true',
-    origin:          fromIata.toUpperCase(),
-    destination:     toIata.toUpperCase(),
-    with_fallback:   'false',
+    currency:           'usd',
+    trs:                '523964',
+    shmarker:           '696220',
+    color_button:       '#0770e3',
+    target_host:        'www.aviasales.com/search',
+    locale:             lang==='ru'?'ru':lang==='en'?'en':'fr',
+    powered_by:         'true',
+    origin:             fromIata.toUpperCase(),
+    destination:        toIata.toUpperCase(),
+    with_fallback:      'false',
     non_direct_flights: 'true',
-    min_lines:       '5',
-    border_radius:   '0',
-    color_background:'#FFFFFF',
-    color_text:      '#000000',
-    color_border:    '#EFEFEF',
-    promo_id:        '2811',
-    campaign_id:     '100'
+    min_lines:          '5',
+    border_radius:      '0',
+    color_background:   '#FFFFFF',
+    color_text:         '#000000',
+    color_border:       '#EFEFEF',
+    promo_id:           '2811',
+    campaign_id:        '100'
   });
 
   const script = document.createElement('script');
+  script.id      = 'tp-schedule-script';
   script.async   = true;
   script.charset = 'utf-8';
   script.src     = `https://tpembd.com/content?${params.toString()}`;
+  script.onload  = () => {
+    container.style.display = 'block';
+    setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'nearest'}), 300);
+  };
+  script.onerror = () => console.warn('[Midzo] Widget failed to load');
 
-  inner.appendChild(script);
-  container.style.display = 'block';
-
-  // Scroll vers le widget
-  setTimeout(()=> container.scrollIntoView({behavior:'smooth', block:'start'}), 800);
+  target.appendChild(script);
 }
 
 function showResults(){
@@ -1844,7 +1861,7 @@ function showResults(){
   syncStateToInputs();
 
   // Charger le widget Schedule avec le trajet
-  loadScheduleWidget(state.fromIata, state.toIata, state.departureDate);
+  loadScheduleWidget(state.fromIata, state.toIata);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2073,7 +2090,9 @@ async function resetChat(){
   dpDeptDate=null; dpRetDate=null; chatCtx=[]; chatDone=false;
   resultCtaEl.classList.remove('show');
   const _wc = document.getElementById('tp-widget-container');
-  if(_wc){ _wc.style.display='none'; document.getElementById('tp-widget-inner').innerHTML=''; }
+  if(_wc){ _wc.style.display='none'; document.getElementById('tp_schedule_widget').innerHTML=''; }
+  const _os = document.getElementById('tp-schedule-script');
+  if(_os) _os.remove();
   chatMsgs.innerHTML='';
   chatInput.value=''; chatInput.disabled=false;
   chatSendBtn.disabled=true;
