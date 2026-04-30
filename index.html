@@ -1096,7 +1096,8 @@ function buildAviasalesURL(fromIata, toIata){
     path += ret;
   }
   path += pax;
-  return `https://www.aviasales.com/search/${path}?marker=696220`;
+  // Format Travelpayouts direct — marker dans l'URL Aviasales
+  return `https://aviasales.com/search/${path}?marker=696220`;
 }
 
 document.getElementById('btn-search').addEventListener('click', async()=>{
@@ -1274,15 +1275,32 @@ const CITY_MAP = {
   'moscou vnukovo':'VKO','vnukovo':'VKO','vko':'VKO',
   'krasnodar':'KRR','krr':'KRR',
   'saint petersbourg':'LED','saint-petersbourg':'LED','led':'LED','pulkovo':'LED',
+  'st petersbourg':'LED','st-petersbourg':'LED',
+  'saint-petersbour':'LED','petersbourg':'LED','petersbour':'LED',
   'novosibirsk':'OVB','ovb':'OVB','tolmachevo':'OVB',
-  'ekaterinbourg':'SVX','svx':'SVX','koltsovo':'SVX',
+  'ekaterinbourg':'SVX','svx':'SVX','koltsovo':'SVX','iekaterinbourg':'SVX',
+  'sochi':'AER','aer':'AER','sotchi':'AER',
   'kazan':'KZN','kzn':'KZN',
-  'sochi':'AER','aer':'AER',
   'samara':'KUF','kuf':'KUF',
-  'ufa':'UFA','ufa':'UFA',
-  'rostov':'ROV','rov':'ROV',
+  'ufa':'UFA',
+  'rostov':'ROV','rov':'ROV','rostov sur le don':'ROV',
   'mineralnye vody':'MRV','mrv':'MRV',
   'volgograd':'VOG','vog':'VOG',
+  'perm':'PEE','pee':'PEE',
+  'nijni novgorod':'GOJ','nizhny novgorod':'GOJ','goj':'GOJ',
+  'omsk':'OMS','oms':'OMS',
+  'tyumen':'TJM','tjm':'TJM',
+  'khabarovsk':'KHV','khv':'KHV',
+  'vladivostok':'VVO','vvo':'VVO',
+  'irkoutsk':'IKT','irkutsk':'IKT','ikt':'IKT',
+  'krasnoyarsk':'KJA','kja':'KJA',
+  'tbilissi':'TBS','tbilisi':'TBS','tbs':'TBS',
+  'erevan':'EVN','yerevan':'EVN','evn':'EVN',
+  'baku':'GYD','bakou':'GYD','gyd':'GYD',
+  'almaty':'ALA','alma ata':'ALA','ala':'ALA',
+  'tachkent':'TAS','tashkent':'TAS','tas':'TAS',
+  'minsk':'MSQ','msq':'MSQ',
+  'kiev':'KBP','kyiv':'KBP','kbp':'KBP',
   // Océanie
   'sydney':'SYD','syd':'SYD',
   'melbourne':'MEL','mel':'MEL',
@@ -1620,7 +1638,7 @@ function generateAviasalesLink(s){
 
   path += pax;
 
-  const url = `https://www.aviasales.com/search/${path}?marker=696220`;
+  const url = `https://aviasales.com/search/${path}?marker=696220`;
   return url;
 }
 
@@ -1815,6 +1833,10 @@ async function handleAIResponse(data){
   if(c.return_date  && c.return_date  !== 'null') state.returnDate    = normalizeDate(c.return_date)  || state.returnDate;
   if(c.passengers   && c.passengers   !== 'null') state.passengers    = Math.max(1, parseInt(c.passengers)||1);
   if(c.budget       && c.budget       !== 'null') state.budget        = c.budget;
+
+  // Si IATA encore manquant après findIata — dernier recours via /api/cities
+  if(!state.fromIata && state.from) state.fromIata = await resolveIata(state.from);
+  if(!state.toIata   && state.to)   state.toIata   = await resolveIata(state.to);
 
   console.log('[Midzo] STATE:', JSON.stringify(state));
 
