@@ -1096,8 +1096,8 @@ function buildAviasalesURL(fromIata, toIata){
     path += ret;
   }
   path += pax;
-  // Format Travelpayouts direct — marker dans l'URL Aviasales
-  return `https://aviasales.com/search/${path}?marker=696220`;
+  const dest = `https%3A%2F%2Faviasales.com%2Fsearch%2F${path}`;
+  return `https://tp.media/r?marker=696220&trs=488431&p=4114&u=${dest}`;
 }
 
 document.getElementById('btn-search').addEventListener('click', async()=>{
@@ -1638,8 +1638,8 @@ function generateAviasalesLink(s){
 
   path += pax;
 
-  const url = `https://aviasales.com/search/${path}?marker=696220`;
-  return url;
+  const dest = `https%3A%2F%2Faviasales.com%2Fsearch%2F${path}`;
+  return `https://tp.media/r?marker=696220&trs=488431&p=4114&u=${dest}`;
 }
 
 /* ══════════════════════════════════════════════════════════════
