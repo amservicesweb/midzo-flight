@@ -1064,16 +1064,28 @@ function setTripType(type){
 /* ══════════════════════════════════════════════════════════════
    DATE PICKER
 ═══════════════════════════════════════════════════════════════ */
-const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const MONTHS_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DAYS=['Lu','Ma','Me','Je','Ve','Sa','Di'], DAYS_EN=['Mo','Tu','We','Th','Fr','Sa','Su'];
+const MONTHS    = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const DAYS      = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+const DAYS_EN   = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+const DAYS_RU   = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
 function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
-function fmtDate(d){ const m=lang==='en'?['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']:['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']; return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`; }
+function fmtDate(d){
+  const MONTHS = {
+    fr: ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
+    en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    ru: ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек']
+  };
+  const m = (MONTHS[lang]||MONTHS.fr)[d.getMonth()];
+  return `${d.getDate()} ${m} ${d.getFullYear()}`;
+}
 
 function renderDPGrid(gridId, month, year, selectedDate, minDate){
   const grid=document.getElementById(gridId);
-  const months=lang==='en'?MONTHS_EN:MONTHS, days=lang==='en'?DAYS_EN:DAYS;
+  const months = lang==='ru'?MONTHS_RU : lang==='en'?MONTHS_EN : MONTHS;
+  const days   = lang==='ru'?DAYS_RU   : lang==='en'?DAYS_EN   : DAYS;
   document.getElementById(gridId.replace('-grid','-month')).textContent=`${months[month]} ${year}`;
   const dayNames=days.map(d=>`<div class="dp-dn">${d}</div>`).join('');
   const first=new Date(year,month,1).getDay(), offset=first===0?6:first-1;
@@ -1677,10 +1689,10 @@ function normalizeDate(str){
 
 function fmtDateLabel(iso){
   if(!iso) return '';
-  // Parse manuellement pour éviter le décalage UTC
   const [y,m,d] = iso.split('-').map(Number);
-  const date = new Date(y, m-1, d); // constructeur local, pas UTC
-  return date.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const date = new Date(y, m-1, d);
+  const locale = lang==='ru'?'ru-RU':lang==='en'?'en-GB':'fr-FR';
+  return date.toLocaleDateString(locale,{day:'numeric',month:'long',year:'numeric'});
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2006,9 +2018,13 @@ function showBestSeason(fromLabel, toLabel){
 function showVariants(fromLabel, toLabel, s){
   if(!s.fromIata || !s.toIata || !s.departureDate) return;
 
-  // Variant 1 : partir une semaine plus tôt
+  // Variant 1 : partir une semaine plus tôt (si la date est dans le futur)
+  const today = new Date(); today.setHours(0,0,0,0);
   const early = new Date(s.departureDate+'T00:00:00');
   early.setDate(early.getDate()-7);
+  // Si date passée → proposer une semaine plus tard à la place
+  const earlyIsValid = early > today;
+  if(!earlyIsValid) early.setDate(early.getDate()+14); // +7 jours après la date originale
   const earlyISO = early.toISOString().split('T')[0];
   const earlyLink = generateAviasalesLink({...s, departureDate: earlyISO});
 
@@ -2024,11 +2040,14 @@ function showVariants(fromLabel, toLabel, s){
   const earlyLabel  = fmtDateLabel(earlyISO);
   const retLabel    = fmtDateLabel(retISO);
   const pax2        = (parseInt(s.passengers)||1)+1;
+  const earlyPrefix = earlyIsValid
+    ? { fr:'📅 Partir le', en:'📅 Depart', ru:'📅 Вылет' }
+    : { fr:'📅 Partir plus tard le', en:'📅 Later departure', ru:'📅 Позже:' };
 
   const titles = {
-    fr: ['Suggestions pour vous', `📅 Partir le ${earlyLabel}`, `↩️ Aller-retour (retour ${retLabel})`, `👥 ${pax2} passagers`],
-    en: ['Suggestions for you',  `📅 Depart ${earlyLabel}`,    `↩️ Round trip (return ${retLabel})`,    `👥 ${pax2} passengers`],
-    ru: ['Варианты для вас',     `📅 Вылет ${earlyLabel}`,     `↩️ Туда-обратно (возврат ${retLabel})`, `👥 ${pax2} пассажира`],
+    fr: ['Suggestions pour vous', `${earlyPrefix.fr} ${earlyLabel}`, `↩️ Aller-retour (retour ${retLabel})`, `👥 ${pax2} passagers`],
+    en: ['Suggestions for you',  `${earlyPrefix.en} ${earlyLabel}`, `↩️ Round trip (return ${retLabel})`,    `👥 ${pax2} passengers`],
+    ru: ['Варианты для вас',     `${earlyPrefix.ru} ${earlyLabel}`, `↩️ Туда-обратно (возврат ${retLabel})`, `👥 ${pax2} пассажира`],
   };
   const T = titles[lang]||titles.fr;
 
