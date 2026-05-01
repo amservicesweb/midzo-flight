@@ -13,7 +13,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<title id="page-title">Midzo Flight · Trouvez votre vol au meilleur prix avec Sofia l'agente IA de voyage formé par MIDZO</title>
+<title id="page-title">Midzo Flight · Trouvez votre vol au meilleur prix</title>
 <meta name="description" id="page-desc" content="Comparez des centaines de vols avec l'agent IA Sofia. 728+ compagnies en temps réel.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -203,17 +203,20 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--sky);color:var(
 .wa-btn:hover{background:#1db954;}
 .result-cta{display:none;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.9rem 1.2rem;background:var(--blue-lt);border-top:1px solid rgba(7,112,227,.15);}
 .result-cta.show{display:flex;}
-.prices-bubble { padding: 0 !important; overflow: hidden; min-width: 260px; max-width: 340px; }
-.prices-title { padding: .6rem .9rem; font-size: .78rem; font-weight: 700; color: var(--blue); border-bottom: 1px solid rgba(7,112,227,.1); }
-.price-item { display: flex; justify-content: space-between; align-items: center; padding: .55rem .9rem; text-decoration: none; color: var(--text); border-bottom: 1px solid rgba(0,0,0,.05); transition: background .15s; }
-.price-item:hover { background: rgba(7,112,227,.05); }
-.price-info { display: flex; flex-direction: column; gap: 2px; }
-.price-airline { font-size: .75rem; font-weight: 600; color: var(--text); }
-.price-date { font-size: .7rem; color: var(--muted); }
-.price-stops { font-size: .68rem; color: var(--muted); }
-.price-amount { font-size: .88rem; font-weight: 800; color: var(--blue); white-space: nowrap; }
-.prices-more { display: block; text-align: center; padding: .55rem; font-size: .75rem; font-weight: 600; color: var(--blue); text-decoration: none; background: rgba(7,112,227,.05); }
-.prices-more:hover { background: rgba(7,112,227,.1); }
+
+/* ── Carte de vol ── */
+.flight-map-bubble{padding:0!important;overflow:hidden;min-width:280px;max-width:360px;}
+.flight-map-svg{width:100%;display:block;border-radius:10px 10px 0 0;}
+.flight-map-info{display:flex;justify-content:space-between;align-items:center;padding:.5rem .8rem;font-size:.75rem;font-weight:600;color:var(--text);background:#f8fbff;border-radius:0 0 10px 10px;}
+.flight-map-dist{color:var(--muted);font-weight:400;font-size:.7rem;}
+@keyframes drawPath{to{stroke-dashoffset:0}}
+@keyframes fadeInDot{to{opacity:1}}
+
+/* ── Variantes ── */
+.variants-bubble{padding:.6rem .8rem!important;min-width:240px;max-width:340px;}
+.variants-title{font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.03em;}
+.variant-btn{display:block;padding:.5rem .75rem;margin:.3rem 0;background:var(--blue-lt);color:var(--blue);border-radius:8px;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.variant-btn:hover{background:var(--blue);color:#fff;}
 
 /* ── CTA FINAL ── */
 .cta-final{background:linear-gradient(135deg,#0a1840,#0c2775);border-radius:18px;padding:3.5rem 2rem;text-align:center;margin:0 1.5rem 4rem;}
@@ -1827,99 +1830,6 @@ function generateBotReply(s){
 /* ══════════════════════════════════════════════════════════════
    SHOW RESULTS
 ═══════════════════════════════════════════════════════════════ */
-// Charge le Schedule Widget Travelpayouts avec le trajet actuel
-// Récupère et affiche les prix réels dans le chat
-async function fetchAndShowPrices(fromIata, toIata){
-  if(!fromIata || !toIata) return;
-
-  // Message de chargement
-  const loadRow = document.createElement('div');
-  loadRow.className = 'brow-bot'; loadRow.id = 'prices-loading';
-  loadRow.innerHTML = `<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-  chatMsgs.appendChild(loadRow);
-  chatMsgs.scrollTop = chatMsgs.scrollHeight;
-
-  try {
-    const r = await fetch(`/api/prices?origin=${fromIata}&destination=${toIata}&currency=usd&lang=${lang}`);
-    loadRow.remove();
-
-    if(!r.ok) throw new Error('API error');
-    const data = await r.json();
-
-    if(!data.flights || data.flights.length === 0){
-      const noFaresMsg = lang==='ru'
-        ? `Нет доступных тарифов для ${fromIata} → ${toIata}. Нажмите "Смотреть рейсы" для поиска на Aviasales.`
-        : lang==='en'
-        ? `No fares available for ${fromIata} → ${toIata} right now. Click "See flights" to search on Aviasales.`
-        : `Pas de tarifs disponibles pour ${fromIata} → ${toIata}. Cliquez "Voir les vols" pour chercher sur Aviasales.`;
-      addBotMsg(noFaresMsg);
-      return;
-    }
-
-    // Construire la carte de prix
-    const row = document.createElement('div');
-    row.className = 'brow-bot';
-    const av = document.createElement('div'); av.className='bot-av';
-    av.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg>';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble-bot prices-bubble';
-
-    const title = document.createElement('div');
-    title.className = 'prices-title';
-    const pricesLabel = lang==='ru' ? `✈️ Лучшие тарифы ${fromIata} → ${toIata}`
-                      : lang==='en' ? `✈️ Best fares ${fromIata} → ${toIata}`
-                      : `✈️ Meilleurs tarifs ${fromIata} → ${toIata}`;
-    title.textContent = pricesLabel;
-    bubble.appendChild(title);
-
-    data.flights.forEach(f => {
-      const item = document.createElement('a');
-      item.className = 'price-item';
-      item.href = f.link;
-      item.target = '_blank';
-
-      const dateStr = f.departure_at
-        ? new Date(f.departure_at).toLocaleDateString(lang==='ru'?'ru-RU':lang==='en'?'en-GB':'fr-FR', {day:'numeric',month:'short'})
-        : '';
-
-      const stops = f.stops === 0
-        ? (lang==='ru'?'Direct':lang==='en'?'Direct':'Direct')
-        : `${f.stops} ${lang==='ru'?'пересадка':lang==='en'?'stop':'escale'}`;
-
-      item.innerHTML = `
-        <div class="price-info">
-          <span class="price-airline">${f.airline||'✈'}</span>
-          <span class="price-date">${dateStr}</span>
-          <span class="price-stops">${stops}</span>
-        </div>
-        <div class="price-amount">$${f.price}</div>
-      `;
-      bubble.appendChild(item);
-    });
-
-    const more = document.createElement('a');
-    more.className = 'prices-more';
-    more.href = data.search_link;
-    more.target = '_blank';
-    more.textContent = lang==='ru'?'Смотреть все рейсы →':lang==='en'?'See all flights →':'Voir tous les vols →';
-    bubble.appendChild(more);
-
-    row.appendChild(av);
-    row.appendChild(bubble);
-    chatMsgs.appendChild(row);
-    chatMsgs.scrollTop = chatMsgs.scrollHeight;
-
-  } catch(e) {
-    loadRow.remove();
-    console.warn('[Midzo] Prices fetch failed:', e.message);
-  }
-}
-
-function prefillSearchWidget(fromIata, toIata, depDate, retDate, passengers){
-  const cta = document.getElementById('result-cta');
-  if(cta) setTimeout(()=> cta.scrollIntoView({behavior:'smooth', block:'nearest'}), 400);
-}
 
 // Nettoie le label pour l'affichage — garde juste le nom de ville
 function cleanLabel(name){
@@ -1935,44 +1845,210 @@ function cleanLabel(name){
 async function showResults(){
   if(chatDone) return;
 
-  // Résolution IATA — synchro d'abord
   if(!state.fromIata && state.from) state.fromIata = findIata(state.from);
   if(!state.toIata   && state.to)   state.toIata   = findIata(state.to);
-
-  // Si encore manquant → essai async via /api/cities
   if(!state.fromIata && state.from) state.fromIata = await resolveIata(state.from);
   if(!state.toIata   && state.to)   state.toIata   = await resolveIata(state.to);
 
   const link = generateAviasalesLink(state);
-  if(!link){
-    // Ne pas afficher le message d'erreur si Sofia a déjà répondu
-    // — juste logger silencieusement
-    console.warn('[Midzo] Cannot generate link — missing IATA:', state);
-    return;
-  }
+  if(!link){ console.warn('[Midzo] Cannot generate link:', state); return; }
 
   chatDone = true;
   aviasalesLnk.href = link;
   aviasalesLnk.textContent = t('seeFlights');
-
-  console.log('[Midzo] STATE:', JSON.stringify(state, null, 2));
-  console.log('[Midzo] LINK:', link);
 
   const fromLabel = cleanLabel(state.from || state.fromIata);
   const toLabel   = cleanLabel(state.to   || state.toIata);
   const dateStr   = state.departureDate ? fmtDateLabel(state.departureDate) : '';
   const msg = t('botFound', fromLabel, toLabel, dateStr, state.passengers);
 
-  addBotMsg(msg);
+  addBotMsg(msg, ()=>{
+    // ① Carte de vol animée
+    setTimeout(()=> showFlightMap(state.fromIata, state.toIata, fromLabel, toLabel), 400);
+    // ② Meilleure période
+    setTimeout(()=> showBestSeason(fromLabel, toLabel), 1200);
+    // ③ Suggestions variantes
+    setTimeout(()=> showVariants(fromLabel, toLabel, state), 2200);
+  });
   chatCtx.push({role:'assistant', content:msg});
   resultMsgEl.textContent = t('botFoundMsg', fromLabel, toLabel);
   resultCtaEl.classList.add('show');
   syncStateToInputs();
+}
 
-  prefillSearchWidget(state.fromIata, state.toIata, state.departureDate, state.returnDate, state.passengers);
+/* ══════════════════════════════════════════════════════════════
+   ① CARTE DE VOL ANIMÉE
+═══════════════════════════════════════════════════════════════ */
+// Coordonnées approximatives par IATA
+const IATA_COORDS = {
+  CDG:[48.9,2.5],ORY:[48.7,2.4],LYS:[45.7,5.1],MRS:[43.4,5.2],NCE:[43.7,7.2],
+  BOD:[44.8,-0.7],TLS:[43.6,1.4],LHR:[51.5,-0.5],LGW:[51.2,-0.2],AMS:[52.3,4.8],
+  BRU:[50.9,4.5],FRA:[50.0,8.6],MUC:[48.4,11.8],BER:[52.4,13.5],MAD:[40.5,-3.6],
+  BCN:[41.3,2.1],FCO:[41.8,12.2],MXP:[45.6,8.7],VIE:[48.1,16.6],ZRH:[47.5,8.5],
+  GVA:[46.2,6.1],CPH:[55.6,12.7],ARN:[59.6,17.9],OSL:[60.2,11.1],HEL:[60.3,25.0],
+  WAW:[52.2,21.0],PRG:[50.1,14.3],BUD:[47.4,19.3],ATH:[37.9,23.9],IST:[41.3,28.7],
+  SAW:[40.9,29.3],SVO:[55.9,37.4],DME:[55.4,37.9],VKO:[55.6,37.3],LED:[59.8,30.3],
+  KRR:[45.0,39.2],AER:[43.4,40.1],KZN:[55.6,49.3],SVX:[56.7,60.8],OVB:[55.0,82.7],
+  DXB:[25.3,55.4],AUH:[24.4,54.7],DOH:[25.3,51.6],RUH:[24.9,46.7],BEY:[33.8,35.5],
+  TLV:[32.0,34.9],MCT:[23.6,58.3],AMM:[31.7,36.0],
+  ABJ:[5.3,-4.0],DSS:[14.7,-17.5],LFW:[6.2,1.3],CMN:[33.4,-7.6],TUN:[36.8,10.2],
+  ALG:[36.7,3.2],CAI:[30.1,31.4],LOS:[6.6,3.3],ACC:[5.6,-0.2],NBO:[-1.3,36.9],
+  JNB:[-26.1,28.2],DLA:[4.0,9.7],COO:[6.4,2.4],BKO:[12.5,-8.0],OUA:[12.4,-1.5],
+  ADD:[9.0,38.8],TNR:[-18.8,47.5],MRU:[-20.4,57.7],MLE:[4.2,73.5],SEZ:[-4.7,55.5],
+  BKK:[13.7,100.7],DMK:[13.9,100.6],HND:[35.5,139.8],NRT:[35.8,140.4],ICN:[37.4,126.5],
+  SIN:[1.4,103.9],KUL:[2.7,101.7],CGK:[-6.1,106.7],DPS:[-8.7,115.2],MNL:[14.5,121.0],
+  SGN:[10.8,106.7],HAN:[21.2,105.8],BOM:[19.1,72.9],DEL:[28.6,77.1],PEK:[40.1,116.6],
+  PVG:[31.1,121.8],HKG:[22.3,114.2],
+  JFK:[40.6,-73.8],EWR:[40.7,-74.2],MIA:[25.8,-80.3],LAX:[33.9,-118.4],ORD:[42.0,-87.9],
+  YUL:[45.5,-73.7],YYZ:[43.7,-79.6],GRU:[-23.4,-46.5],EZE:[-34.8,-58.5],
+  SYD:[-33.9,151.2],MEL:[-37.7,144.8],AKL:[-37.0,174.8],
+  CUN:[21.0,-86.9],HAV:[22.9,-82.4],PUJ:[18.6,-68.4],HKT:[8.1,98.3],
+};
 
-  // Afficher les prix réels dans le chat
-  setTimeout(()=> fetchAndShowPrices(state.fromIata, state.toIata), 600);
+function showFlightMap(fromIata, toIata, fromLabel, toLabel){
+  const fc = IATA_COORDS[fromIata];
+  const tc = IATA_COORDS[toIata];
+  if(!fc || !tc) return;
+
+  // Convertir coordonnées géo → position SVG (projection simple)
+  const W=400, H=200;
+  function geoToSvg(lat, lng){
+    const x = ((lng + 180) / 360) * W;
+    const y = ((90 - lat) / 180) * H;
+    return [Math.round(x), Math.round(y)];
+  }
+
+  const [fx, fy] = geoToSvg(fc[0], fc[1]);
+  const [tx, ty] = geoToSvg(tc[0], tc[1]);
+
+  // Point de contrôle pour courbe de Bezier (arc vers le haut)
+  const cx = (fx+tx)/2;
+  const cy = Math.min(fy,ty) - Math.abs(tx-fx)*0.35 - 30;
+
+  const pathD = `M${fx},${fy} Q${cx},${cy} ${tx},${ty}`;
+  const dist  = Math.round(Math.sqrt(Math.pow((tc[1]-fc[1])*111,2)+Math.pow((tc[0]-fc[0])*111,2)));
+  const hours = Math.round(dist/800*10)/10;
+
+  const row = document.createElement('div'); row.className='brow-bot';
+  row.innerHTML = `
+    <div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div>
+    <div class="bubble-bot flight-map-bubble">
+      <svg class="flight-map-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+        <!-- Fond monde simplifié -->
+        <rect width="${W}" height="${H}" fill="#e8f0fe" rx="8"/>
+        <!-- Grille légère -->
+        <line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="#c5d5f5" stroke-width="0.5"/>
+        <line x1="${W/2}" y1="0" x2="${W/2}" y2="${H}" stroke="#c5d5f5" stroke-width="0.5"/>
+        <!-- Tracé du vol animé -->
+        <path id="flight-path-shadow" d="${pathD}" fill="none" stroke="rgba(7,112,227,0.15)" stroke-width="4" stroke-linecap="round"/>
+        <path id="flight-path" d="${pathD}" fill="none" stroke="#0770e3" stroke-width="2"
+          stroke-dasharray="600" stroke-dashoffset="600" stroke-linecap="round"
+          style="animation:drawPath 1.8s ease forwards 0.2s"/>
+        <!-- Points départ/arrivée -->
+        <circle cx="${fx}" cy="${fy}" r="5" fill="#0770e3" opacity="0"/>
+        <circle cx="${fx}" cy="${fy}" r="5" fill="#0770e3" style="animation:fadeInDot .3s ease forwards 0.2s"/>
+        <circle cx="${tx}" cy="${ty}" r="5" fill="#ff4d4d" opacity="0" style="animation:fadeInDot .3s ease forwards 2s"/>
+        <!-- Avion animé le long du trajet -->
+        <text font-size="14" text-anchor="middle" opacity="0" style="animation:fadeInDot .3s ease forwards 0.5s">
+          <textPath href="#flight-path" startOffset="0%">
+            <animate attributeName="startOffset" from="0%" to="95%" dur="1.8s" begin="0.2s" fill="freeze"/>✈
+          </textPath>
+        </text>
+        <!-- Labels -->
+        <text x="${fx}" y="${fy-10}" text-anchor="middle" font-size="9" font-weight="700" fill="#0770e3" opacity="0" style="animation:fadeInDot .3s forwards 0.2s">${fromIata}</text>
+        <text x="${tx}" y="${ty-10}" text-anchor="middle" font-size="9" font-weight="700" fill="#cc0000" opacity="0" style="animation:fadeInDot .3s forwards 2s">${toIata}</text>
+      </svg>
+      <div class="flight-map-info">
+        <span>🛫 ${fromLabel}</span>
+        <span class="flight-map-dist">~${dist < 1000 ? dist+'km' : (dist/1000).toFixed(1)+'k km'} · ~${hours}h</span>
+        <span>🛬 ${toLabel}</span>
+      </div>
+    </div>`;
+  chatMsgs.appendChild(row);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ② MEILLEURE PÉRIODE
+═══════════════════════════════════════════════════════════════ */
+const SEASONS = {
+  // destination → { best: "mois", tip_fr, tip_en, tip_ru }
+  'MLE':{ best:'jan-avr', fr:'Maldives : la meilleure saison est d\'octobre à avril — mer calme, soleil garanti 🌊',    en:'Maldives: best season is Oct-Apr — calm sea, guaranteed sunshine 🌊',          ru:'Мальдивы: лучший сезон — октябрь–апрель, тихое море и солнце 🌊' },
+  'DPS':{ best:'avr-oct', fr:'Bali : la saison sèche d\'avril à octobre est idéale pour les plages 🏄',               en:'Bali: dry season Apr-Oct is ideal for beaches 🏄',                           ru:'Бали: сухой сезон апрель–октябрь идеален для пляжей 🏄' },
+  'BKK':{ best:'nov-fév', fr:'Bangkok : les mois frais de novembre à février sont les plus agréables 🌺',             en:'Bangkok: cool months Nov-Feb are the most pleasant 🌺',                       ru:'Бангкок: прохладные месяцы ноябрь–февраль самые приятные 🌺' },
+  'HKT':{ best:'nov-avr', fr:'Phuket : la meilleure période est novembre à avril, hors mousson 🏖️',                  en:'Phuket: best time is Nov-Apr, outside monsoon season 🏖️',                     ru:'Пхукет: лучшее время — ноябрь–апрель, вне сезона дождей 🏖️' },
+  'DXB':{ best:'oct-avr', fr:'Dubaï : d\'octobre à avril, la chaleur est plus supportable pour visiter 🌅',          en:'Dubai: Oct-Apr the heat is more bearable for sightseeing 🌅',                 ru:'Дубай: с октября по апрель жара терпимее для туризма 🌅' },
+  'IST':{ best:'avr-mai', fr:'Istanbul : le printemps (avril-mai) est parfait — fleurs de tulipes et peu de touristes 🌷', en:'Istanbul: spring (Apr-May) is perfect — tulips in bloom, fewer tourists 🌷', ru:'Стамбул: весна (апрель–май) идеальна — тюльпаны и меньше туристов 🌷' },
+  'JFK':{ best:'sep-oct', fr:'New York : septembre-octobre, l\'automne est magnifique et moins chargé 🍂',            en:'New York: Sep-Oct, fall is gorgeous and less crowded 🍂',                     ru:'Нью-Йорк: сентябрь–октябрь, осень прекрасна и менее многолюдна 🍂' },
+  'MIA':{ best:'déc-avr', fr:'Miami : de décembre à avril, temps parfait pour la plage et les sorties 🌴',           en:'Miami: Dec-Apr, perfect weather for beach and nightlife 🌴',                  ru:'Майами: декабрь–апрель, идеальная погода для пляжа 🌴' },
+  'BCN':{ best:'mai-jun', fr:'Barcelone : mai-juin avant la foule estivale, c\'est parfait 🥘',                      en:'Barcelona: May-Jun before summer crowds, simply perfect 🥘',                  ru:'Барселона: май–июнь до летних толп — идеально 🥘' },
+  'NBO':{ best:'jan-fév', fr:'Nairobi : janvier-février pour les safaris — faune concentrée autour des points d\'eau 🦁', en:'Nairobi: Jan-Feb for safaris — wildlife gathers at water holes 🦁',          ru:'Найроби: январь–февраль для сафари — дикие животные у водоёмов 🦁' },
+  'JNB':{ best:'mai-sep', fr:'Johannesburg : mai-septembre, hiver austral sec et idéal pour les safaris 🦒',         en:'Johannesburg: May-Sep, dry austral winter — ideal for safaris 🦒',            ru:'Йоханнесбург: май–сентябрь, сухая зима — идеально для сафари 🦒' },
+  'TUN':{ best:'avr-jun', fr:'Tunis : printemps (avril-juin) — temps doux et très peu de touristes 🏛️',              en:'Tunis: spring (Apr-Jun) — mild weather, very few tourists 🏛️',                ru:'Тунис: весна (апрель–июнь) — мягкая погода и мало туристов 🏛️' },
+  'CMN':{ best:'mar-mai', fr:'Casablanca : mars-mai, avant la canicule estivale 🌸',                                  en:'Casablanca: Mar-May, before the summer heat 🌸',                             ru:'Касабланка: март–май, до летней жары 🌸' },
+  'SIN':{ best:'fév-avr', fr:'Singapour : février-avril est la période la moins pluvieuse 🌆',                       en:'Singapore: Feb-Apr is the least rainy period 🌆',                            ru:'Сингапур: февраль–апрель — наименее дождливый период 🌆' },
+  'SYD':{ best:'sep-nov', fr:'Sydney : printemps austral (sept-nov) — doux et fleuri, parfait 🌺',                   en:'Sydney: austral spring (Sep-Nov) — mild, blooming, perfect 🌺',              ru:'Сидней: австральная весна (сент–ноябрь) — мягко и цветуще 🌺' },
+  'CUN':{ best:'déc-avr', fr:'Cancún : décembre-avril, hors saison des ouragans et des pluies 🌊',                   en:'Cancun: Dec-Apr, outside hurricane and rain season 🌊',                      ru:'Канкун: декабрь–апрель, вне сезона ураганов и дождей 🌊' },
+};
+
+function showBestSeason(fromLabel, toLabel){
+  const toIata = state.toIata;
+  const s = SEASONS[toIata];
+  if(!s) return; // Pas de donnée pour cette destination → on n'affiche rien
+
+  const tip = lang==='ru' ? s.ru : lang==='en' ? s.en : s.fr;
+  addBotMsg(`💡 ${tip}`);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ③ SUGGESTIONS VARIANTES
+═══════════════════════════════════════════════════════════════ */
+function showVariants(fromLabel, toLabel, s){
+  if(!s.fromIata || !s.toIata || !s.departureDate) return;
+
+  // Variant 1 : partir une semaine plus tôt
+  const early = new Date(s.departureDate+'T00:00:00');
+  early.setDate(early.getDate()-7);
+  const earlyISO = early.toISOString().split('T')[0];
+  const earlyLink = generateAviasalesLink({...s, departureDate: earlyISO});
+
+  // Variant 2 : aller-retour (retour +7 jours)
+  const ret = new Date(s.departureDate+'T00:00:00');
+  ret.setDate(ret.getDate()+7);
+  const retISO = ret.toISOString().split('T')[0];
+  const rtLink = generateAviasalesLink({...s, returnDate: retISO, tripType:'roundtrip'});
+
+  // Variant 3 : +1 passager
+  const pax2Link = generateAviasalesLink({...s, passengers: (parseInt(s.passengers)||1)+1});
+
+  const earlyLabel  = fmtDateLabel(earlyISO);
+  const retLabel    = fmtDateLabel(retISO);
+  const pax2        = (parseInt(s.passengers)||1)+1;
+
+  const titles = {
+    fr: ['Suggestions pour vous', `📅 Partir le ${earlyLabel}`, `↩️ Aller-retour (retour ${retLabel})`, `👥 ${pax2} passagers`],
+    en: ['Suggestions for you',  `📅 Depart ${earlyLabel}`,    `↩️ Round trip (return ${retLabel})`,    `👥 ${pax2} passengers`],
+    ru: ['Варианты для вас',     `📅 Вылет ${earlyLabel}`,     `↩️ Туда-обратно (возврат ${retLabel})`, `👥 ${pax2} пассажира`],
+  };
+  const T = titles[lang]||titles.fr;
+
+  // Afficher comme chips cliquables
+  const row = document.createElement('div'); row.className='brow-bot';
+  row.innerHTML=`<div class="bot-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div><div class="bubble-bot variants-bubble"></div>`;
+  const bubble = row.querySelector('.variants-bubble');
+
+  const title = document.createElement('div'); title.className='variants-title';
+  title.textContent = T[0]; bubble.appendChild(title);
+
+  [[T[1], earlyLink],[T[2], rtLink],[T[3], pax2Link]].forEach(([label, link])=>{
+    if(!link) return;
+    const btn = document.createElement('a');
+    btn.className='variant-btn'; btn.href=link; btn.target='_blank';
+    btn.textContent=label; bubble.appendChild(btn);
+  });
+
+  chatMsgs.appendChild(row);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
 }
 
 /* ══════════════════════════════════════════════════════════════
