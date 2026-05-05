@@ -1,106 +1,937 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Midzo Flight</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#5B2BE0">
+<title>Midzo Flight · Trouvez votre vol avec l'IA Sofia</title>
+<meta name="description" content="Sofia, votre conseillère IA voyage. Destinations, meilleures périodes, astuces visa. Cherchez parmi 728+ compagnies.">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-body { margin:0; font-family:'Plus Jakarta Sans',sans-serif; background:#f5f7fb; }
-header { display:flex; justify-content:space-between; padding:16px 40px; background:#fff; border-bottom:1px solid #eee; }
-.logo { font-weight:800; color:#0770e3; }
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;height:-webkit-fill-available;}
+body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#1a1a2e;overflow-x:hidden;min-height:100vh;}
+input,button,textarea{font-family:inherit;font-size:16px;}
+a{text-decoration:none;color:inherit;}
+*{-webkit-tap-highlight-color:transparent;}
 
-.hero { text-align:center; padding:80px 20px; background:linear-gradient(135deg,#0770e3,#044faa); color:#fff; }
+/* ── Variables ── */
+:root{
+  --tp-violet:#5B2BE0;
+  --tp-violet-dk:#4a1fc7;
+  --tp-yellow:#F5A623;
+  --tp-yellow-dk:#e09920;
+  --dark:#1a1a2e;
+  --white:#fff;
+  --gray:#f5f5f5;
+  --border:#e8e8e8;
+  --muted:#6b7280;
+  --r:12px;
+}
 
-.cta-btn { display:inline-flex; align-items:center; gap:10px; background:#fff; color:#0770e3; padding:12px 20px; border-radius:12px; text-decoration:none; font-weight:700; }
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  height:60px;padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:all .3s;
+}
+.nav.scrolled{
+  background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 1px 8px rgba(0,0,0,.06);
+}
+.nav-logo{display:flex;align-items:center;gap:7px;}
+.nav-logo-word{font-weight:900;font-size:1.1rem;color:#fff;letter-spacing:.03em;transition:color .3s;}
+.nav-logo-sub{font-size:.45rem;font-weight:800;color:#fff;background:rgba(255,255,255,.2);border-radius:3px;padding:2px 5px;letter-spacing:.08em;transition:all .3s;}
+.nav.scrolled .nav-logo-word{color:var(--dark);}
+.nav.scrolled .nav-logo-sub{background:rgba(91,43,224,.12);color:var(--tp-violet);}
+.nav-mid{display:flex;align-items:center;gap:.1rem;}
+.nav-lnk{padding:.4rem .8rem;border-radius:8px;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.85);transition:all .15s;}
+.nav.scrolled .nav-lnk{color:var(--muted);}
+.nav-lnk:hover{background:rgba(255,255,255,.15);color:#fff;}
+.nav.scrolled .nav-lnk:hover{background:var(--gray);color:var(--dark);}
+.nav-right{display:flex;align-items:center;gap:.6rem;}
+.nav-lang{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;padding:.35rem .65rem;
+  font-size:.78rem;font-weight:600;color:#fff;cursor:pointer;
+  position:relative;transition:all .3s;
+}
+.nav.scrolled .nav-lang{background:var(--gray);border-color:var(--border);color:var(--dark);}
+.lang-dd{display:none;position:absolute;top:calc(100%+6px);right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.1);min-width:125px;overflow:hidden;z-index:999;}
+.lang-dd.open{display:block;}
+.lang-opt{display:block;width:100%;padding:.55rem .9rem;background:none;border:none;cursor:pointer;font-size:.8rem;font-weight:500;text-align:left;font-family:inherit;color:var(--dark);transition:background .1s;}
+.lang-opt:hover{background:var(--gray);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:.5rem 1.1rem;border-radius:9px;font-size:.82rem;font-weight:700;border:none;cursor:pointer;transition:all .18s;font-family:inherit;}
+.btn-violet{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.25);}
+.btn-violet:hover{background:rgba(255,255,255,.25);}
+.nav.scrolled .btn-violet{background:rgba(91,43,224,.08);color:var(--tp-violet);border-color:rgba(91,43,224,.2);}
+.btn-yellow{background:var(--tp-yellow);color:#fff;box-shadow:0 2px 10px rgba(245,166,35,.3);}
+.btn-yellow:hover{background:var(--tp-yellow-dk);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,166,35,.4);}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;}
+.hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .25s;}
+.nav.scrolled .hamburger span{background:var(--dark);}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 
-.chat { max-width:700px; margin:40px auto; background:#fff; border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+/* Mobile menu */
+.mob-menu{display:none;position:fixed;top:60px;left:0;right:0;bottom:0;background:rgba(26,26,46,.97);backdrop-filter:blur(10px);z-index:998;padding:1.5rem;flex-direction:column;gap:.5rem;}
+.mob-menu.open{display:flex;}
+.mob-lnk{padding:1rem;border-radius:10px;font-size:.95rem;font-weight:600;color:rgba(255,255,255,.85);border-bottom:1px solid rgba(255,255,255,.06);}
+.mob-lang-row{display:flex;gap:.5rem;margin-top:1rem;}
+.mob-lang-btn{flex:1;padding:.65rem;border-radius:9px;background:rgba(255,255,255,.08);border:none;color:#fff;font-size:.82rem;font-weight:700;font-family:inherit;cursor:pointer;}
+.mob-lang-btn:hover{background:rgba(255,255,255,.15);}
 
-.messages { height:300px; overflow-y:auto; margin-bottom:10px; }
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 1.5rem 3rem;text-align:center;overflow:hidden;
+  background:var(--tp-violet);
+}
+/* Image d'avion en overlay */
+.hero-img{
+  position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80') center/cover no-repeat;
+  opacity:.18;
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom, rgba(91,43,224,.85) 0%, rgba(91,43,224,.75) 60%, rgba(91,43,224,.95) 100%);
+}
+.hero-content{position:relative;z-index:2;max-width:740px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:.3rem .9rem;
+  font-size:.72rem;font-weight:700;color:rgba(255,255,255,.88);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:1.4rem;
+}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:#00d26a;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{
+  font-size:clamp(2.2rem,5.5vw,3.6rem);font-weight:900;
+  color:#fff;line-height:1.1;letter-spacing:-.025em;margin-bottom:1rem;
+}
+.hero h1 em{font-style:normal;color:var(--tp-yellow);}
+.hero-sub{font-size:clamp(.95rem,2vw,1.1rem);color:rgba(255,255,255,.78);max-width:520px;margin:0 auto 2rem;line-height:1.65;}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:.8rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.hero-btns .btn{padding:.75rem 1.8rem;font-size:.9rem;border-radius:10px;}
+.btn-hero-main{background:var(--tp-yellow);color:#fff;box-shadow:0 4px 20px rgba(245,166,35,.4);}
+.btn-hero-main:hover{background:var(--tp-yellow-dk);transform:translateY(-2px);box-shadow:0 6px 28px rgba(245,166,35,.5);}
+.btn-hero-sec{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);}
+.btn-hero-sec:hover{background:rgba(255,255,255,.2);}
+.hero-stats{
+  display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;
+  padding:1.6rem 0;border-top:1px solid rgba(255,255,255,.1);
+}
+.stat-num{font-size:1.5rem;font-weight:900;color:#fff;}
+.stat-lbl{font-size:.68rem;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.05em;}
 
-.msg { margin:8px 0; padding:10px 14px; border-radius:12px; max-width:80%; }
+/* ── SECTIONS ── */
+.section{padding:5.5rem 1.5rem;}
+.container{max-width:1100px;margin:0 auto;}
+.sec-label{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tp-violet);background:rgba(91,43,224,.08);border-radius:20px;padding:.28rem .8rem;
+  margin-bottom:.9rem;
+}
+.sec-title{font-size:clamp(1.7rem,3.5vw,2.4rem);font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:.75rem;}
+.sec-sub{font-size:.95rem;color:var(--muted);line-height:1.65;max-width:500px;}
+.sec-header{text-align:center;margin-bottom:3.5rem;}
+.fade-up{opacity:0;transform:translateY(20px);transition:all .65s cubic-bezier(.16,1,.3,1);}
+.fade-up.in{opacity:1;transform:none;}
+[data-d="1"]{transition-delay:.1s;}[data-d="2"]{transition-delay:.2s;}[data-d="3"]{transition-delay:.3s;}[data-d="4"]{transition-delay:.4s;}
 
-.user { background:#0770e3; color:#fff; margin-left:auto; }
-.bot { background:#eef2f7; }
+/* ── SOFIA SECTION ── */
+.sofia-wrap{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.sofia-feats{display:flex;flex-direction:column;gap:.9rem;margin:1.5rem 0 2rem;}
+.feat{display:flex;align-items:flex-start;gap:.85rem;}
+.feat-icon{width:40px;height:40px;border-radius:10px;background:rgba(91,43,224,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.feat-t{font-size:.88rem;font-weight:700;color:var(--dark);}
+.feat-d{font-size:.78rem;color:var(--muted);margin-top:2px;}
 
-.input-box { display:flex; gap:10px; }
-input { flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; }
+/* Chat card */
+.chat-card{background:#fff;border-radius:18px;box-shadow:0 4px 32px rgba(91,43,224,.12),0 1px 0 var(--border);overflow:hidden;border:1px solid var(--border);}
+.chat-bar{background:linear-gradient(135deg,var(--tp-violet),var(--tp-violet-dk));padding:.9rem 1.1rem;display:flex;align-items:center;gap:.75rem;}
+.chat-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-info-name{font-size:.84rem;font-weight:700;color:#fff;}
+.chat-info-sub{font-size:.68rem;color:rgba(255,255,255,.6);}
+.chat-online{display:flex;align-items:center;gap:4px;font-size:.7rem;font-weight:600;color:#00d26a;margin-left:auto;}
+.chat-online-dot{width:6px;height:6px;border-radius:50%;background:#00d26a;animation:pulse 2s infinite;}
+.chat-chips{padding:.6rem 1rem;background:#fafafa;border-bottom:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;}
+.chip{background:#fff;border:1.5px solid #e0e0e0;border-radius:20px;padding:.28rem .75rem;font-size:.74rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--dark);transition:all .15s;}
+.chip:hover{background:var(--tp-violet);color:#fff;border-color:var(--tp-violet);}
+.chat-msgs{padding:.85rem 1rem;min-height:220px;background:#fafafa;display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;max-height:260px;}
+.msg-bot{display:flex;gap:7px;align-items:flex-end;}
+.msg-bot-av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--tp-violet),var(--tp-violet-dk));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bub-bot{background:#fff;border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:.5rem .8rem;font-size:.8rem;line-height:1.5;color:var(--dark);max-width:86%;}
+.msg-user{display:flex;justify-content:flex-end;}
+.bub-user{background:var(--tp-violet);color:#fff;border-radius:14px 14px 4px 14px;padding:.5rem .8rem;font-size:.8rem;line-height:1.5;max-width:86%;}
+.typing{display:flex;gap:3px;padding:.1rem 0;}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--tp-violet);animation:bounce .9s infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chat-input-row{padding:.7rem .9rem;border-top:1px solid var(--border);background:#fff;display:flex;gap:7px;align-items:center;}
+.chat-inp{flex:1;background:#f5f5f5;border:1.5px solid var(--border);border-radius:22px;padding:.5rem .9rem;font-size:.8rem;outline:none;transition:border .2s;}
+.chat-inp:focus{border-color:var(--tp-violet);background:#fff;}
+.chat-send{width:34px;height:34px;border-radius:50%;background:var(--tp-violet);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
+.chat-send:hover{background:var(--tp-violet-dk);transform:scale(1.05);}
+.chat-send:disabled{background:#d0d0d0;cursor:not-allowed;transform:none;}
 
-button { background:#0770e3; color:#fff; border:none; padding:12px 16px; border-radius:10px; cursor:pointer; }
+/* ── HOW IT WORKS ── */
+.how-section{background:var(--tp-violet);}
+.how-section .sec-label{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);}
+.how-section .sec-title{color:#fff;}
+.how-section .sec-sub{color:rgba(255,255,255,.6);}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
+.step{text-align:center;padding:2rem 1.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:16px;}
+.step-n{width:56px;height:56px;border-radius:50%;background:var(--tp-yellow);display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;box-shadow:0 4px 16px rgba(245,166,35,.4);}
+.step h3{font-size:.95rem;font-weight:800;color:#fff;margin-bottom:.45rem;}
+.step p{font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.6;}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.about-img-wrap{border-radius:16px;overflow:hidden;background:linear-gradient(135deg,var(--tp-violet),#0770e3);}
+.about-img-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.about-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.5rem;}
+.about-tag{display:flex;align-items:center;gap:5px;background:rgba(91,43,224,.07);border:1px solid rgba(91,43,224,.15);border-radius:8px;padding:.35rem .8rem;font-size:.78rem;font-weight:600;color:var(--tp-violet);}
+
+/* ── FAQ ── */
+.faq-section{background:var(--gray);}
+.faq-list{display:flex;flex-direction:column;gap:.75rem;max-width:720px;margin:0 auto;}
+.faq-item{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.faq-q{width:100%;padding:1.1rem 1.2rem;background:none;border:none;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:700;color:var(--dark);text-align:left;display:flex;justify-content:space-between;align-items:center;gap:1rem;transition:color .15s;}
+.faq-q:hover{color:var(--tp-violet);}
+.faq-q svg{flex-shrink:0;transition:transform .25s;}
+.faq-item.open .faq-q svg{transform:rotate(180deg);}
+.faq-a{display:none;padding:0 1.2rem 1.1rem;font-size:.83rem;color:var(--muted);line-height:1.65;}
+.faq-item.open .faq-a{display:block;}
+
+/* ── CONTACT ── */
+.contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.contact-info{}
+.contact-item{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:1.4rem;}
+.contact-icon{width:42px;height:42px;border-radius:10px;background:rgba(91,43,224,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.contact-lbl{font-size:.78rem;font-weight:700;color:var(--dark);}
+.contact-val{font-size:.82rem;color:var(--muted);margin-top:2px;}
+.contact-val a{color:var(--tp-violet);font-weight:600;}
+/* Contact form */
+.form{display:flex;flex-direction:column;gap:.9rem;background:#fff;border:1px solid var(--border);border-radius:16px;padding:1.8rem;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:.78rem;font-weight:700;color:var(--dark);}
+.form-input{padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:9px;font-size:.85rem;font-family:inherit;outline:none;transition:border .2s;}
+.form-input:focus{border-color:var(--tp-violet);}
+.form-textarea{resize:vertical;min-height:100px;}
+.form-btn{background:var(--tp-violet);color:#fff;border:none;border-radius:9px;padding:.75rem;font-size:.88rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all .18s;}
+.form-btn:hover{background:var(--tp-violet-dk);transform:translateY(-1px);}
+.form-success{display:none;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:9px;padding:.9rem 1rem;font-size:.82rem;color:#065f46;font-weight:600;text-align:center;}
+
+/* ── FOOTER ── */
+.footer{background:#0d0d1a;padding:3.5rem 1.5rem 0;}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,.06);}
+.ft-brand-name{font-size:1.05rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px;margin-bottom:.6rem;}
+.ft-brand-sub{font-size:.44rem;font-weight:800;color:var(--tp-violet);background:rgba(91,43,224,.2);border-radius:3px;padding:2px 5px;}
+.ft-desc{font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.7;max-width:220px;}
+.ft-soc{display:flex;gap:.5rem;margin-top:1rem;}
+.ft-soc-btn{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.ft-soc-btn:hover{background:rgba(255,255,255,.12);}
+.ft-col-title{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.28);margin-bottom:.9rem;}
+.ft-link{display:block;font-size:.8rem;color:rgba(255,255,255,.48);margin-bottom:.48rem;transition:color .15s;}
+.ft-link:hover{color:#fff;}
+.footer-bottom{max-width:1100px;margin:1.5rem auto 0;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:rgba(255,255,255,.28);flex-wrap:wrap;gap:.5rem;padding-bottom:1.5rem;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .nav-mid,.btn-violet,.btn-yellow.nav-hide{display:none!important;}
+  .hamburger{display:flex!important;}
+  .sofia-wrap,.about-grid,.contact-wrap{grid-template-columns:1fr;}
+  .steps{grid-template-columns:1fr;}
+  .footer-inner{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:540px){
+  .hero h1{font-size:2rem;}
+  .section{padding:4rem 1.1rem;}
+  .footer-inner{grid-template-columns:1fr;}
+}
 </style>
 </head>
-
 <body>
 
-<header>
-  <div class="logo">MIDZO</div>
-</header>
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="/" class="nav-logo">
+    <span class="nav-logo-word">MIDZO</span>
+    <span class="nav-logo-sub">FLIGHT</span>
+  </a>
+  <div class="nav-mid">
+    <a href="#sofia" class="nav-lnk" id="nl-sofia">Agent IA</a>
+    <a href="#how" class="nav-lnk" id="nl-how">Comment ça marche</a>
+    <a href="#about" class="nav-lnk" id="nl-about">À propos</a>
+    <a href="#faq" class="nav-lnk" id="nl-faq">FAQ</a>
+    <a href="#contact" class="nav-lnk" id="nl-contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-lang" onclick="document.getElementById('lang-dd').classList.toggle('open')">
+      <span id="lang-flag">🇫🇷</span>
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div class="lang-dd" id="lang-dd">
+        <button class="lang-opt" onclick="setLang('fr')">🇫🇷 Français</button>
+        <button class="lang-opt" onclick="setLang('en')">🇬🇧 English</button>
+        <button class="lang-opt" onclick="setLang('ru')">🇷🇺 Русский</button>
+      </div>
+    </div>
+    <a href="/sofia" class="btn btn-violet nav-hide" id="nav-btn-sofia">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="nav-sofia-txt">Sofia IA</span>
+    </a>
+    <a href="https://search.midzoflight.com" class="btn btn-yellow" id="nav-btn-search">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg>
+      <span id="nav-search-txt">Rechercher</span>
+    </a>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
 
-<section class="hero">
-  <h1>Planifiez votre voyage intelligemment</h1>
-  <a href="https://search.midzoflight.com" class="cta-btn">Rechercher un vol</a>
-</section>
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mob-menu">
+  <a href="#sofia" class="mob-lnk" onclick="toggleMenu()" id="m-sofia">Agent IA Sofia</a>
+  <a href="#how" class="mob-lnk" onclick="toggleMenu()" id="m-how">Comment ça marche</a>
+  <a href="#about" class="mob-lnk" onclick="toggleMenu()" id="m-about">À propos</a>
+  <a href="#faq" class="mob-lnk" onclick="toggleMenu()" id="m-faq">FAQ</a>
+  <a href="#contact" class="mob-lnk" onclick="toggleMenu()" id="m-contact">Contact</a>
+  <a href="https://search.midzoflight.com" class="btn btn-yellow" style="justify-content:center;margin-top:.5rem;" id="m-search">Rechercher un vol</a>
+  <a href="/sofia" class="btn btn-violet" style="justify-content:center;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:#fff;" id="m-sofia-btn">Parler à Sofia</a>
+  <div class="mob-lang-row">
+    <button class="mob-lang-btn" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button class="mob-lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+    <button class="mob-lang-btn" onclick="setLang('ru')">🇷🇺 RU</button>
+  </div>
+</div>
 
-<section class="chat">
-  <div class="messages" id="messages"></div>
-
-  <div class="input-box">
-    <input id="input" placeholder="Posez votre question..." />
-    <button onclick="sendMessage()">Envoyer</button>
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-img"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-dot"></div>
+      <span id="hero-badge">Sofia disponible · 728 compagnies</span>
+    </div>
+    <h1 id="hero-h1">Votre agent IA<br>trouve le vol <em>idéal</em></h1>
+    <p class="hero-sub" id="hero-sub">Demandez à Sofia vos conseils voyage, puis cherchez parmi 728+ compagnies en temps réel. Tout en un, sans frais.</p>
+    <div class="hero-btns">
+      <a href="https://search.midzoflight.com" class="btn btn-hero-main" id="hero-btn-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg>
+        <span id="hero-search-txt">Rechercher un vol</span>
+      </a>
+      <a href="/sofia" class="btn btn-hero-sec" id="hero-btn-sofia">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        <span id="hero-sofia-txt">Demander à Sofia</span>
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">728+</div><div class="stat-lbl" id="s1">Compagnies</div></div>
+      <div><div class="stat-num">3</div><div class="stat-lbl" id="s2">Langues</div></div>
+      <div><div class="stat-num">24/7</div><div class="stat-lbl" id="s3">Disponible</div></div>
+      <div><div class="stat-num">0€</div><div class="stat-lbl" id="s4">De frais</div></div>
+    </div>
   </div>
 </section>
 
+<!-- SOFIA -->
+<section class="section" id="sofia">
+  <div class="container">
+    <div class="sofia-wrap">
+      <div class="fade-up">
+        <div class="sec-label">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" fill="#5B2BE0"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="#5B2BE0" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <span id="sofia-label">Agent IA Sofia</span>
+        </div>
+        <h2 class="sec-title" id="sofia-title">Votre conseillère voyage intelligente</h2>
+        <p class="sec-sub" id="sofia-desc">Sofia comprend votre langage naturel et vous guide comme un vrai agent de voyage. Destinations, périodes, visas, budget.</p>
+        <div class="sofia-feats">
+          <div class="feat fade-up" data-d="1">
+            <div class="feat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#5B2BE0"/></svg></div>
+            <div><div class="feat-t" id="f1t">Destinations sur mesure</div><div class="feat-d" id="f1d">Selon votre budget, saison et envies</div></div>
+          </div>
+          <div class="feat fade-up" data-d="2">
+            <div class="feat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#5B2BE0" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#5B2BE0" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="#5B2BE0" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="#5B2BE0" stroke-width="2"/></svg></div>
+            <div><div class="feat-t" id="f2t">Meilleures périodes</div><div class="feat-d" id="f2d">Évitez la pluie, les foules et les pics de prix</div></div>
+          </div>
+          <div class="feat fade-up" data-d="3">
+            <div class="feat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="#5B2BE0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#5B2BE0" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="feat-t" id="f3t">Visa & formalités</div><div class="feat-d" id="f3d">Toutes les infos pratiques avant de partir</div></div>
+          </div>
+        </div>
+        <a href="/sofia" class="btn btn-yellow" id="sofia-cta-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          <span id="sofia-cta-txt">Parler à Sofia</span>
+        </a>
+      </div>
+
+      <!-- Chat demo -->
+      <div class="chat-card fade-up" data-d="2">
+        <div class="chat-bar">
+          <div class="chat-av"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div><div class="chat-info-name">Sofia</div><div class="chat-info-sub" id="chat-sub-txt">Conseillère voyage IA · Midzo Flight</div></div>
+          <div class="chat-online"><div class="chat-online-dot"></div><span id="chat-online-txt">En ligne</span></div>
+        </div>
+        <div class="chat-chips">
+          <button class="chip" id="chip1" onclick="demoSend(this.textContent)">Bali ou Thaïlande ?</button>
+          <button class="chip" id="chip2" onclick="demoSend(this.textContent)">Visa pour Dubaï ?</button>
+          <button class="chip" id="chip3" onclick="demoSend(this.textContent)">Pas cher en décembre ?</button>
+        </div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="msg-bot">
+            <div class="msg-bot-av"><svg width="9" height="9" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2.5"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+            <div class="bub-bot" id="welcome-msg">Bonjour ! Je suis Sofia, votre conseillère voyage. Posez-moi n'importe quelle question sur votre prochain voyage ✈️</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-inp" id="chat-inp" placeholder="Posez votre question voyage...">
+          <button class="chat-send" id="chat-send" disabled onclick="demoSend()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-section" id="how">
+  <div class="container">
+    <div class="sec-header fade-up">
+      <div class="sec-label" id="how-label">Comment ça marche</div>
+      <h2 class="sec-title" id="how-title">3 étapes simples</h2>
+      <p class="sec-sub" id="how-sub">De votre première question à la réservation, en quelques secondes.</p>
+    </div>
+    <div class="steps">
+      <div class="step fade-up" data-d="1">
+        <div class="step-n"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2.5"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        <h3 id="st1t">Demandez à Sofia</h3>
+        <p id="st1d">Posez votre question en langage naturel. Sofia comprend tout.</p>
+      </div>
+      <div class="step fade-up" data-d="2">
+        <div class="step-n"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/></svg></div>
+        <h3 id="st2t">Recevez des conseils</h3>
+        <p id="st2d">Recommandations personnalisées, meilleures périodes, astuces visa.</p>
+      </div>
+      <div class="step fade-up" data-d="3">
+        <div class="step-n"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg></div>
+        <h3 id="st3t">Trouvez votre vol</h3>
+        <p id="st3d">728+ compagnies comparées. Le meilleur prix vous attend.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="fade-up">
+        <div class="sec-label" id="about-label">À propos</div>
+        <h2 class="sec-title" id="about-title">Midzo Flight, c'est quoi ?</h2>
+        <p class="sec-sub" style="max-width:100%;margin-bottom:1.2rem;" id="about-desc1">Midzo Flight est une plateforme de recherche de vols propulsée par l'intelligence artificielle. Notre mission : rendre le voyage accessible à tous, en simplifiant la recherche et en offrant des conseils personnalisés.</p>
+        <p class="sec-sub" style="max-width:100%;margin-bottom:1.5rem;" id="about-desc2">Nous agrégeons les tarifs de 728+ compagnies aériennes en temps réel, et notre IA Sofia vous guide comme un vrai agent de voyage — disponible 24h/24, en français, anglais et russe.</p>
+        <div class="about-tags">
+          <div class="about-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#5B2BE0"/></svg><span id="tag1">Afrique · Europe · Russie</span></div>
+          <div class="about-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#5B2BE0" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="#5B2BE0" stroke-width="2" stroke-linecap="round"/></svg><span id="tag2">IA Sofia 24/7</span></div>
+          <div class="about-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#5B2BE0" stroke-width="2" stroke-linejoin="round"/></svg><span id="tag3">0 commission</span></div>
+        </div>
+      </div>
+      <div class="about-img-wrap fade-up" data-d="2">
+        <div style="border-radius:16px;overflow:hidden;position:relative;min-height:320px;">
+          <img src="https://images.unsplash.com/photo-1597758124096-ae7f9c13789c?w=800&q=80"
+               alt="Abidjan"
+               style="width:100%;height:100%;object-fit:cover;display:block;min-height:320px;"
+               onerror="this.src='https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&q=80'">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(91,43,224,.7) 0%,rgba(91,43,224,.2) 60%,transparent 100%);border-radius:16px;"></div>
+          <div style="position:absolute;bottom:1.2rem;left:1.2rem;">
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);margin-bottom:3px;">Côte d'Ivoire</div>
+            <div style="font-size:1.4rem;font-weight:900;color:#fff;">Abidjan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section faq-section" id="faq">
+  <div class="container">
+    <div class="sec-header fade-up">
+      <div class="sec-label" id="faq-label">FAQ</div>
+      <h2 class="sec-title" id="faq-title">Questions fréquentes</h2>
+    </div>
+    <div class="faq-list" id="faq-list"></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="sec-header fade-up">
+      <div class="sec-label" id="contact-label">Contact</div>
+      <h2 class="sec-title" id="contact-title">Contactez-nous</h2>
+      <p class="sec-sub" id="contact-sub">Une question ? Un problème ? On vous répond rapidement.</p>
+    </div>
+    <div class="contact-wrap">
+      <div class="contact-info fade-up">
+        <div class="contact-item">
+          <div class="contact-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" stroke="#5B2BE0" stroke-width="2"/><path d="M22 6l-10 7L2 6" stroke="#5B2BE0" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div><div class="contact-lbl" id="cl-email">Email</div><div class="contact-val"><a href="mailto:contact@midzoflight.com">contact@midzoflight.com</a></div></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21.75 15.75l-3-3a1.5 1.5 0 00-2.12 0l-1.5 1.5a10.5 10.5 0 01-5.37-5.37l1.5-1.5a1.5 1.5 0 000-2.12l-3-3A1.5 1.5 0 006.09 3L4.5 4.59A3 3 0 003 7.5C3 15.5 8.5 21 16.5 21a3 3 0 002.91-1.5l1.59-1.59a1.5 1.5 0 00-.25-2.16z" stroke="#5B2BE0" stroke-width="2" stroke-linejoin="round"/></svg></div>
+          <div><div class="contact-lbl">WhatsApp</div><div class="contact-val"><a href="https://wa.me/79961792326" target="_blank">+7 996 179 2326</a></div></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.56-.44.7-.88.43l-2.42-1.79-1.16 1.12c-.13.13-.24.24-.49.24l.17-2.46 4.47-4.04c.19-.17-.04-.27-.3-.1L7.74 15.4l-2.38-.74c-.52-.16-.53-.52.11-.77l9.29-3.58c.43-.16.81.1.68.49z" fill="#5B2BE0"/></svg></div>
+          <div><div class="contact-lbl">Telegram</div><div class="contact-val"><a href="https://t.me/midzoflight_bot" target="_blank">@midzoflight_bot</a></div></div>
+        </div>
+      </div>
+      <div class="fade-up" data-d="2">
+        <div class="form">
+          <div class="form-group">
+            <label class="form-label" id="fl-name">Votre nom</label>
+            <input type="text" class="form-input" id="f-name" placeholder="Jean Dupont">
+          </div>
+          <div class="form-group">
+            <label class="form-label" id="fl-email">Email</label>
+            <input type="email" class="form-input" id="f-email" placeholder="jean@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" id="fl-msg">Message</label>
+            <textarea class="form-input form-textarea" id="f-msg" placeholder="Votre message..."></textarea>
+          </div>
+          <button class="form-btn" id="form-btn" onclick="submitForm()">Envoyer</button>
+          <div class="form-success" id="form-success">Message envoyé ! Nous vous répondrons sous 24h.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="ft-brand-name">MIDZO <span class="ft-brand-sub">FLIGHT</span></div>
+      <p class="ft-desc" id="ft-desc">Votre agent IA voyage. 728+ compagnies. Sans frais.</p>
+      <div class="ft-soc" style="margin-top:1rem;">
+        <a href="https://t.me/midzoflight_bot" target="_blank" class="ft-soc-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,.5)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.56-.44.7-.88.43l-2.42-1.79-1.16 1.12c-.13.13-.24.24-.49.24l.17-2.46 4.47-4.04c.19-.17-.04-.27-.3-.1L7.74 15.4l-2.38-.74c-.52-.16-.53-.52.11-.77l9.29-3.58c.43-.16.81.1.68.49z"/></svg>
+        </a>
+        <a href="https://wa.me/79961792326" target="_blank" class="ft-soc-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,.5)"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="ft-col-title" id="ft-nav">Navigation</div>
+      <a href="https://search.midzoflight.com" class="ft-link" id="ft-search">Rechercher un vol</a>
+      <a href="/sofia" class="ft-link" id="ft-sofia">Agent IA Sofia</a>
+      <a href="#about" class="ft-link" id="ft-about">À propos</a>
+      <a href="#faq" class="ft-link" id="ft-faq">FAQ</a>
+      <a href="#contact" class="ft-link" id="ft-contact">Contact</a>
+    </div>
+    <div>
+      <div class="ft-col-title" id="ft-legal-title">Légal</div>
+      <a href="#" class="ft-link" id="ft-privacy">Confidentialité</a>
+      <a href="#" class="ft-link" id="ft-terms">Conditions</a>
+      <a href="mailto:contact@midzoflight.com" class="ft-link">contact@midzoflight.com</a>
+      <a href="https://t.me/midzoflight_bot" class="ft-link" target="_blank">@midzoflight_bot</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span id="ft-copy">© 2026 Midzo Flight · Tous droits réservés</span>
+    <span id="ft-powered">Propulsé par Travelpayouts</span>
+  </div>
+</footer>
+
 <script>
-let context = [];
+var lang = localStorage.getItem('midzo_lang') || 'fr';
+var MAX_MSG = 10;
+var msgCount = parseInt(localStorage.getItem('sofia_demo_msgs') || '0');
+var lastReset = localStorage.getItem('sofia_reset_date') || '';
+var today = new Date().toDateString();
+if(lastReset !== today){ msgCount = 0; localStorage.setItem('sofia_demo_msgs','0'); localStorage.setItem('sofia_reset_date',today); }
+var demoCtx = [];
 
-function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerText = text;
-  document.getElementById("messages").appendChild(div);
-  document.getElementById("messages").scrollTop = 9999;
+var TX = {
+fr:{
+  badge:'Sofia disponible · 728 compagnies',
+  h1:'Votre agent IA<br>trouve le vol <em>idéal</em>',
+  sub:'Demandez à Sofia vos conseils voyage, puis cherchez parmi 728+ compagnies en temps réel. Tout en un, sans frais.',
+  searchTxt:'Rechercher un vol', sofiaTxt:'Demander à Sofia',
+  s1:'Compagnies',s2:'Langues',s3:'Disponible',s4:'De frais',
+  sofiaLbl:'Agent IA Sofia',sofiaTitle:'Votre conseillère voyage intelligente',
+  sofiaDesc:'Sofia comprend votre langage naturel et vous guide comme un vrai agent de voyage. Destinations, périodes, visas, budget.',
+  f1t:'Destinations sur mesure',f1d:'Selon votre budget, saison et envies',
+  f2t:'Meilleures périodes',f2d:'Évitez la pluie, les foules et les pics de prix',
+  f3t:'Visa & formalités',f3d:'Toutes les infos pratiques avant de partir',
+  sofiaCta:'Parler à Sofia',
+  chatSub:'Conseillère voyage IA · Midzo Flight',chatOnline:'En ligne',
+  chip1:'Bali ou Thaïlande ?',chip2:'Visa pour Dubaï ?',chip3:'Pas cher en décembre ?',
+  chatPh:'Posez votre question voyage...',
+  welcome:"Bonjour ! Je suis Sofia, votre conseillère voyage. Posez-moi n'importe quelle question sur votre prochain voyage ✈️",
+  howLbl:'Comment ça marche',howTitle:'3 étapes simples',
+  howSub:'De votre première question à la réservation, en quelques secondes.',
+  st1t:'Demandez à Sofia',st1d:'Posez votre question en langage naturel. Sofia comprend tout.',
+  st2t:'Recevez des conseils',st2d:'Recommandations personnalisées, meilleures périodes, astuces visa.',
+  st3t:'Trouvez votre vol',st3d:'728+ compagnies comparées. Le meilleur prix vous attend.',
+  aboutLbl:'À propos',aboutTitle:'Midzo Flight, c\'est quoi ?',
+  aboutD1:'Midzo Flight est une plateforme de recherche de vols propulsée par l\'intelligence artificielle. Notre mission : rendre le voyage accessible à tous, en simplifiant la recherche et en offrant des conseils personnalisés.',
+  aboutD2:'Nous agrégeons les tarifs de 728+ compagnies aériennes en temps réel, et notre IA Sofia vous guide comme un vrai agent de voyage — disponible 24h/24, en français, anglais et russe.',
+  tag1:'Afrique · Europe · Russie',tag2:'IA Sofia 24/7',tag3:'0 commission',
+  faqLbl:'FAQ',faqTitle:'Questions fréquentes',
+  faqs:[
+    ['Midzo Flight est-il gratuit ?','Oui, entièrement gratuit. Aucune commission, aucun frais cachés. Vous accédez directement aux tarifs des compagnies.'],
+    ['Comment fonctionne Sofia ?','Sofia est une IA formée pour le voyage. Elle comprend le langage naturel et répond à vos questions sur les destinations, visa, meilleures périodes et astuces de voyage.'],
+    ['Combien de messages gratuits avec Sofia ?','Vous avez 10 messages gratuits par jour avec Sofia. Le compteur se remet à zéro chaque jour à minuit.'],
+    ['Les prix affichés sont-ils exacts ?','Oui, les tarifs proviennent directement de 728+ compagnies et agences en temps réel via Travelpayouts.'],
+    ['Dans quelles langues parle Sofia ?','Sofia parle français, anglais et russe. Elle détecte automatiquement votre langue.'],
+  ],
+  contactLbl:'Contact',contactTitle:'Contactez-nous',contactSub:'Une question ? Un problème ? On vous répond rapidement.',
+  clEmail:'Email',flName:'Votre nom',flEmail:'Email',flMsg:'Message',
+  formBtn:'Envoyer',formSuccess:'Message envoyé ! Nous vous répondrons sous 24h.',
+  navSofia:'Agent IA',navHow:'Comment ça marche',navAbout:'À propos',navFaq:'FAQ',navContact:'Contact',
+  navBtnSofia:'Sofia IA',navBtnSearch:'Rechercher',
+  mSofia:'Agent IA Sofia',mHow:'Comment ça marche',mAbout:'À propos',mFaq:'FAQ',mContact:'Contact',
+  mSearch:'Rechercher un vol',mSofiaBtn:'Parler à Sofia',
+  ftDesc:'Votre agent IA voyage. 728+ compagnies. Sans frais.',
+  ftNav:'Navigation',ftSearch:'Rechercher un vol',ftSofia:'Agent IA Sofia',ftAbout:'À propos',ftFaq:'FAQ',ftContact:'Contact',
+  ftLegal:'Légal',ftPrivacy:'Confidentialité',ftTerms:'Conditions',
+  ftCopy:'© 2026 Midzo Flight · Tous droits réservés',ftPowered:'Propulsé par Travelpayouts',
+  limitMsg:'Vous avez atteint la limite de 10 messages aujourd\'hui. Revenez demain ou contactez-nous sur WhatsApp.',
+},
+en:{
+  badge:'Sofia available · 728 airlines',
+  h1:'Your AI agent<br>finds the <em>perfect</em> flight',
+  sub:'Ask Sofia for travel advice, then search among 728+ airlines in real time. All in one, no fees.',
+  searchTxt:'Search flights',sofiaTxt:'Ask Sofia',
+  s1:'Airlines',s2:'Languages',s3:'Available',s4:'In fees',
+  sofiaLbl:'Sofia AI Agent',sofiaTitle:'Your intelligent travel advisor',
+  sofiaDesc:'Sofia understands natural language and guides you like a real travel agent. Destinations, seasons, visas, budget.',
+  f1t:'Tailored destinations',f1d:'Based on your budget, season and preferences',
+  f2t:'Best travel times',f2d:'Avoid rain, crowds and peak prices',
+  f3t:'Visa & formalities',f3d:'All practical info before you leave',
+  sofiaCta:'Talk to Sofia',
+  chatSub:'AI Travel Advisor · Midzo Flight',chatOnline:'Online',
+  chip1:'Bali or Thailand?',chip2:'Visa for Dubai?',chip3:'Cheap in December?',
+  chatPh:'Ask your travel question...',
+  welcome:"Hello! I'm Sofia, your travel advisor. Ask me anything about your next trip ✈️",
+  howLbl:'How it works',howTitle:'3 simple steps',
+  howSub:'From your first question to booking, in seconds.',
+  st1t:'Ask Sofia',st1d:'Ask in natural language. Sofia understands everything.',
+  st2t:'Get advice',st2d:'Personalized recommendations, best seasons, visa tips.',
+  st3t:'Find your flight',st3d:'728+ airlines compared. The best price awaits.',
+  aboutLbl:'About',aboutTitle:'What is Midzo Flight?',
+  aboutD1:'Midzo Flight is an AI-powered flight search platform. Our mission: make travel accessible to everyone by simplifying search and providing personalized advice.',
+  aboutD2:'We aggregate fares from 728+ airlines in real time, and our AI Sofia guides you like a real travel agent — available 24/7 in French, English and Russian.',
+  tag1:'Africa · Europe · Russia',tag2:'Sofia AI 24/7',tag3:'0 commission',
+  faqLbl:'FAQ',faqTitle:'Frequently asked questions',
+  faqs:[
+    ['Is Midzo Flight free?','Yes, completely free. No commission, no hidden fees. You access airline fares directly.'],
+    ['How does Sofia work?','Sofia is an AI trained for travel. She understands natural language and answers your questions about destinations, visas, best seasons and travel tips.'],
+    ['How many free messages with Sofia?','You have 10 free messages per day with Sofia. The counter resets every day at midnight.'],
+    ['Are the prices accurate?','Yes, fares come directly from 728+ airlines and agencies in real time via Travelpayouts.'],
+    ['What languages does Sofia speak?','Sofia speaks French, English and Russian. She automatically detects your language.'],
+  ],
+  contactLbl:'Contact',contactTitle:'Contact us',contactSub:'A question? A problem? We respond quickly.',
+  clEmail:'Email',flName:'Your name',flEmail:'Email',flMsg:'Message',
+  formBtn:'Send',formSuccess:'Message sent! We will reply within 24 hours.',
+  navSofia:'AI Agent',navHow:'How it works',navAbout:'About',navFaq:'FAQ',navContact:'Contact',
+  navBtnSofia:'Sofia AI',navBtnSearch:'Search',
+  mSofia:'Sofia AI Agent',mHow:'How it works',mAbout:'About',mFaq:'FAQ',mContact:'Contact',
+  mSearch:'Search flights',mSofiaBtn:'Talk to Sofia',
+  ftDesc:'Your AI travel agent. 728+ airlines. No fees.',
+  ftNav:'Navigation',ftSearch:'Search flights',ftSofia:'Sofia AI Agent',ftAbout:'About',ftFaq:'FAQ',ftContact:'Contact',
+  ftLegal:'Legal',ftPrivacy:'Privacy',ftTerms:'Terms',
+  ftCopy:'© 2026 Midzo Flight · All rights reserved',ftPowered:'Powered by Travelpayouts',
+  limitMsg:'You have reached the 10 message limit for today. Come back tomorrow or contact us on WhatsApp.',
+},
+ru:{
+  badge:'София доступна · 728 авиакомпаний',
+  h1:'Ваш ИИ-агент<br>найдёт <em>идеальный</em> рейс',
+  sub:'Спросите Софию о путешествии, затем ищите среди 728+ авиакомпаний в реальном времени. Всё в одном, без комиссий.',
+  searchTxt:'Найти рейс',sofiaTxt:'Спросить Софию',
+  s1:'Авиакомпаний',s2:'Языка',s3:'Доступна',s4:'Комиссий',
+  sofiaLbl:'ИИ-агент София',sofiaTitle:'Ваш умный советник по путешествиям',
+  sofiaDesc:'София понимает естественный язык и направляет вас как настоящий турагент. Направления, сезоны, визы, бюджет.',
+  f1t:'Персональные направления',f1d:'Исходя из бюджета, сезона и предпочтений',
+  f2t:'Лучшее время для поездки',f2d:'Избегайте плохой погоды, толп и пиков цен',
+  f3t:'Виза и формальности',f3d:'Вся практическая информация перед отъездом',
+  sofiaCta:'Говорить с Софией',
+  chatSub:'ИИ-советник · Midzo Flight',chatOnline:'В сети',
+  chip1:'Бали или Таиланд?',chip2:'Виза в Дубай?',chip3:'Дёшево в декабре?',
+  chatPh:'Задайте вопрос о путешествии...',
+  welcome:'Привет! Я София, ваш советник по путешествиям. Задайте любой вопрос о вашей следующей поездке ✈️',
+  howLbl:'Как это работает',howTitle:'3 простых шага',
+  howSub:'От первого вопроса до бронирования — за секунды.',
+  st1t:'Спросите Софию',st1d:'Задайте вопрос на естественном языке. София всё понимает.',
+  st2t:'Получите советы',st2d:'Персональные рекомендации, лучшее время, советы по визе.',
+  st3t:'Найдите рейс',st3d:'728+ авиакомпаний сравнено. Лучшая цена ждёт вас.',
+  aboutLbl:'О нас',aboutTitle:'Что такое Midzo Flight?',
+  aboutD1:'Midzo Flight — платформа поиска авиабилетов на базе искусственного интеллекта. Наша миссия: сделать путешествия доступными для всех, упрощая поиск и предлагая персональные советы.',
+  aboutD2:'Мы агрегируем тарифы 728+ авиакомпаний в реальном времени, а наш ИИ София направляет вас как настоящий турагент — доступна 24/7 на французском, английском и русском.',
+  tag1:'Африка · Европа · Россия',tag2:'ИИ София 24/7',tag3:'0 комиссий',
+  faqLbl:'FAQ',faqTitle:'Часто задаваемые вопросы',
+  faqs:[
+    ['Midzo Flight бесплатен?','Да, полностью бесплатно. Никаких комиссий, никаких скрытых сборов. Вы получаете прямой доступ к тарифам авиакомпаний.'],
+    ['Как работает София?','София — ИИ, обученный для путешествий. Она понимает естественный язык и отвечает на вопросы о направлениях, визах, лучшем времени поездки.'],
+    ['Сколько бесплатных сообщений с Софией?','У вас 10 бесплатных сообщений в день. Счётчик сбрасывается каждый день в полночь.'],
+    ['Цены точные?','Да, тарифы поступают напрямую от 728+ авиакомпаний и агентств в реальном времени через Travelpayouts.'],
+    ['На каких языках говорит София?','София говорит на французском, английском и русском. Она автоматически определяет ваш язык.'],
+  ],
+  contactLbl:'Контакт',contactTitle:'Свяжитесь с нами',contactSub:'Вопрос? Проблема? Мы отвечаем быстро.',
+  clEmail:'Email',flName:'Ваше имя',flEmail:'Email',flMsg:'Сообщение',
+  formBtn:'Отправить',formSuccess:'Сообщение отправлено! Мы ответим в течение 24 часов.',
+  navSofia:'ИИ-агент',navHow:'Как это работает',navAbout:'О нас',navFaq:'FAQ',navContact:'Контакт',
+  navBtnSofia:'София ИИ',navBtnSearch:'Найти',
+  mSofia:'ИИ-агент София',mHow:'Как это работает',mAbout:'О нас',mFaq:'FAQ',mContact:'Контакт',
+  mSearch:'Найти рейс',mSofiaBtn:'Говорить с Софией',
+  ftDesc:'Ваш ИИ-агент путешествий. 728+ авиакомпаний. Без комиссий.',
+  ftNav:'Навигация',ftSearch:'Найти рейс',ftSofia:'ИИ-агент София',ftAbout:'О нас',ftFaq:'FAQ',ftContact:'Контакт',
+  ftLegal:'Юридическое',ftPrivacy:'Конфиденциальность',ftTerms:'Условия',
+  ftCopy:'© 2026 Midzo Flight · Все права защищены',ftPowered:'На базе Travelpayouts',
+  limitMsg:'Вы достигли лимита в 10 сообщений на сегодня. Возвращайтесь завтра или напишите нам в WhatsApp.',
+}
+};
+
+function T(k){ return (TX[lang]||TX.fr)[k]||''; }
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.getElementById('lang-flag').textContent = lang==='en'?'🇬🇧':lang==='ru'?'🇷🇺':'🇫🇷';
+  // Hero
+  document.getElementById('hero-badge').textContent = T('badge');
+  document.getElementById('hero-h1').innerHTML = T('h1');
+  document.getElementById('hero-sub').textContent = T('sub');
+  document.getElementById('hero-search-txt').textContent = T('searchTxt');
+  document.getElementById('hero-sofia-txt').textContent = T('sofiaTxt');
+  document.getElementById('s1').textContent=T('s1');document.getElementById('s2').textContent=T('s2');
+  document.getElementById('s3').textContent=T('s3');document.getElementById('s4').textContent=T('s4');
+  // Sofia
+  document.getElementById('sofia-label').textContent=T('sofiaLbl');
+  document.getElementById('sofia-title').textContent=T('sofiaTitle');
+  document.getElementById('sofia-desc').textContent=T('sofiaDesc');
+  document.getElementById('f1t').textContent=T('f1t');document.getElementById('f1d').textContent=T('f1d');
+  document.getElementById('f2t').textContent=T('f2t');document.getElementById('f2d').textContent=T('f2d');
+  document.getElementById('f3t').textContent=T('f3t');document.getElementById('f3d').textContent=T('f3d');
+  document.getElementById('sofia-cta-txt').textContent=T('sofiaCta');
+  document.getElementById('chat-sub-txt').textContent=T('chatSub');
+  document.getElementById('chat-online-txt').textContent=T('chatOnline');
+  document.getElementById('chip1').textContent=T('chip1');
+  document.getElementById('chip2').textContent=T('chip2');
+  document.getElementById('chip3').textContent=T('chip3');
+  document.getElementById('chat-inp').placeholder=T('chatPh');
+  document.getElementById('welcome-msg').textContent=T('welcome');
+  // How
+  document.getElementById('how-label').textContent=T('howLbl');
+  document.getElementById('how-title').textContent=T('howTitle');
+  document.getElementById('how-sub').textContent=T('howSub');
+  document.getElementById('st1t').textContent=T('st1t');document.getElementById('st1d').textContent=T('st1d');
+  document.getElementById('st2t').textContent=T('st2t');document.getElementById('st2d').textContent=T('st2d');
+  document.getElementById('st3t').textContent=T('st3t');document.getElementById('st3d').textContent=T('st3d');
+  // About
+  document.getElementById('about-label').textContent=T('aboutLbl');
+  document.getElementById('about-title').textContent=T('aboutTitle');
+  document.getElementById('about-desc1').textContent=T('aboutD1');
+  document.getElementById('about-desc2').textContent=T('aboutD2');
+  document.getElementById('tag1').textContent=T('tag1');
+  document.getElementById('tag2').textContent=T('tag2');
+  document.getElementById('tag3').textContent=T('tag3');
+  // FAQ
+  document.getElementById('faq-label').textContent=T('faqLbl');
+  document.getElementById('faq-title').textContent=T('faqTitle');
+  buildFaq();
+  // Contact
+  document.getElementById('contact-label').textContent=T('contactLbl');
+  document.getElementById('contact-title').textContent=T('contactTitle');
+  document.getElementById('contact-sub').textContent=T('contactSub');
+  document.getElementById('cl-email').textContent=T('clEmail');
+  document.getElementById('fl-name').textContent=T('flName');
+  document.getElementById('fl-email').textContent=T('flEmail');
+  document.getElementById('fl-msg').textContent=T('flMsg');
+  document.getElementById('form-btn').textContent=T('formBtn');
+  document.getElementById('form-success').textContent=T('formSuccess');
+  // Nav
+  document.getElementById('nl-sofia').textContent=T('navSofia');
+  document.getElementById('nl-how').textContent=T('navHow');
+  document.getElementById('nl-about').textContent=T('navAbout');
+  document.getElementById('nl-faq').textContent=T('navFaq');
+  document.getElementById('nl-contact').textContent=T('navContact');
+  document.getElementById('nav-sofia-txt').textContent=T('navBtnSofia');
+  document.getElementById('nav-search-txt').textContent=T('navBtnSearch');
+  document.getElementById('m-sofia').textContent=T('mSofia');
+  document.getElementById('m-how').textContent=T('mHow');
+  document.getElementById('m-about').textContent=T('mAbout');
+  document.getElementById('m-faq').textContent=T('mFaq');
+  document.getElementById('m-contact').textContent=T('mContact');
+  document.getElementById('m-search').textContent=T('mSearch');
+  document.getElementById('m-sofia-btn').textContent=T('mSofiaBtn');
+  // Footer
+  document.getElementById('ft-desc').textContent=T('ftDesc');
+  document.getElementById('ft-nav').textContent=T('ftNav');
+  document.getElementById('ft-search').textContent=T('ftSearch');
+  document.getElementById('ft-sofia').textContent=T('ftSofia');
+  document.getElementById('ft-about').textContent=T('ftAbout');
+  document.getElementById('ft-faq').textContent=T('ftFaq');
+  document.getElementById('ft-contact').textContent=T('ftContact');
+  document.getElementById('ft-legal-title').textContent=T('ftLegal');
+  document.getElementById('ft-privacy').textContent=T('ftPrivacy');
+  document.getElementById('ft-terms').textContent=T('ftTerms');
+  document.getElementById('ft-copy').textContent=T('ftCopy');
+  document.getElementById('ft-powered').textContent=T('ftPowered');
 }
 
-async function sendMessage() {
-  const input = document.getElementById("input");
-  const message = input.value.trim();
-  if (!message) return;
+function setLang(l){
+  lang=l;localStorage.setItem('midzo_lang',l);
+  document.getElementById('lang-dd').classList.remove('open');
+  applyLang();
+}
 
-  addMessage(message, "user");
-  input.value = "";
+// FAQ
+function buildFaq(){
+  var list=document.getElementById('faq-list');
+  list.innerHTML='';
+  T('faqs').forEach(function(pair,i){
+    var item=document.createElement('div');item.className='faq-item';
+    item.innerHTML='<button class="faq-q" onclick="toggleFaq(this)">'+pair[0]+
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>'+
+      '</button><div class="faq-a">'+pair[1]+'</div>';
+    list.appendChild(item);
+  });
+}
+function toggleFaq(btn){
+  var item=btn.closest('.faq-item');
+  var isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(el){el.classList.remove('open');});
+  if(!isOpen) item.classList.add('open');
+}
 
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: message,
-        context: context,
-        mode: "advisor",
-        lang: "fr"
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.reply) {
-      addMessage(data.reply, "bot");
-
-      context.push({ role:"user", content:message });
-      context.push({ role:"assistant", content:data.reply });
-    } else {
-      addMessage("Erreur, réessayez.", "bot");
-    }
-
-  } catch(e) {
-    addMessage("Connexion impossible.", "bot");
+// CHAT DEMO
+function demoSend(msg){
+  var inp=document.getElementById('chat-inp');
+  var text=(msg||inp.value).trim();
+  if(!text||text===T('chatPh')) return;
+  inp.value='';
+  document.getElementById('chat-send').disabled=true;
+  document.querySelectorAll('.chip').forEach(function(c){c.style.opacity='.5';c.style.pointerEvents='none';});
+  if(msgCount>=MAX_MSG){
+    addMsg('bot',T('limitMsg'));
+    return;
   }
+  addMsg('user',text);
+  msgCount++;
+  localStorage.setItem('sofia_demo_msgs',msgCount);
+  demoCtx.push({role:'user',content:text});
+  var tid=addTyping();
+  fetch('/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:text,context:demoCtx.slice(-6),lang:lang,mode:'advisor'})
+  }).then(function(r){return r.json();}).then(function(d){
+    removeTyping(tid);
+    var reply=d.reply||'...';
+    demoCtx.push({role:'assistant',content:reply});
+    addMsg('bot',reply);
+    document.querySelectorAll('.chip').forEach(function(c){c.style.opacity='1';c.style.pointerEvents='auto';});
+  }).catch(function(){
+    removeTyping(tid);
+    document.querySelectorAll('.chip').forEach(function(c){c.style.opacity='1';c.style.pointerEvents='auto';});
+  });
 }
-</script>
+function addMsg(type,text){
+  var msgs=document.getElementById('chat-msgs');
+  var row=document.createElement('div');
+  if(type==='bot'){
+    row.className='msg-bot';
+    row.innerHTML='<div class="msg-bot-av"><svg width="9" height="9" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2.5"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="bub-bot"></div>';
+    row.querySelector('.bub-bot').textContent=text;
+  }else{
+    row.className='msg-user';
+    var bub=document.createElement('div');bub.className='bub-user';bub.textContent=text;
+    row.appendChild(bub);
+  }
+  msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+}
+var typingId=0;
+function addTyping(){
+  var msgs=document.getElementById('chat-msgs');
+  var id='t'+(++typingId);
+  var row=document.createElement('div');row.className='msg-bot';row.id=id;
+  row.innerHTML='<div class="msg-bot-av"><svg width="9" height="9" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2.5"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="bub-bot"><div class="typing"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+  return id;
+}
+function removeTyping(id){var el=document.getElementById(id);if(el)el.remove();}
+document.getElementById('chat-inp').addEventListener('input',function(){
+  document.getElementById('chat-send').disabled=this.value.trim().length<2;
+});
+document.getElementById('chat-inp').addEventListener('keypress',function(e){
+  if(e.key==='Enter'){e.preventDefault();demoSend();}
+});
 
+// NAV SCROLL
+window.addEventListener('scroll',function(){
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>30);
+});
+
+// MOBILE MENU
+function toggleMenu(){
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('mob-menu').classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.nav-lang'))document.getElementById('lang-dd').classList.remove('open');
+  if(!e.target.closest('#hamburger')&&!e.target.closest('#mob-menu')){
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('mob-menu').classList.remove('open');
+  }
+});
+
+// CONTACT FORM
+function submitForm(){
+  var name=document.getElementById('f-name').value.trim();
+  var email=document.getElementById('f-email').value.trim();
+  var msg=document.getElementById('f-msg').value.trim();
+  if(!name||!email||!msg)return;
+  // Simple mailto fallback
+  var subject=encodeURIComponent('Message de '+name+' via Midzo Flight');
+  var body=encodeURIComponent('Nom: '+name+'\nEmail: '+email+'\n\n'+msg);
+  window.open('mailto:contact@midzoflight.com?subject='+subject+'&body='+body);
+  document.getElementById('form-success').style.display='block';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-email').value='';
+  document.getElementById('f-msg').value='';
+}
+
+// SCROLL ANIMATIONS
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in');});
+},{threshold:0.08});
+document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+
+// INIT
+applyLang();
+</script>
 </body>
 </html>
-```
