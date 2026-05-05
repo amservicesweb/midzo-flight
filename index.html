@@ -1,7 +1,106 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<meta http-equiv="refresh" content="0;url=https://search.midzoflight.com">
-<script>window.location.href='https://search.midzoflight.com';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Midzo Flight</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body { margin:0; font-family:'Plus Jakarta Sans',sans-serif; background:#f5f7fb; }
+header { display:flex; justify-content:space-between; padding:16px 40px; background:#fff; border-bottom:1px solid #eee; }
+.logo { font-weight:800; color:#0770e3; }
+
+.hero { text-align:center; padding:80px 20px; background:linear-gradient(135deg,#0770e3,#044faa); color:#fff; }
+
+.cta-btn { display:inline-flex; align-items:center; gap:10px; background:#fff; color:#0770e3; padding:12px 20px; border-radius:12px; text-decoration:none; font-weight:700; }
+
+.chat { max-width:700px; margin:40px auto; background:#fff; border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+
+.messages { height:300px; overflow-y:auto; margin-bottom:10px; }
+
+.msg { margin:8px 0; padding:10px 14px; border-radius:12px; max-width:80%; }
+
+.user { background:#0770e3; color:#fff; margin-left:auto; }
+.bot { background:#eef2f7; }
+
+.input-box { display:flex; gap:10px; }
+input { flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; }
+
+button { background:#0770e3; color:#fff; border:none; padding:12px 16px; border-radius:10px; cursor:pointer; }
+</style>
 </head>
+
+<body>
+
+<header>
+  <div class="logo">MIDZO</div>
+</header>
+
+<section class="hero">
+  <h1>Planifiez votre voyage intelligemment</h1>
+  <a href="https://search.midzoflight.com" class="cta-btn">Rechercher un vol</a>
+</section>
+
+<section class="chat">
+  <div class="messages" id="messages"></div>
+
+  <div class="input-box">
+    <input id="input" placeholder="Posez votre question..." />
+    <button onclick="sendMessage()">Envoyer</button>
+  </div>
+</section>
+
+<script>
+let context = [];
+
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerText = text;
+  document.getElementById("messages").appendChild(div);
+  document.getElementById("messages").scrollTop = 9999;
+}
+
+async function sendMessage() {
+  const input = document.getElementById("input");
+  const message = input.value.trim();
+  if (!message) return;
+
+  addMessage(message, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: message,
+        context: context,
+        mode: "advisor",
+        lang: "fr"
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.reply) {
+      addMessage(data.reply, "bot");
+
+      context.push({ role:"user", content:message });
+      context.push({ role:"assistant", content:data.reply });
+    } else {
+      addMessage("Erreur, réessayez.", "bot");
+    }
+
+  } catch(e) {
+    addMessage("Connexion impossible.", "bot");
+  }
+}
+</script>
+
+</body>
 </html>
+```
