@@ -1,5 +1,13 @@
 {
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "inject.js", "use": "@vercel/static" }
+  ],
   "routes": [
-    { "src": "^/sofia$", "dest": "/sofia.html" }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/sofia", "dest": "/sofia.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
