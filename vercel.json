@@ -5,8 +5,11 @@
     { "src": "*.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/sofia", "dest": "/sofia.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "^/api/(.*)", "dest": "/api/$1" },
+
+    { "src": "^/sofia$", "dest": "/sofia.html" },
+
+    { "src": "^/$", "dest": "/index.html" },
+    { "src": "^(?!/api)(.*)", "dest": "/index.html" }
   ]
 }
