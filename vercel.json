@@ -6,8 +6,11 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
+
     { "src": "/sofia", "dest": "/sofia.html" },
     { "src": "/sofia.html", "dest": "/sofia.html" },
-    { "src": "/", "dest": "/index.html" }
+
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
