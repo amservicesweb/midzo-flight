@@ -1,11 +1,35 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "@vercel/node@3"
+  "builds": [
+    {
+      "src": "api/chat.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/cities.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/prices.js",
+      "use": "@vercel/node"
     }
-  },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ],
+  "routes": [
+    {
+      "src": "/api/chat",
+      "dest": "/api/chat.js"
+    },
+    {
+      "src": "/api/cities",
+      "dest": "/api/cities.js"
+    },
+    {
+      "src": "/api/prices",
+      "dest": "/api/prices.js"
+    },
+    {
+      "src": "/(.*)",
+      "status": 404
+    }
   ]
 }
