@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devenez Partenaire | Midzo Flight</title>
+    <meta name="description" content="Recommandez des vols et gagnez des commissions avec le programme partenaire Midzo Flight.">
+    <meta name="theme-color" content="#0770e3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="https://i.imgur.com/N3uodPn.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://i.imgur.com/N3uodPn.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #0770e3;
+            --blue-dark: #044faa;
+            --blue-light: #e8f2fd;
+            --sky: #f1f7ff;
+            --text: #111236;
+            --muted: #68697f;
+            --border: #e6e6e6;
+            --white: #fff;
+            --navy: #0a1840;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--sky);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.7;
+        }
+
+        /* ═══ HEADER (identique au site principal) ═══ */
+        .tpwl-logo-header {
+            background: url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=85) no-repeat center/cover;
+            padding: 20px 5% 12px;
+            position: relative;
+        }
+        .tpwl-logo-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(5,14,50,.55), rgba(5,14,50,.78));
+            z-index: 1;
+        }
+        .tpwl-logo-header > * { position: relative; z-index: 2; }
+        .tpwl-logo__logo {
+            width: 130px;
+            height: 48px;
+            background: no-repeat url('https://i.imgur.com/N3uodPn.png');
+            background-size: contain;
+            display: block;
+        }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .header-row a {
+            font-size: .82rem;
+            font-weight: 600;
+            color: rgba(255,255,255,.88);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .header-row a:hover { color: #fff; }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .sofia-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg,var(--blue),var(--blue-dark));
+            color: #fff !important;
+            padding: 7px 14px;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: .78rem;
+            text-decoration: none !important;
+            box-shadow: 0 2px 10px rgba(7,112,227,.24);
+            white-space: nowrap;
+            transition: all .2s;
+        }
+        .sofia-nav-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(7,112,227,.34); }
+        .sofia-nav-btn svg { width: 14px; height: 14px; }
+
+        /* ═══ CONTENU ═══ */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+        }
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 0.6rem;
+        }
+        ul {
+            padding-left: 1.4rem;
+            margin-bottom: 1.2rem;
+        }
+        li {
+            margin-bottom: 0.4rem;
+            color: var(--muted);
+        }
+
+        /* ═══ FORMULAIRE ═══ */
+        .form-box {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.8rem;
+            margin-top: 2rem;
+        }
+        .form-box h3 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+        }
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: .9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .form-row input:focus,
+        .form-row select:focus,
+        .form-row textarea:focus {
+            border-color: var(--blue);
+        }
+        .form-row textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .submit-btn {
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 100px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: background .2s;
+            margin-top: 0.5rem;
+        }
+        .submit-btn:hover { background: var(--blue-dark); }
+        .form-confirmation {
+            display: none;
+            background: #e8faf0;
+            border: 1px solid #b7ebd0;
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #0d6b3e;
+        }
+
+        /* ═══ LANG SELECTOR ═══ */
+        .lang-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--muted);
+            transition: all 0.2s;
+        }
+        .lang-btn.active {
+            background: var(--blue);
+            color: #fff;
+            border-color: var(--blue);
+        }
+
+        /* ═══ FOOTER ═══ */
+        .midzo-footer {
+            background: var(--navy);
+            color: rgba(255,255,255,.5);
+            padding: 2.5rem 5%;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 1.8rem;
+            max-width: 1240px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .footer-col-title {
+            font-weight: 700;
+            font-size: .64rem;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: rgba(255,255,255,.18);
+            margin-bottom: .9rem;
+        }
+        .footer-col a {
+            color: rgba(255,255,255,.4);
+            font-size: .8rem;
+            text-decoration: none;
+            display: block;
+            margin-bottom: .55rem;
+            transition: color .2s;
+        }
+        .footer-col a:hover { color: #fff; }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,.05);
+            padding-top: 1.2rem;
+            text-align: center;
+            max-width: 1240px;
+            margin: 0 auto;
+            font-size: .68rem;
+            color: rgba(255,255,255,.15);
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid { grid-template-columns: 1fr; gap: 18px; }
+            .midzo-footer { padding: 1.8rem 10px; }
+            .main-content { padding: 1.5rem 1rem; }
+            h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="tpwl-logo-header">
+    <div class="header-row">
+        <a href="https://www.midzoflight.com" style="display:block;text-decoration:none;flex-shrink:0">
+            <div class="tpwl-logo__logo"></div>
+        </a>
+        <nav class="header-nav">
+            <a href="https://www.midzoflight.com">Vols</a>
+            <a href="https://www.midzoflight.com">Hôtels</a>
+            <a href="https://www.midzoflight.com">Agent IA</a>
+            <a href="mailto:contact@midzoflight.com">Contact</a>
+            <a href="#" class="sofia-nav-btn">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+                Sofia IA
+            </a>
+        </nav>
+    </div>
+</header>
+
+<!-- ═══ CONTENU ═══ -->
+<div class="main-content">
+    <div class="lang-selector">
+        <button class="lang-btn active" onclick="switchLang('fr')">🇫🇷 FR</button>
+        <button class="lang-btn" onclick="switchLang('en')">🇬🇧 EN</button>
+        <button class="lang-btn" onclick="switchLang('ru')">🇷🇺 RU</button>
+    </div>
+
+    <!-- FR -->
+    <div id="lang-fr">
+        <h1>Devenez Partenaire Midzo Flight ✈️</h1>
+        <p class="subtitle">Recommandez des vols à votre communauté et gagnez une commission sur chaque réservation.</p>
+
+        <h2>Comment ça fonctionne</h2>
+        <ul>
+            <li>Vous recevez votre <strong>lien personnel</strong> Midzo Flight</li>
+            <li>Vous le partagez autour de vous (WhatsApp, Telegram, réseaux sociaux, blog)</li>
+            <li>Quand quelqu'un réserve un vol après avoir cliqué sur votre lien, <strong>vous gagnez une commission</strong></li>
+            <li>Vous suivez vos performances via un tableau de bord dédié</li>
+        </ul>
+
+        <h2>Qui peut devenir partenaire ?</h2>
+        <ul>
+            <li>Blogueurs et créateurs de contenu voyage</li>
+            <li>Agences de voyage et agents indépendants</li>
+            <li>Étudiants cherchant un revenu complémentaire</li>
+            <li>Toute personne active sur les réseaux sociaux</li>
+        </ul>
+
+        <div class="form-box">
+            <h3>📝 Formulaire d'inscription</h3>
+            <div class="form-row">
+                <input type="text" id="fr-nom" placeholder="Votre nom complet *" required>
+                <input type="email" id="fr-email" placeholder="Votre adresse email *" required>
+                <input type="tel" id="fr-whatsapp" placeholder="Votre numéro WhatsApp *" required>
+                <select id="fr-profil">
+                    <option value="">Vous êtes...</option>
+                    <option value="blogueur">Blogueur / Créateur de contenu</option>
+                    <option value="agence">Agence de voyage</option>
+                    <option value="etudiant">Étudiant</option>
+                    <option value="autre">Autre</option>
+                </select>
+                <textarea id="fr-message" placeholder="Dites-nous pourquoi vous voulez devenir partenaire Midzo Flight (optionnel)"></textarea>
+                <button class="submit-btn" onclick="submitForm('fr')">Envoyer ma candidature</button>
+            </div>
+            <div class="form-confirmation" id="fr-confirmation">
+                ✅ Votre candidature a bien été envoyée ! Nous vous contacterons sous 48h sur WhatsApp.
+            </div>
+        </div>
+    </div>
+
+    <!-- EN -->
+    <div id="lang-en" style="display:none;">
+        <h1>Become a Midzo Flight Partner ✈️</h1>
+        <p class="subtitle">Recommend flights to your community and earn a commission on every booking.</p>
+
+        <h2>How it works</h2>
+        <ul>
+            <li>You get your <strong>personal Midzo Flight link</strong></li>
+            <li>Share it with your network (WhatsApp, Telegram, social media, blog)</li>
+            <li>When someone books a flight after clicking your link, <strong>you earn a commission</strong></li>
+            <li>Track your performance via a dedicated dashboard</li>
+        </ul>
+
+        <h2>Who can become a partner?</h2>
+        <ul>
+            <li>Travel bloggers and content creators</li>
+            <li>Travel agencies and independent agents</li>
+            <li>Students looking for extra income</li>
+            <li>Anyone active on social media</li>
+        </ul>
+
+        <div class="form-box">
+            <h3>📝 Registration Form</h3>
+            <div class="form-row">
+                <input type="text" id="en-nom" placeholder="Your full name *" required>
+                <input type="email" id="en-email" placeholder="Your email address *" required>
+                <input type="tel" id="en-whatsapp" placeholder="Your WhatsApp number *" required>
+                <select id="en-profil">
+                    <option value="">You are...</option>
+                    <option value="blogger">Blogger / Content creator</option>
+                    <option value="agency">Travel agency</option>
+                    <option value="student">Student</option>
+                    <option value="other">Other</option>
+                </select>
+                <textarea id="en-message" placeholder="Tell us why you want to become a Midzo Flight partner (optional)"></textarea>
+                <button class="submit-btn" onclick="submitForm('en')">Submit my application</button>
+            </div>
+            <div class="form-confirmation" id="en-confirmation">
+                ✅ Your application has been sent! We will contact you within 48h on WhatsApp.
+            </div>
+        </div>
+    </div>
+
+    <!-- RU -->
+    <div id="lang-ru" style="display:none;">
+        <h1>Станьте партнёром Midzo Flight ✈️</h1>
+        <p class="subtitle">Рекомендуйте авиабилеты и зарабатывайте комиссию с каждой продажи.</p>
+
+        <h2>Как это работает</h2>
+        <ul>
+            <li>Вы получаете <strong>персональную ссылку</strong> Midzo Flight</li>
+            <li>Делитесь ею (WhatsApp, Telegram, соцсети, блог)</li>
+            <li>Когда кто-то бронирует билет по вашей ссылке, <strong>вы получаете комиссию</strong></li>
+            <li>Отслеживайте результаты через специальный кабинет</li>
+        </ul>
+
+        <h2>Кто может стать партнёром?</h2>
+        <ul>
+            <li>Тревел-блогеры и создатели контента</li>
+            <li>Турагентства и независимые агенты</li>
+            <li>Студенты, ищущие дополнительный доход</li>
+            <li>Все, кто активен в соцсетях</li>
+        </ul>
+
+        <div class="form-box">
+            <h3>📝 Форма регистрации</h3>
+            <div class="form-row">
+                <input type="text" id="ru-nom" placeholder="Ваше полное имя *" required>
+                <input type="email" id="ru-email" placeholder="Ваш email *" required>
+                <input type="tel" id="ru-whatsapp" placeholder="Ваш номер WhatsApp *" required>
+                <select id="ru-profil">
+                    <option value="">Вы...</option>
+                    <option value="blogger">Блогер / Создатель контента</option>
+                    <option value="agency">Турагентство</option>
+                    <option value="student">Студент</option>
+                    <option value="other">Другое</option>
+                </select>
+                <textarea id="ru-message" placeholder="Расскажите, почему хотите стать партнёром (необязательно)"></textarea>
+                <button class="submit-btn" onclick="submitForm('ru')">Отправить заявку</button>
+            </div>
+            <div class="form-confirmation" id="ru-confirmation">
+                ✅ Ваша заявка отправлена! Мы свяжемся с вами в течение 48 часов через WhatsApp.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="midzo-footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:.7rem">
+                <div style="width:34px;height:34px;background:url('https://i.imgur.com/N3uodPn.png') no-repeat center/contain"></div>
+                <span style="font-weight:800;font-size:.95rem;color:#fff">MIDZO</span>
+            </div>
+            <p style="font-size:.78rem;color:rgba(255,255,255,.36);line-height:1.5;max-width:200px">728+ compagnies comparées en temps réel. Votre agent IA Sofia vous guide.</p>
+        </div>
+        <div class="footer-col">
+            <p class="footer-col-title">Navigation</p>
+            <a href="https://www.midzoflight.com">Recherche de vols</a>
+            <a href="https://www.midzoflight.com">Agent IA Sofia</a>
+            <a href="https://t.me/midzoflight_bot" target="_blank" rel="noopener">Bot Telegram</a>
+        </div>
+        <div class="footer-col">
+            <p class="footer-col-title">Informations</p>
+            <a href="#">À propos</a>
+            <a href="#">FAQ</a>
+            <a href="#">Confidentialité</a>
+            <a href="#">Cookies</a>
+        </div>
+        <div class="footer-col">
+            <p class="footer-col-title">Contact</p>
+            <a href="mailto:contact@midzoflight.com">contact@midzoflight.com</a>
+            <a href="https://wa.me/79961792326" target="_blank" rel="noopener">+7 996 179-23-26</a>
+            <a href="https://t.me/midzoflight_bot" target="_blank" rel="noopener">@midzoflight_bot</a>
+        </div>
+    </div>
+    <div class="footer-bottom">© 2026 Midzo Flight · Tous droits réservés.</div>
+</footer>
+
+<script>
+    function switchLang(lang) {
+        ['fr','en','ru'].forEach(l => {
+            document.getElementById('lang-'+l).style.display = 'none';
+        });
+        document.getElementById('lang-'+lang).style.display = 'block';
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`[onclick="switchLang('${lang}')"]`).classList.add('active');
+    }
+
+    function submitForm(lang) {
+        const nom = document.getElementById(`${lang}-nom`).value;
+        const email = document.getElementById(`${lang}-email`).value;
+        const whatsapp = document.getElementById(`${lang}-whatsapp`).value;
+
+        if (!nom || !email || !whatsapp) {
+            alert(lang === 'fr' ? 'Veuillez remplir tous les champs obligatoires.' : lang === 'en' ? 'Please fill in all required fields.' : 'Пожалуйста, заполните все обязательные поля.');
+            return;
+        }
+
+        // Afficher la confirmation
+        document.getElementById(`${lang}-confirmation`).style.display = 'block';
+        
+        // Vider le formulaire
+        document.getElementById(`${lang}-nom`).value = '';
+        document.getElementById(`${lang}-email`).value = '';
+        document.getElementById(`${lang}-whatsapp`).value = '';
+        document.getElementById(`${lang}-profil`).value = '';
+        document.getElementById(`${lang}-message`).value = '';
+
+        // Ici, vous pouvez ajouter un appel API pour enregistrer les données
+        console.log('Nouveau partenaire:', { nom, email, whatsapp, langue: lang });
+    }
+</script>
+
+</body>
+</html>
