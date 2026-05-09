@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Midzo Flight · Conseils voyage</title>
+    <meta name="description" content="Conseils voyage, destinations, visas et astuces pour voyager mieux avec Midzo Flight.">
+    <meta name="theme-color" content="#0770e3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="https://i.imgur.com/N3uodPn.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://i.imgur.com/N3uodPn.png">
+    <meta property="og:title" content="Blog Midzo Flight · Conseils voyage">
+    <meta property="og:description" content="Destinations, visas, astuces et inspirations pour vos prochains voyages.">
+    <meta property="og:image" content="https://i.imgur.com/N3uodPn.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #0770e3;
+            --blue-dark: #044faa;
+            --navy: #0a1840;
+            --sky: #f1f7ff;
+            --text: #111236;
+            --muted: #68697f;
+            --border: #e6e6e6;
+            --white: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--sky);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+        a { color: var(--blue); text-decoration: none; transition: all 0.15s; }
+        a:hover { text-decoration: underline; }
+
+        /* ═══ HEADER ═══ */
+        .nav {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .nav-logo img {
+            height: 36px;
+            width: auto;
+        }
+        .nav-logo span {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text);
+            letter-spacing: -0.03em;
+        }
+        .nav-link {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--muted);
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        /* ═══ HERO ═══ */
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #0c2775 100%);
+            color: #fff;
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .hero p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ═══ ARTICLES ═══ */
+        .articles {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        .article-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .article-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(7,112,227,.08);
+            border-color: rgba(7,112,227,.2);
+        }
+        .article-card h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+        .article-card h2 a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        .article-card h2 a:hover {
+            color: var(--blue);
+        }
+        .article-date {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+        .article-excerpt {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+        .article-tag {
+            display: inline-block;
+            background: #e8f2fd;
+            color: var(--blue);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 100px;
+        }
+
+        /* ═══ FOOTER ═══ */
+        .footer {
+            background: var(--navy);
+            color: rgba(255,255,255,.5);
+            text-align: center;
+            padding: 2rem 1.5rem;
+            font-size: 0.8rem;
+        }
+        .footer a {
+            color: rgba(255,255,255,.4);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #fff;
+        }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 500px) {
+            .nav { padding: 0 1rem; }
+            .hero { padding: 2rem 1rem; }
+            .articles { padding: 1.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ HEADER ═══ -->
+    <nav class="nav">
+        <a href="https://www.midzoflight.com" class="nav-logo">
+            <img src="https://i.imgur.com/N3uodPn.png" alt="Midzo Flight" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <span style="display:none;align-items:center;gap:8px;">
+                <span style="width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z" fill="white"/></svg>
+                </span>
+                <span style="font-weight:800;font-size:1.1rem;color:var(--text);">MIDZO</span>
+            </span>
+        </a>
+        <a href="https://www.midzoflight.com" class="nav-link">← Retour au site</a>
+    </nav>
+
+    <!-- ═══ HERO ═══ -->
+    <header class="hero">
+        <h1>Blog Midzo Flight ✈️</h1>
+        <p>Conseils voyage, destinations, visas et astuces pour voyager mieux.</p>
+    </header>
+
+    <!-- ═══ ARTICLES ═══ -->
+    <main class="articles">
+        <article class="article-card">
+            <span class="article-tag">Visa</span>
+            <h2><a href="/blog/visa-5-minutes">10 destinations où le visa s'obtient en moins de 5 minutes</a></h2>
+            <p class="article-date">9 mai 2026</p>
+            <p class="article-excerpt">Découvrez 10 pays où les formalités de visa prennent moins de 5 minutes. e-Visa, visa on arrival, ou sans visa du tout.</p>
+        </article>
+
+        <article class="article-card">
+            <span class="article-tag">Destinations</span>
+            <h2><a href="/blog/sans-visa-togolais">5 pays sans visa pour les Togolais</a></h2>
+            <p class="article-date">8 mai 2026</p>
+            <p class="article-excerpt">Votre passeport togolais vous emmène plus loin que vous ne le pensez. Voici 5 destinations sans visa.</p>
+        </article>
+    </main>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+        <p>© 2026 Midzo Flight · <a href="https://www.midzoflight.com">midzoflight.com</a></p>
+    </footer>
+
+</body>
+</html>
