@@ -2,11 +2,13 @@
   "version": 2,
   "builds": [
     { "src": "api/**/*.js", "use": "@vercel/node" },
-    { "src": "blog/**/*.html", "use": "@vercel/static" }
+    { "src": "partenaires.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/blog", "dest": "/blog/index.html" },
-    { "src": "/blog/(.*)", "dest": "/blog/$1" }
+    { "src": "/api/chat", "dest": "/api/chat.js" },
+    { "src": "/api/cities", "dest": "/api/cities.js" },
+    { "src": "/api/prices", "dest": "/api/prices.js" },
+    { "src": "/", "dest": "/partenaires.html" },
+    { "src": "/(.*)", "status": 404 }
   ]
 }
