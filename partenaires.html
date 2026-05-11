@@ -471,12 +471,19 @@
     }
 
     function submitForm(event, lang) {
-        event.preventDefault();
-        setTimeout(() => {
-            document.getElementById('success-'+lang).style.display = 'block';
-            document.getElementById('partner-form-'+lang).style.display = 'none';
-        }, 500);
-    }
+    event.preventDefault();
+    
+    const form = event.target;
+    const name = encodeURIComponent(form.querySelector('[name="name"]').value);
+    const email = encodeURIComponent(form.querySelector('[name="email"]').value);
+    const whatsapp = encodeURIComponent(form.querySelector('[name="whatsapp"]').value);
+    const profile = encodeURIComponent(form.querySelector('[name="profile"]').value);
+    const motivation = encodeURIComponent(form.querySelector('[name="motivation"]').value);
+
+    const message = `Bonjour%20Midzo%2C%20je%20souhaite%20devenir%20partenaire%20affili%C3%A9.%0A%0A📋%20Ma%20candidature%20%3A%0A%0A👤%20Nom%20%3A%20${name}%0A📧%20Email%20%3A%20${email}%0A📱%20WhatsApp%20%3A%20${whatsapp}%0A🏷️%20Profil%20%3A%20${profile}%0A💬%20Motivation%20%3A%20${motivation}`;
+
+    window.open(`https://wa.me/79961792326?text=${message}`, '_blank');
+}
 
     const browserLang = navigator.language?.split('-')[0];
     if (browserLang === 'en' || browserLang === 'ru') {
