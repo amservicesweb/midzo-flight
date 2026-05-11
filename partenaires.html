@@ -24,23 +24,30 @@
             line-height: 1.7;
         }
 
-        /* ═══ HEADER ═══ */
+        /* ═══ HEADER (fond image + menu blanc) ═══ */
         .site-header {
-            background: #fff;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 0 5%;
+            background: url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=85) no-repeat center center;
+            background-size: cover;
+            padding: 20px 5% 12px;
+            position: relative;
+        }
+        .site-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(5,14,50,0.55) 0%, rgba(5,14,50,0.78) 100%);
+            z-index: 1;
         }
         .header-inner {
+            position: relative;
+            z-index: 2;
             max-width: 1240px;
             margin: 0 auto;
-            height: 60px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+            flex-wrap: wrap;
         }
         .logo-link {
             display: flex;
@@ -50,8 +57,8 @@
             flex-shrink: 0;
         }
         .logo-img {
-            width: 110px;
-            height: 40px;
+            width: 130px;
+            height: 48px;
             background: url('https://i.imgur.com/N3uodPn.png') no-repeat center/contain;
         }
         .header-nav {
@@ -63,17 +70,17 @@
         .header-nav a {
             font-size: 0.82rem;
             font-weight: 600;
-            color: var(--muted);
+            color: rgba(255,255,255,0.88);
             text-decoration: none;
             white-space: nowrap;
             transition: color 0.2s;
         }
-        .header-nav a:hover { color: var(--blue); }
+        .header-nav a:hover { color: #fff; }
         .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: var(--blue);
+            background: linear-gradient(135deg, #0770e3, #044faa);
             color: #fff !important;
             padding: 8px 16px;
             border-radius: 20px;
@@ -81,8 +88,10 @@
             font-size: 0.8rem;
             text-decoration: none !important;
             white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(7,112,227,0.24);
+            transition: all 0.2s;
         }
-        .btn-primary:hover { background: var(--blue-dk); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(7,112,227,0.34); }
 
         /* ═══ CONTENU ═══ */
         .container {
@@ -266,12 +275,13 @@
             .footer-grid { grid-template-columns: 1fr; gap: 18px; }
             .container { padding: 1.5rem 1rem; }
             .form-box { padding: 1.5rem; }
+            .logo-img { width: 100px; height: 36px; }
         }
     </style>
 </head>
 <body>
 
-<!-- ═══ HEADER ═══ -->
+<!-- ═══ HEADER (fond image + menu) ═══ -->
 <header class="site-header">
     <div class="header-inner">
         <a href="https://www.midzoflight.com" class="logo-link">
@@ -319,7 +329,6 @@
             <li>Toute personne active sur les réseaux sociaux</li>
         </ul>
 
-        <!-- FORMULAIRE D'INSCRIPTION -->
         <div class="form-box">
             <h2>Formulaire d'inscription</h2>
             <form id="partner-form-fr" onsubmit="submitForm(event, 'fr')">
@@ -359,15 +368,12 @@
     <div id="lang-en" style="display:none;">
         <h1>Become a Midzo Flight Partner</h1>
         <p class="subtitle">Recommend flights to your community and earn a commission on every booking.</p>
-
         <h2>How it works</h2>
         <ul>
             <li>You get your personal Midzo Flight link</li>
-            <li>Share it with your network (WhatsApp, Telegram, social media, blog)</li>
-            <li>When someone books a flight after clicking your link, you earn a commission</li>
-            <li>Track your performance via a dedicated dashboard</li>
+            <li>Share it with your network</li>
+            <li>When someone books via your link, you earn a commission</li>
         </ul>
-
         <h2>Who can become a partner?</h2>
         <ul>
             <li>Travel bloggers and content creators</li>
@@ -375,95 +381,48 @@
             <li>Students looking for extra income</li>
             <li>Anyone active on social media</li>
         </ul>
-
         <div class="form-box">
             <h2>Registration Form</h2>
             <form id="partner-form-en" onsubmit="submitForm(event, 'en')">
-                <div class="form-group">
-                    <label>Full Name *</label>
-                    <input type="text" name="name" placeholder="Ex: John Doe" required>
-                </div>
-                <div class="form-group">
-                    <label>Email Address *</label>
-                    <input type="email" name="email" placeholder="Ex: john@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label>WhatsApp Number *</label>
-                    <input type="tel" name="whatsapp" placeholder="Ex: +228 90 00 00 00" required>
-                </div>
-                <div class="form-group">
-                    <label>You are...</label>
-                    <select name="profile">
-                        <option value="">-- Select --</option>
-                        <option value="blogger">Blogger / Content Creator</option>
-                        <option value="agent">Travel Agent</option>
-                        <option value="student">Student</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Tell us why you want to become a Midzo Flight partner (optional)</label>
-                    <textarea name="motivation" placeholder="A few words about your motivation..."></textarea>
-                </div>
+                <div class="form-group"><label>Full Name *</label><input type="text" name="name" placeholder="Ex: John Doe" required></div>
+                <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="Ex: john@email.com" required></div>
+                <div class="form-group"><label>WhatsApp Number *</label><input type="tel" name="whatsapp" placeholder="Ex: +228 90 00 00 00" required></div>
+                <div class="form-group"><label>You are...</label><select name="profile"><option value="">-- Select --</option><option value="blogger">Blogger</option><option value="agent">Travel Agent</option><option value="student">Student</option><option value="other">Other</option></select></div>
+                <div class="form-group"><label>Why do you want to become a partner? (optional)</label><textarea name="motivation" placeholder="A few words..."></textarea></div>
                 <button type="submit" class="btn-submit">Submit Application</button>
             </form>
-            <div class="success-msg" id="success-en">✅ Your application has been submitted successfully! We'll contact you within 48h.</div>
+            <div class="success-msg" id="success-en">✅ Application submitted! We'll contact you within 48h.</div>
         </div>
     </div>
 
     <!-- RUSSE -->
     <div id="lang-ru" style="display:none;">
         <h1>Станьте партнёром Midzo Flight</h1>
-        <p class="subtitle">Рекомендуйте авиабилеты своему сообществу и зарабатывайте комиссию с каждой продажи.</p>
-
+        <p class="subtitle">Рекомендуйте авиабилеты и зарабатывайте комиссию.</p>
         <h2>Как это работает</h2>
         <ul>
-            <li>Вы получаете персональную ссылку Midzo Flight</li>
-            <li>Делитесь ею с друзьями (WhatsApp, Telegram, соцсети, блог)</li>
-            <li>Когда кто-то бронирует билет по вашей ссылке, вы получаете комиссию</li>
-            <li>Отслеживайте результаты через специальный кабинет</li>
+            <li>Вы получаете персональную ссылку</li>
+            <li>Делитесь ею с друзьями</li>
+            <li>Получаете комиссию с каждой продажи</li>
         </ul>
-
         <h2>Кто может стать партнёром?</h2>
         <ul>
-            <li>Тревел-блогеры и создатели контента</li>
-            <li>Турагентства и независимые агенты</li>
-            <li>Студенты, ищущие дополнительный доход</li>
+            <li>Тревел-блогеры</li>
+            <li>Турагенты</li>
+            <li>Студенты</li>
             <li>Все, кто активен в соцсетях</li>
         </ul>
-
         <div class="form-box">
             <h2>Форма заявки</h2>
             <form id="partner-form-ru" onsubmit="submitForm(event, 'ru')">
-                <div class="form-group">
-                    <label>Ваше полное имя *</label>
-                    <input type="text" name="name" placeholder="Напр: Иван Петров" required>
-                </div>
-                <div class="form-group">
-                    <label>Ваш email *</label>
-                    <input type="email" name="email" placeholder="Напр: ivan@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Ваш номер WhatsApp *</label>
-                    <input type="tel" name="whatsapp" placeholder="Напр: +228 90 00 00 00" required>
-                </div>
-                <div class="form-group">
-                    <label>Вы...</label>
-                    <select name="profile">
-                        <option value="">-- Выберите --</option>
-                        <option value="blogger">Блогер / Создатель контента</option>
-                        <option value="agent">Турагент</option>
-                        <option value="student">Студент</option>
-                        <option value="other">Другое</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Расскажите, почему хотите стать партнёром (необязательно)</label>
-                    <textarea name="motivation" placeholder="Пара слов о вашей мотивации..."></textarea>
-                </div>
+                <div class="form-group"><label>Ваше имя *</label><input type="text" name="name" placeholder="Иван Петров" required></div>
+                <div class="form-group"><label>Email *</label><input type="email" name="email" placeholder="ivan@email.com" required></div>
+                <div class="form-group"><label>WhatsApp *</label><input type="tel" name="whatsapp" placeholder="+228 90 00 00 00" required></div>
+                <div class="form-group"><label>Вы...</label><select name="profile"><option value="">-- Выберите --</option><option value="blogger">Блогер</option><option value="agent">Турагент</option><option value="student">Студент</option><option value="other">Другое</option></select></div>
+                <div class="form-group"><label>Почему хотите стать партнёром? (необязательно)</label><textarea name="motivation" placeholder="Пара слов..."></textarea></div>
                 <button type="submit" class="btn-submit">Отправить заявку</button>
             </form>
-            <div class="success-msg" id="success-ru">✅ Ваша заявка отправлена! Мы свяжемся с вами в течение 48 часов.</div>
+            <div class="success-msg" id="success-ru">✅ Заявка отправлена! Свяжемся в течение 48 часов.</div>
         </div>
     </div>
 </div>
@@ -513,7 +472,6 @@
 
     function submitForm(event, lang) {
         event.preventDefault();
-        // Afficher le message de succès
         setTimeout(() => {
             document.getElementById('success-'+lang).style.display = 'block';
             document.getElementById('partner-form-'+lang).style.display = 'none';
