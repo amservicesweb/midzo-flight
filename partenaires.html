@@ -12,13 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --blue: #0770e3;
-            --blue-dk: #044faa;
-            --sky: #f1f7ff;
-            --text: #111236;
-            --muted: #68697f;
-            --border: #e6e6e6;
-            --navy: #0a1840;
+            --blue: #0770e3; --blue-dk: #044faa; --sky: #f1f7ff;
+            --text: #111236; --muted: #68697f; --border: #e6e6e6; --navy: #0a1840;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -85,7 +80,6 @@
             font-weight: 700;
             font-size: 0.8rem;
             text-decoration: none !important;
-            transition: background 0.2s;
             white-space: nowrap;
         }
         .btn-primary:hover { background: var(--blue-dk); }
@@ -144,39 +138,82 @@
             color: var(--muted);
             font-size: 0.9rem;
         }
-        .cta-box {
-            background: var(--sky);
+
+        /* ═══ FORMULAIRE ═══ */
+        .form-box {
+            background: #fff;
+            border: 1.5px solid var(--border);
             border-radius: 14px;
-            padding: 1.5rem;
-            text-align: center;
+            padding: 2rem;
             margin-top: 2rem;
         }
-        .cta-box p {
-            font-weight: 600;
-            margin-bottom: 0.8rem;
+        .form-box h2 {
+            margin-top: 0;
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
         }
-        .btn-wa {
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--blue);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+        .btn-submit {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #25d366;
+            background: var(--blue);
             color: #fff;
-            padding: 12px 26px;
+            padding: 12px 30px;
             border-radius: 100px;
             text-decoration: none;
             font-weight: 700;
             font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-        .btn-wa:hover { background: #1db954; }
-        hr {
             border: none;
-            border-top: 1px solid var(--border);
-            margin: 2rem 0;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+            width: 100%;
+            justify-content: center;
         }
-        .footer-note {
-            font-size: 0.82rem;
-            color: var(--muted);
+        .btn-submit:hover { background: var(--blue-dk); }
+        .success-msg {
+            display: none;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            margin-top: 1rem;
         }
 
         /* ═══ FOOTER ═══ */
@@ -228,6 +265,7 @@
             .btn-primary { padding: 6px 12px; font-size: 0.7rem; }
             .footer-grid { grid-template-columns: 1fr; gap: 18px; }
             .container { padding: 1.5rem 1rem; }
+            .form-box { padding: 1.5rem; }
         }
     </style>
 </head>
@@ -242,7 +280,7 @@
         <nav class="header-nav">
             <a href="https://www.midzoflight.com">Vols</a>
             <a href="https://www.midzoflight.com">Hôtels</a>
-            <a href="https://www.midzoflight.com" onclick="window.open('/sofia'); return false;">Agent IA</a>
+            <a href="https://www.midzoflight.com">Agent IA</a>
             <a href="mailto:contact@midzoflight.com">Contact</a>
             <a href="https://www.midzoflight.com" class="btn-primary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
@@ -263,7 +301,7 @@
     <!-- FRANÇAIS -->
     <div id="lang-fr">
         <h1>Devenez Partenaire Midzo Flight</h1>
-        <p class="subtitle">Recommandez des vols à votre communauté et gagnez une commission sur chaque réservation. Simple, gratuit et sans engagement.</p>
+        <p class="subtitle">Recommandez des vols à votre communauté et gagnez une commission sur chaque réservation.</p>
 
         <h2>Comment ça fonctionne</h2>
         <ul>
@@ -278,28 +316,49 @@
             <li>Blogueurs et créateurs de contenu voyage</li>
             <li>Agences de voyage et agents indépendants</li>
             <li>Étudiants cherchant un revenu complémentaire</li>
-            <li>Toute personne active sur les réseaux sociaux ou groupes WhatsApp</li>
+            <li>Toute personne active sur les réseaux sociaux</li>
         </ul>
 
-        <h2>Combien puis-je gagner ?</h2>
-        <p>La commission est calculée sur chaque réservation effectuée via votre lien. Plus vous générez de ventes, plus vous gagnez. Paiement mensuel par Mobile Money ou virement bancaire.</p>
-
-        <div class="cta-box">
-            <p>Prêt à commencer ?</p>
-            <a href="https://wa.me/79961792326?text=Bonjour%20Midzo%2C%20je%20souhaite%20devenir%20partenaire%20affili%C3%A9" class="btn-wa" target="_blank" rel="noopener">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-                Postuler sur WhatsApp
-            </a>
+        <!-- FORMULAIRE D'INSCRIPTION -->
+        <div class="form-box">
+            <h2>Formulaire d'inscription</h2>
+            <form id="partner-form-fr" onsubmit="submitForm(event, 'fr')">
+                <div class="form-group">
+                    <label>Votre nom complet *</label>
+                    <input type="text" name="name" placeholder="Ex: Jean Dupont" required>
+                </div>
+                <div class="form-group">
+                    <label>Votre adresse email *</label>
+                    <input type="email" name="email" placeholder="Ex: jean@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Votre numéro WhatsApp *</label>
+                    <input type="tel" name="whatsapp" placeholder="Ex: +228 90 00 00 00" required>
+                </div>
+                <div class="form-group">
+                    <label>Vous êtes...</label>
+                    <select name="profile">
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="blogger">Blogueur / Créateur de contenu</option>
+                        <option value="agent">Agent de voyage</option>
+                        <option value="student">Étudiant</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Dites-nous pourquoi vous voulez devenir partenaire Midzo Flight (optionnel)</label>
+                    <textarea name="motivation" placeholder="Quelques mots sur votre motivation..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Envoyer ma candidature</button>
+            </form>
+            <div class="success-msg" id="success-fr">✅ Votre candidature a été envoyée avec succès ! Nous vous contacterons sous 48h.</div>
         </div>
-
-        <hr>
-        <p class="footer-note">Contact : <strong>contact@midzoflight.com</strong> · Telegram : <strong>@midzoflight_bot</strong></p>
     </div>
 
     <!-- ANGLAIS -->
     <div id="lang-en" style="display:none;">
         <h1>Become a Midzo Flight Partner</h1>
-        <p class="subtitle">Recommend flights to your community and earn a commission on every booking. Simple, free, and with no strings attached.</p>
+        <p class="subtitle">Recommend flights to your community and earn a commission on every booking.</p>
 
         <h2>How it works</h2>
         <ul>
@@ -314,28 +373,48 @@
             <li>Travel bloggers and content creators</li>
             <li>Travel agencies and independent agents</li>
             <li>Students looking for extra income</li>
-            <li>Anyone active on social media or WhatsApp groups</li>
+            <li>Anyone active on social media</li>
         </ul>
 
-        <h2>How much can I earn?</h2>
-        <p>The commission is calculated on every booking made through your link. The more sales you generate, the more you earn. Monthly payment via Mobile Money or bank transfer.</p>
-
-        <div class="cta-box">
-            <p>Ready to start?</p>
-            <a href="https://wa.me/79961792326?text=Hello%20Midzo%2C%20I%20want%20to%20become%20an%20affiliate%20partner" class="btn-wa" target="_blank" rel="noopener">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-                Apply on WhatsApp
-            </a>
+        <div class="form-box">
+            <h2>Registration Form</h2>
+            <form id="partner-form-en" onsubmit="submitForm(event, 'en')">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="name" placeholder="Ex: John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" name="email" placeholder="Ex: john@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp Number *</label>
+                    <input type="tel" name="whatsapp" placeholder="Ex: +228 90 00 00 00" required>
+                </div>
+                <div class="form-group">
+                    <label>You are...</label>
+                    <select name="profile">
+                        <option value="">-- Select --</option>
+                        <option value="blogger">Blogger / Content Creator</option>
+                        <option value="agent">Travel Agent</option>
+                        <option value="student">Student</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tell us why you want to become a Midzo Flight partner (optional)</label>
+                    <textarea name="motivation" placeholder="A few words about your motivation..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Submit Application</button>
+            </form>
+            <div class="success-msg" id="success-en">✅ Your application has been submitted successfully! We'll contact you within 48h.</div>
         </div>
-
-        <hr>
-        <p class="footer-note">Contact : <strong>contact@midzoflight.com</strong> · Telegram : <strong>@midzoflight_bot</strong></p>
     </div>
 
     <!-- RUSSE -->
     <div id="lang-ru" style="display:none;">
         <h1>Станьте партнёром Midzo Flight</h1>
-        <p class="subtitle">Рекомендуйте авиабилеты своему сообществу и зарабатывайте комиссию с каждой продажи. Просто, бесплатно и без обязательств.</p>
+        <p class="subtitle">Рекомендуйте авиабилеты своему сообществу и зарабатывайте комиссию с каждой продажи.</p>
 
         <h2>Как это работает</h2>
         <ul>
@@ -350,22 +429,42 @@
             <li>Тревел-блогеры и создатели контента</li>
             <li>Турагентства и независимые агенты</li>
             <li>Студенты, ищущие дополнительный доход</li>
-            <li>Все, кто активен в соцсетях или группах WhatsApp</li>
+            <li>Все, кто активен в соцсетях</li>
         </ul>
 
-        <h2>Сколько я могу заработать?</h2>
-        <p>Комиссия начисляется с каждой продажи по вашей ссылке. Чем больше продаж, тем выше доход. Ежемесячная выплата через Mobile Money или банковский перевод.</p>
-
-        <div class="cta-box">
-            <p>Готовы начать?</p>
-            <a href="https://wa.me/79961792326?text=Здравствуйте%2C%20я%20хочу%20стать%20партнёром%20Midzo%20Flight" class="btn-wa" target="_blank" rel="noopener">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-                Подать заявку в WhatsApp
-            </a>
+        <div class="form-box">
+            <h2>Форма заявки</h2>
+            <form id="partner-form-ru" onsubmit="submitForm(event, 'ru')">
+                <div class="form-group">
+                    <label>Ваше полное имя *</label>
+                    <input type="text" name="name" placeholder="Напр: Иван Петров" required>
+                </div>
+                <div class="form-group">
+                    <label>Ваш email *</label>
+                    <input type="email" name="email" placeholder="Напр: ivan@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Ваш номер WhatsApp *</label>
+                    <input type="tel" name="whatsapp" placeholder="Напр: +228 90 00 00 00" required>
+                </div>
+                <div class="form-group">
+                    <label>Вы...</label>
+                    <select name="profile">
+                        <option value="">-- Выберите --</option>
+                        <option value="blogger">Блогер / Создатель контента</option>
+                        <option value="agent">Турагент</option>
+                        <option value="student">Студент</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Расскажите, почему хотите стать партнёром (необязательно)</label>
+                    <textarea name="motivation" placeholder="Пара слов о вашей мотивации..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Отправить заявку</button>
+            </form>
+            <div class="success-msg" id="success-ru">✅ Ваша заявка отправлена! Мы свяжемся с вами в течение 48 часов.</div>
         </div>
-
-        <hr>
-        <p class="footer-note">Контакт : <strong>contact@midzoflight.com</strong> · Telegram : <strong>@midzoflight_bot</strong></p>
     </div>
 </div>
 
@@ -377,7 +476,7 @@
                 <div style="width:34px;height:34px;background:url('https://i.imgur.com/N3uodPn.png') no-repeat center/contain"></div>
                 <span style="font-weight:800;font-size:.95rem;color:#fff">MIDZO</span>
             </div>
-            <p style="font-size:.78rem;color:rgba(255,255,255,.36);max-width:200px">728+ compagnies comparées en temps réel. Votre agent IA Sofia vous guide.</p>
+            <p style="font-size:.78rem;color:rgba(255,255,255,.36);max-width:200px">728+ compagnies comparées en temps réel. Sofia vous guide.</p>
         </div>
         <div class="footer-col">
             <p class="footer-col-title">Navigation</p>
@@ -412,7 +511,15 @@
         document.querySelector(`[onclick="switchLang('${lang}')"]`).classList.add('active');
     }
 
-    // Appliquer la langue détectée automatiquement
+    function submitForm(event, lang) {
+        event.preventDefault();
+        // Afficher le message de succès
+        setTimeout(() => {
+            document.getElementById('success-'+lang).style.display = 'block';
+            document.getElementById('partner-form-'+lang).style.display = 'none';
+        }, 500);
+    }
+
     const browserLang = navigator.language?.split('-')[0];
     if (browserLang === 'en' || browserLang === 'ru') {
         switchLang(browserLang);
