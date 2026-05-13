@@ -1,23 +1,21 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "api/chat.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/cities.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/track.js",
-      "use": "@vercel/node"
-    }
+    { "src": "api/chat.js", "use": "@vercel/node" },
+    { "src": "api/cities.js", "use": "@vercel/node" },
+    { "src": "api/prices.js", "use": "@vercel/node" },
+    { "src": "api/track.js", "use": "@vercel/node" },
+    { "src": "partenaires.html", "use": "@vercel/static" },
+    { "src": "suivi.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/chat", "dest": "/api/chat.js" },
     { "src": "/api/cities", "dest": "/api/cities.js" },
+    { "src": "/api/prices", "dest": "/api/prices.js" },
     { "src": "/api/track", "dest": "/api/track.js" },
+    { "src": "/partenaires", "dest": "/partenaires.html" },
+    { "src": "/suivi", "dest": "/suivi.html" },
+    { "src": "/", "dest": "/partenaires.html" },
     { "src": "/(.*)", "status": 404 }
   ]
 }
