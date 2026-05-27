@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Maison Bleue · Mont Agou | Midzo Flight</title>
+<meta name="description" content="Hébergement unique au pied du Mont Agou. 2 chambres, terrasse panoramique, bar. Dès 35 000 FCFA/nuit.">
+<meta name="theme-color" content="#0770e3">
+<link rel="icon" href="https://i.imgur.com/N3uodPn.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0770e3; --blue-dk:#044faa; --blue-soft:#eef4fc;
+  --ink:#0e1430;       /* near-black brand */
+  --ink-2:#1d2447;
+  --text:#15183a;
+  --muted:#6b7088;
+  --line:#e7e9ef;
+  --bg:#fbfaf6;        /* warm paper */
+  --card:#ffffff;
+  --forest:#1f3b2d;    /* deep sage */
+  --forest-2:#2f5d44;
+  --sage:#7a9889;
+  --sand:#e8dec8;
+  --sand-2:#f2ecdc;
+  --clay:#b5664a;
+  --navy:#0a1840;
+  --r-sm:10px; --r:14px; --r-lg:22px; --r-xl:28px;
+  --shadow-sm:0 1px 2px rgba(14,20,48,.04), 0 2px 8px rgba(14,20,48,.04);
+  --shadow:0 12px 32px -16px rgba(14,20,48,.18), 0 2px 6px rgba(14,20,48,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text)}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+  font-size:16px;
+}
+a{color:inherit}
+img,svg{display:block;max-width:100%}
+.serif{font-family:'Fraunces',serif;font-weight:500;letter-spacing:-.01em}
+
+/* ═══ HEADER ═══ */
+.site-header{
+  background:rgba(255,255,255,.86);
+  backdrop-filter:saturate(140%) blur(10px);
+  -webkit-backdrop-filter:saturate(140%) blur(10px);
+  border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:100;
+}
+.header-inner{
+  max-width:1240px;margin:0 auto;
+  height:64px;padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.logo-link{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.logo-img{
+  width:108px;height:38px;
+  background:url('https://i.imgur.com/N3uodPn.png') no-repeat left center/contain;
+}
+.header-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.header-nav a{
+  font-size:.84rem;font-weight:600;color:var(--ink-2);
+  text-decoration:none;padding:8px 12px;border-radius:8px;
+  transition:background .15s,color .15s;
+}
+.header-nav a:hover{background:var(--blue-soft);color:var(--blue)}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--ink);color:#fff!important;
+  padding:9px 14px 9px 12px;border-radius:999px;
+  font-weight:600;font-size:.82rem;text-decoration:none!important;
+  white-space:nowrap;transition:background .2s,transform .2s;
+}
+.btn-primary:hover{background:var(--blue)}
+.btn-primary .dot{
+  width:6px;height:6px;border-radius:999px;background:#7dd674;
+  box-shadow:0 0 0 3px rgba(125,214,116,.25);
+}
+
+/* language switcher */
+.lang-switch{
+  display:inline-flex;align-items:center;
+  background:#f3f4f8;border:1px solid var(--line);
+  border-radius:999px;padding:3px;gap:2px;
+  margin-left:4px;
+}
+.lang-switch button{
+  border:0;background:transparent;cursor:pointer;
+  font-family:inherit;font-weight:600;font-size:.72rem;
+  color:var(--muted);letter-spacing:.06em;
+  padding:5px 10px;border-radius:999px;
+  transition:background .15s,color .15s;
+}
+.lang-switch button:hover{color:var(--ink)}
+.lang-switch button.active{
+  background:#fff;color:var(--ink);
+  box-shadow:0 1px 2px rgba(14,20,48,.08);
+}
+
+/* ═══ HERO ═══ */
+.hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 80% at 80% 10%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(80% 60% at 10% 90%, rgba(122,152,137,.35), transparent 60%),
+    linear-gradient(160deg,#0e2a1f 0%, #1f3b2d 45%, #14261d 100%);
+  color:#fff;
+  padding:84px 24px 92px;
+}
+.hero::before{
+  /* topographic contour lines */
+  content:"";position:absolute;inset:0;opacity:.18;pointer-events:none;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 70% 50%, transparent 39%, rgba(255,255,255,.6) 40%, transparent 41%),
+    radial-gradient(ellipse 70% 50% at 70% 50%, transparent 49%, rgba(255,255,255,.5) 50%, transparent 51%),
+    radial-gradient(ellipse 80% 60% at 70% 50%, transparent 59%, rgba(255,255,255,.4) 60%, transparent 61%),
+    radial-gradient(ellipse 90% 70% at 70% 50%, transparent 69%, rgba(255,255,255,.3) 70%, transparent 71%),
+    radial-gradient(ellipse 100% 80% at 70% 50%, transparent 79%, rgba(255,255,255,.25) 80%, transparent 81%);
+  filter:blur(.3px);
+}
+.hero-inner{
+  position:relative;max-width:1180px;margin:0 auto;
+  display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;
+}
+
+/* hero image stack */
+.hero-media{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  grid-template-rows:auto auto;
+  gap:14px;
+  min-height:520px;
+}
+.hero-media image-slot{
+  width:100%;
+  display:block;
+  background:rgba(255,255,255,.06);
+  outline:1px dashed rgba(255,255,255,.28);
+  outline-offset:-6px;
+  --image-slot-placeholder-color:rgba(255,255,255,.7);
+}
+.hero-media .slot-main{
+  grid-column:1 / 2;grid-row:1 / 3;
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.5);
+  height:520px;
+}
+.hero-media .slot-sub{
+  grid-column:2 / 3;
+  border-radius:var(--r);
+  overflow:hidden;
+  box-shadow:0 20px 40px -20px rgba(0,0,0,.4);
+  height:253px;
+}
+.hero-media .price-bubble{
+  grid-column:2 / 3;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(10px);
+  border-radius:var(--r);
+  padding:18px 18px 16px;
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:0 20px 40px -20px rgba(0,0,0,.35);
+  height:253px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.hero-media .price-bubble .pb-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.hero-media .price-bubble .pb-amount{font-family:'Fraunces',serif;font-size:1.7rem;font-weight:500;color:var(--ink);line-height:1;margin-top:8px;letter-spacing:-.01em}
+.hero-media .price-bubble .pb-amount small{font-size:.65rem;font-family:'Plus Jakarta Sans',sans-serif;color:var(--muted);font-weight:500;letter-spacing:.04em;margin-left:4px;text-transform:uppercase}
+.hero-media .price-bubble .pb-meta{font-size:.78rem;color:var(--muted);line-height:1.5;margin-top:10px}
+.hero-media .price-bubble .pb-cta{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--ink);color:#fff;
+  padding:10px 14px;border-radius:10px;
+  text-decoration:none;font-weight:600;font-size:.82rem;
+  transition:background .2s;
+}
+.hero-media .price-bubble .pb-cta:hover{background:var(--blue)}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);
+  padding:6px 12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;
+  background:rgba(255,255,255,.04);
+}
+.eyebrow .pulse{width:6px;height:6px;border-radius:999px;background:#9be092;box-shadow:0 0 0 3px rgba(155,224,146,.2)}
+.hero h1{
+  font-family:'Fraunces',serif;font-weight:500;
+  font-size:clamp(2.4rem,5.2vw,4rem);
+  line-height:1.02;letter-spacing:-.02em;
+  margin:18px 0 14px;
+}
+.hero h1 em{font-style:italic;color:#cfe6d8;font-weight:400}
+.hero .subtitle{
+  font-size:1.05rem;color:rgba(255,255,255,.78);
+  max-width:520px;line-height:1.65;
+}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;
+}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  padding:7px 13px;border-radius:999px;
+  font-size:.82rem;color:rgba(255,255,255,.9);font-weight:500;
+}
+.chip svg{stroke:rgba(255,255,255,.85)}
+
+/* hero right card (legacy, kept) */
+.hero-card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--r-lg);
+  padding:24px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:flex;flex-direction:column;gap:18px;
+}
+.hero-card .row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.hero-card .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.55);font-weight:600}
+.hero-card .value{font-family:'Fraunces',serif;font-size:1.4rem;color:#fff;font-weight:500}
+.hero-card .value small{font-size:.7rem;color:rgba(255,255,255,.6);font-weight:400;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.04em;margin-left:4px}
+.hero-card hr{border:0;border-top:1px solid rgba(255,255,255,.1)}
+.hero-card .cta{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:#fff;color:var(--ink);
+  padding:13px 16px;border-radius:12px;
+  font-weight:700;font-size:.92rem;text-decoration:none;
+  transition:transform .2s;
+}
+.hero-card .cta:hover{transform:translateY(-1px)}
+
+/* ═══ CONTENU ═══ */
+.container{max-width:1100px;margin:0 auto;padding:72px 24px 0}
+
+/* ═══ GALLERY ═══ */
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-auto-rows:180px;
+  gap:14px;
+}
+.gallery image-slot{
+  width:100%;height:100%;
+  border-radius:var(--r);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:transform .3s,box-shadow .3s;
+}
+.gallery image-slot:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.g1{grid-column:span 3;grid-row:span 2}
+.g2{grid-column:span 3;grid-row:span 1}
+.g3{grid-column:span 2;grid-row:span 1}
+.g4{grid-column:span 1;grid-row:span 1}
+.g5{grid-column:span 2;grid-row:span 2}
+.g6{grid-column:span 4;grid-row:span 1}
+.gallery-note{
+  display:flex;align-items:center;gap:10px;
+  margin-top:18px;padding:12px 16px;
+  background:var(--sand-2);border:1px dashed #d8ccab;border-radius:12px;
+  font-size:.82rem;color:#7c6a3f;
+}
+.gallery-note svg{flex-shrink:0;color:var(--clay)}
+.lead{
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.3rem,2.4vw,1.7rem);
+  line-height:1.4;color:var(--ink);
+  max-width:780px;letter-spacing:-.01em;font-weight:400;
+}
+.lead strong{font-weight:600;color:var(--forest)}
+
+.section-head{
+  display:flex;align-items:baseline;gap:14px;
+  margin:64px 0 22px;
+}
+.section-head .num{
+  font-family:'Fraunces',serif;
+  font-size:.95rem;color:var(--muted);font-weight:500;letter-spacing:.04em;
+}
+.section-head h2{
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.5rem,2.6vw,1.9rem);
+  font-weight:500;color:var(--ink);letter-spacing:-.01em;
+  line-height:1.2;
+}
+.section-head .rule{flex:1;height:1px;background:var(--line);align-self:center;margin-left:6px}
+
+/* features */
+.features-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+}
+.feature-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:22px 20px 20px;
+  display:flex;flex-direction:column;gap:14px;
+  transition:transform .25s,box-shadow .25s,border-color .25s;
+}
+.feature-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#dadde6}
+.feature-card .ico{
+  width:42px;height:42px;border-radius:11px;
+  background:var(--blue-soft);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--blue);
+}
+.feature-card.green .ico{background:#eaf1ec;color:var(--forest-2)}
+.feature-card.sand .ico{background:var(--sand-2);color:var(--clay)}
+.feature-card h4{
+  font-size:1rem;font-weight:700;color:var(--ink);line-height:1.3;
+}
+.feature-card p{font-size:.86rem;color:var(--muted);line-height:1.55}
+
+/* ═══ TARIFS ═══ */
+.price-wrap{
+  margin-top:8px;
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+}
+.price-card{
+  position:relative;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  padding:28px 26px;
+  overflow:hidden;
+}
+.price-card.feature{
+  background:linear-gradient(180deg,#f4efe2 0%,#ece4cf 100%);
+  border-color:#e0d6bb;
+}
+.price-card .pc-label{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);
+}
+.price-card.feature .pc-label{color:var(--clay)}
+.price-card .pc-amount{
+  font-family:'Fraunces',serif;
+  font-size:clamp(2rem,4vw,2.8rem);font-weight:500;color:var(--ink);
+  margin-top:14px;line-height:1;letter-spacing:-.02em;
+}
+.price-card .pc-amount .unit{font-size:.7rem;font-family:'Plus Jakarta Sans',sans-serif;color:var(--muted);font-weight:500;letter-spacing:.04em;margin-left:6px;text-transform:uppercase}
+.price-card .pc-note{font-size:.85rem;color:var(--muted);margin-top:10px}
+.price-card .pc-tag{
+  position:absolute;top:18px;right:18px;
+  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  background:#fff;color:var(--clay);border:1px solid #e0d6bb;
+  padding:5px 10px;border-radius:999px;
+}
+.price-aside{
+  margin-top:14px;
+  display:flex;align-items:center;gap:10px;
+  font-size:.88rem;color:var(--muted);
+  padding:14px 16px;background:var(--blue-soft);border-radius:12px;border:1px solid #dde8f7;
+}
+.price-aside svg{flex-shrink:0;color:var(--blue)}
+
+/* ═══ PACKS ═══ */
+.pack-box{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#13261c 0%, #1f3b2d 60%, #0e1f17 100%);
+  color:#fff;
+  border-radius:var(--r-xl);
+  padding:48px 40px;
+  margin-top:8px;
+}
+.pack-box::before{
+  content:"";position:absolute;inset:0;opacity:.16;pointer-events:none;
+  background-image:
+    radial-gradient(ellipse 50% 35% at 90% 80%, transparent 39%, rgba(255,255,255,.5) 40%, transparent 41%),
+    radial-gradient(ellipse 65% 45% at 90% 80%, transparent 49%, rgba(255,255,255,.4) 50%, transparent 51%),
+    radial-gradient(ellipse 80% 55% at 90% 80%, transparent 59%, rgba(255,255,255,.3) 60%, transparent 61%);
+}
+.pack-head{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:30px;flex-wrap:wrap}
+.pack-head h3{
+  font-family:'Fraunces',serif;font-weight:500;
+  font-size:clamp(1.4rem,2.4vw,1.8rem);line-height:1.2;letter-spacing:-.01em;
+  max-width:520px;
+}
+.pack-head p{color:rgba(255,255,255,.65);font-size:.95rem;margin-top:8px;max-width:520px}
+.pack-head .badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+  padding:7px 13px;border-radius:999px;
+  font-size:.78rem;font-weight:600;color:rgba(255,255,255,.9);
+  white-space:nowrap;
+}
+.pack-grid{
+  position:relative;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+}
+.pack-card{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--r);
+  padding:22px;
+  display:flex;flex-direction:column;gap:18px;
+  transition:background .2s,border-color .2s;
+}
+.pack-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+.pack-card .pico{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  color:#cfe6d8;
+}
+.pack-card .pack-label{font-size:.95rem;font-weight:600;color:#fff;line-height:1.3}
+.pack-card .pack-price{
+  font-family:'Fraunces',serif;font-size:1.35rem;font-weight:500;color:#fff;letter-spacing:-.01em;
+}
+.pack-card .pack-price small{font-size:.7rem;font-family:'Plus Jakarta Sans',sans-serif;color:rgba(255,255,255,.5);font-weight:400;display:block;letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+.pack-foot{position:relative;color:rgba(255,255,255,.6);margin-top:26px;font-size:.88rem;display:flex;align-items:center;gap:8px}
+
+/* ═══ CTA ═══ */
+.cta-box{
+  margin:72px 0 0;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r-xl);
+  padding:48px;
+  display:grid;grid-template-columns:1.3fr 1fr;align-items:center;gap:32px;
+}
+.cta-box h3{
+  font-family:'Fraunces',serif;font-weight:500;
+  font-size:clamp(1.6rem,3vw,2.2rem);
+  line-height:1.15;letter-spacing:-.015em;color:var(--ink);
+}
+.cta-box p{color:var(--muted);margin-top:12px;font-size:1rem;max-width:420px}
+.cta-actions{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.btn-wa{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#1faa53;color:#fff;
+  padding:15px 26px;border-radius:999px;
+  text-decoration:none;font-weight:700;font-size:.95rem;
+  box-shadow:0 8px 20px -8px rgba(31,170,83,.5);
+  transition:transform .2s,background .2s;
+}
+.btn-wa:hover{background:#178c44;transform:translateY(-1px)}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--ink);text-decoration:none;
+  font-size:.86rem;font-weight:600;
+  padding:10px 16px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;
+}
+.btn-secondary:hover{border-color:var(--ink)}
+
+/* ═══ FOOTER ═══ */
+.site-footer{
+  background:var(--ink);
+  color:rgba(255,255,255,.55);
+  padding:64px 24px 28px;
+  margin-top:96px;
+}
+.footer-grid{
+  display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;
+  gap:40px;max-width:1240px;margin:0 auto;
+}
+.footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.footer-brand .lg{width:36px;height:36px;background:url('https://i.imgur.com/N3uodPn.png') no-repeat center/contain}
+.footer-brand span{font-weight:800;font-size:1rem;color:#fff;letter-spacing:.02em}
+.footer-col .tag{font-size:.78rem;color:rgba(255,255,255,.5);max-width:240px;line-height:1.6}
+.footer-col-title{
+  font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;
+  color:rgba(255,255,255,.4);margin-bottom:14px;
+}
+.footer-col a{
+  color:rgba(255,255,255,.6);font-size:.86rem;text-decoration:none;
+  display:flex;align-items:center;gap:8px;margin-bottom:9px;
+  transition:color .2s;
+}
+.footer-col a:hover{color:#fff}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:20px;margin:32px auto 0;max-width:1240px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  font-size:.78rem;color:rgba(255,255,255,.35);
+}
+
+/* responsive */
+@media (max-width:880px){
+  .hero{padding:60px 20px 70px}
+  .hero-inner{grid-template-columns:1fr;gap:28px}
+  .hero-media{min-height:auto;grid-template-columns:1fr 1fr}
+  .hero-media .slot-main{grid-column:1 / 3;grid-row:auto;height:280px}
+  .hero-media .slot-sub{grid-column:auto;height:200px}
+  .hero-media .price-bubble{grid-column:auto;height:200px}
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .price-wrap{grid-template-columns:1fr}
+  .pack-grid{grid-template-columns:1fr}
+  .pack-box{padding:32px 24px}
+  .cta-box{grid-template-columns:1fr;padding:32px 24px;text-align:left}
+  .cta-actions{align-items:flex-start}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .gallery{grid-template-columns:repeat(4,1fr);grid-auto-rows:140px}
+  .g1{grid-column:span 4;grid-row:span 2}
+  .g2,.g6{grid-column:span 4}
+  .g3,.g5{grid-column:span 2;grid-row:span 1}
+  .g4{grid-column:span 2}
+}
+@media (max-width:540px){
+  .header-nav a:not(.btn-primary){display:none}
+  .features-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .container{padding-top:48px}
+  .section-head{margin-top:48px}
+  .gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:130px}
+  .g1,.g2,.g3,.g4,.g5,.g6{grid-column:span 2;grid-row:span 1}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="https://www.midzoflight.com" class="logo-link" aria-label="Midzo Flight">
+      <div class="logo-img"></div>
+    </a>
+    <nav class="header-nav">
+      <a href="https://www.midzoflight.com" data-i18n="nav.flights">Vols</a>
+      <a href="https://www.midzoflight.com" data-i18n="nav.hotels">Hôtels</a>
+      <a href="https://www.midzoflight.com" data-i18n="nav.ai">Agent IA</a>
+      <a href="/cdn-cgi/l/email-protection#71121e1f05101205311c18150b1e171d181619055f121e1c" data-i18n="nav.contact">Contact</a>
+      <a href="https://www.midzoflight.com" class="btn-primary">
+        <span class="dot"></span>
+        Sofia IA
+      </a>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" data-lang="fr" class="active">FR</button>
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="ru">RU</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="eyebrow"><span class="pulse"></span><span data-i18n="hero.eyebrow">Séjour signature · Togo</span></span>
+      <h1 data-i18n-html="hero.title">La Maison <em>Bleue</em><br>au Mont Agou.</h1>
+      <p class="subtitle" data-i18n="hero.subtitle">Un refuge adossé à la montagne, entre brume matinale et terrasse panoramique. Pensé pour ralentir, respirer, déconnecter.</p>
+      <div class="hero-meta">
+        <span class="chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span data-i18n="hero.chip1">Mont Agou · Togo</span>
+        </span>
+        <span class="chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+          <span data-i18n="hero.chip2">Vue panoramique</span>
+        </span>
+        <span class="chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
+          <span data-i18n="hero.chip3">2 chambres</span>
+        </span>
+      </div>
+    </div>
+
+    <aside class="hero-media">
+      <image-slot id="hero-main" class="slot-main" shape="rounded" radius="22" placeholder="Photo principale (terrasse, façade...)"></image-slot>
+      <image-slot id="hero-sub" class="slot-sub" shape="rounded" radius="14" placeholder="Photo d’ambiance"></image-slot>
+      <div class="price-bubble">
+        <div>
+          <div class="pb-label" data-i18n="hero.from">À partir de</div>
+          <div class="pb-amount">35 000<small data-i18n="hero.perNight">FCFA / nuit</small></div>
+          <div class="pb-meta" data-i18n="hero.specs">2 chambres · salon · terrasse panoramique</div>
+        </div>
+        <a href="https://wa.me/79961792326?text=Bonjour%20Midzo%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20La%20Maison%20Bleue%20au%20Mont%20Agou" class="pb-cta" data-i18n-attr="href:hero.waLink" target="_blank" rel="noopener">
+          <span data-i18n="hero.book">Réserver</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ═══ CONTENU ═══ -->
+<div class="container">
+
+  <p class="lead" data-i18n-html="lead">
+    Perchée sur les hauteurs du Mont Agou, <strong>La Maison Bleue</strong> vous accueille dans un cadre paisible et dépaysant — idéal pour se reconnecter à la nature.
+  </p>
+
+  <!-- ═ Équipements ═ -->
+  <div class="section-head">
+    <span class="num">01 —</span>
+    <h2 data-i18n="s01.title">L'hébergement</h2>
+    <span class="rule"></span>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="f1.t">2 chambres</h4>
+        <p data-i18n="f1.d">Confortables et spacieuses</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z"/><path d="M4 18v2"/><path d="M20 18v2"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="f2.t">1 salon convivial</h4>
+        <p data-i18n="f2.d">Espace détente partagé</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18"/><path d="M5 11V7a7 7 0 0 1 14 0v4"/><path d="M5 11v6a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-6"/><path d="M9 20v2"/><path d="M15 20v2"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="f3.t">Cuisine américaine</h4>
+        <p data-i18n="f3.d">Entièrement équipée</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="f4.t">Terrasse panoramique</h4>
+        <p data-i18n="f4.d">Vue ouverte sur les montagnes</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═ Services ═ -->
+  <div class="section-head">
+    <span class="num">02 —</span>
+    <h2 data-i18n="s02.title">Services à la carte</h2>
+    <span class="rule"></span>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card green">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 11v11"/><path d="M19 3H5l1.5 7a5.5 5.5 0 0 0 11 0L19 3Z"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="s1.t">Bar & rafraîchissements</h4>
+        <p data-i18n="s1.d">Café, boissons fraîches, jus naturels</p>
+      </div>
+    </div>
+    <div class="feature-card green">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="s2.t">Petit déjeuner</h4>
+        <p data-i18n="s2.d">Servi sur demande</p>
+      </div>
+    </div>
+    <div class="feature-card green">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"/><path d="M6 17h12"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="s3.t">Cuisinier disponible</h4>
+        <p data-i18n="s3.d">Repas préparés sur demande</p>
+      </div>
+    </div>
+    <div class="feature-card green">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="s4.t">Parking sécurisé</h4>
+        <p data-i18n="s4.d">À 2 minutes à pied</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═ Galerie photos ═ -->
+  <div class="section-head">
+    <span class="num">03 —</span>
+    <h2 data-i18n="s03.title">Galerie</h2>
+    <span class="rule"></span>
+  </div>
+  <div class="gallery">
+    <image-slot id="gal-1" class="g1" shape="rounded" radius="14" placeholder="Vue terrasse — photo héro"></image-slot>
+    <image-slot id="gal-2" class="g2" shape="rounded" radius="14" placeholder="Salon"></image-slot>
+    <image-slot id="gal-3" class="g3" shape="rounded" radius="14" placeholder="Chambre"></image-slot>
+    <image-slot id="gal-4" class="g4" shape="rounded" radius="14" placeholder="Détail"></image-slot>
+    <image-slot id="gal-5" class="g5" shape="rounded" radius="14" placeholder="Vue extérieure"></image-slot>
+    <image-slot id="gal-6" class="g6" shape="rounded" radius="14" placeholder="Cuisine / bar"></image-slot>
+  </div>
+  <div class="gallery-note">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+    <span data-i18n="gallery.note">Glissez-déposez vos photos dans chaque cadre. Elles seront sauvegardées automatiquement.</span>
+  </div>
+
+  <!-- ═ Tarifs ═ -->
+  <div class="section-head">
+    <span class="num">04 —</span>
+    <h2 data-i18n="s04.title">Nuitée complète</h2>
+    <span class="rule"></span>
+  </div>
+  <div class="price-wrap">
+    <div class="price-card">
+      <div class="pc-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        <span data-i18n="price.week">Semaine</span>
+      </div>
+      <div class="pc-amount">35 000<span class="unit" data-i18n="price.unit">FCFA / nuit</span></div>
+      <div class="pc-note" data-i18n="price.weekNote">Du lundi au jeudi · idéal pour les retraites & télétravail.</div>
+    </div>
+    <div class="price-card feature">
+      <span class="pc-tag" data-i18n="price.tag">Le plus demandé</span>
+      <div class="pc-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/><circle cx="12" cy="12" r="4"/></svg>
+        <span data-i18n="price.weekend">Week-end</span>
+      </div>
+      <div class="pc-amount">55 000<span class="unit" data-i18n="price.unit2">FCFA / nuit</span></div>
+      <div class="pc-note" data-i18n="price.weNote">Vendredi → dimanche · pour s'évader entre amis.</div>
+    </div>
+  </div>
+  <div class="price-aside">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="price.aside">Des réductions peuvent être accordées selon le nombre de nuitées réservées.</span>
+  </div>
+
+  <!-- ═ Packs ═ -->
+  <div class="section-head">
+    <span class="num">05 —</span>
+    <h2 data-i18n="s05.title">Packs complets</h2>
+    <span class="rule"></span>
+  </div>
+  <div class="pack-box">
+    <div class="pack-head">
+      <div>
+        <h3 data-i18n-html="pack.title">Vol + bus + logement.<br>Tout est arrangé pour vous.</h3>
+        <p data-i18n="pack.sub">Pour les voyageurs venant de l'extérieur du Togo, nous orchestrons l'itinéraire complet.</p>
+      </div>
+      <span class="badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <span data-i18n="pack.badge">Devis sur mesure</span>
+      </span>
+    </div>
+    <div class="pack-grid">
+      <div class="pack-card">
+        <div class="pico">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+        </div>
+        <div>
+          <div class="pack-label" data-i18n="pack.flight">Billet d'avion</div>
+          <div class="pack-price">250 000 FCFA<small data-i18n="pack.from">À partir de</small></div>
+        </div>
+      </div>
+      <div class="pack-card">
+        <div class="pico">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+        </div>
+        <div>
+          <div class="pack-label" data-i18n="pack.bus">Bus Lomé → Agou</div>
+          <div class="pack-price">5 000 FCFA<small data-i18n="pack.from2">À partir de</small></div>
+        </div>
+      </div>
+      <div class="pack-card">
+        <div class="pico">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 12 2l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M9 22V12h6v10"/></svg>
+        </div>
+        <div>
+          <div class="pack-label" data-i18n="pack.house">La Maison Bleue</div>
+          <div class="pack-price">35 000 FCFA<small data-i18n="pack.fromNight">À partir de / nuit</small></div>
+        </div>
+      </div>
+    </div>
+    <p class="pack-foot">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span data-i18n="pack.foot">Contactez-nous pour un devis personnalisé selon votre ville de départ.</span>
+    </p>
+  </div>
+
+  <!-- ═ CTA ═ -->
+  <div class="cta-box">
+    <div>
+      <h3 data-i18n-html="cta.title">Prêt à vous évader<br>au Mont Agou ?</h3>
+      <p data-i18n="cta.sub">Réservez votre séjour ou demandez un devis pour un pack complet. Réponse sous quelques heures.</p>
+    </div>
+    <div class="cta-actions">
+      <a href="https://wa.me/79961792326?text=Bonjour%20Midzo%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20La%20Maison%20Bleue%20au%20Mont%20Agou" class="btn-wa" data-i18n-attr="href:cta.waLink" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+        <span data-i18n="cta.wa">Réserver sur WhatsApp</span>
+      </a>
+      <a href="/cdn-cgi/l/email-protection#11727e7f65707265517c78756b7e777d787679653f727e7c" class="btn-secondary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <span class="__cf_email__" data-cfemail="3754585943565443775a5e534d58515b5e505f431954585a">[email&#160;protected]</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-brand">
+        <div class="lg"></div>
+        <span>MIDZO</span>
+      </div>
+      <p class="tag" data-i18n="foot.tag">728+ compagnies comparées en temps réel. Sofia vous guide du décollage à la chambre d'hôtel.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title" data-i18n="foot.nav">Navigation</p>
+      <a href="https://www.midzoflight.com" data-i18n="foot.search">Recherche de vols</a>
+      <a href="https://www.midzoflight.com" data-i18n="foot.sofia">Agent IA Sofia</a>
+      <a href="https://t.me/midzoflight_bot" target="_blank" rel="noopener" data-i18n="foot.bot">Bot Telegram</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title" data-i18n="foot.info">Informations</p>
+      <a href="https://www.midzoflight.com" data-i18n="foot.about">À propos</a>
+      <a href="https://www.midzoflight.com" data-i18n="foot.faq">FAQ</a>
+      <a href="https://www.midzoflight.com" data-i18n="foot.priv">Confidentialité</a>
+      <a href="https://www.midzoflight.com" data-i18n="foot.cook">Cookies</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title" data-i18n="foot.contact">Contact</p>
+      <a href="/cdn-cgi/l/email-protection#187b77766c797b6c5875717c62777e74717f706c367b7775">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <span class="__cf_email__" data-cfemail="20434f4e54414354604d49445a4f464c494748540e434f4d">[email&#160;protected]</span>
+      </a>
+      <a href="https://wa.me/79961792326" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        +7 996 179-23-26
+      </a>
+      <a href="https://t.me/midzoflight_bot" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        @midzoflight_bot
+      </a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span data-i18n="foot.rights">© 2026 Midzo Flight · Tous droits réservés.</span>
+    <span data-i18n="foot.made">Fait avec soin pour les voyageurs curieux.</span>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="image-slot.js"></script>
+<script>
+(function(){
+  const dict = {
+    fr: {
+      "nav.flights":"Vols","nav.hotels":"Hôtels","nav.ai":"Agent IA","nav.contact":"Contact",
+      "hero.eyebrow":"Séjour signature · Togo",
+      "hero.title":'La Maison <em>Bleue</em><br>au Mont Agou.',
+      "hero.subtitle":"Un refuge adossé à la montagne, entre brume matinale et terrasse panoramique. Pensé pour ralentir, respirer, déconnecter.",
+      "hero.chip1":"Mont Agou · Togo","hero.chip2":"Vue panoramique","hero.chip3":"2 chambres",
+      "hero.from":"À partir de","hero.perNight":"FCFA / nuit","hero.specs":"2 chambres · salon · terrasse panoramique",
+      "hero.book":"Réserver",
+      "hero.waLink":"https://wa.me/79961792326?text=Bonjour%20Midzo%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20La%20Maison%20Bleue%20au%20Mont%20Agou",
+      "hero.slot1":"Photo principale (terrasse, façade…)","hero.slot2":"Photo d'ambiance",
+      "lead":"Perchée sur les hauteurs du Mont Agou, <strong>La Maison Bleue</strong> vous accueille dans un cadre paisible et dépaysant — idéal pour se reconnecter à la nature.",
+      "s01.title":"L'hébergement",
+      "f1.t":"2 chambres","f1.d":"Confortables et spacieuses",
+      "f2.t":"1 salon convivial","f2.d":"Espace détente partagé",
+      "f3.t":"Cuisine américaine","f3.d":"Entièrement équipée",
+      "f4.t":"Terrasse panoramique","f4.d":"Vue ouverte sur les montagnes",
+      "s02.title":"Services à la carte",
+      "s1.t":"Bar & rafraîchissements","s1.d":"Café, boissons fraîches, jus naturels",
+      "s2.t":"Petit déjeuner","s2.d":"Servi sur demande",
+      "s3.t":"Cuisinier disponible","s3.d":"Repas préparés sur demande",
+      "s4.t":"Parking sécurisé","s4.d":"À 2 minutes à pied",
+      "s03.title":"Galerie",
+      "gallery.note":"Glissez-déposez vos photos dans chaque cadre. Elles seront sauvegardées automatiquement.",
+      "gal1":"Vue terrasse — photo héro","gal2":"Salon","gal3":"Chambre","gal4":"Détail","gal5":"Vue extérieure","gal6":"Cuisine / bar",
+      "s04.title":"Nuitée complète",
+      "price.week":"Semaine","price.weekend":"Week-end","price.unit":"FCFA / nuit","price.unit2":"FCFA / nuit",
+      "price.weekNote":"Du lundi au jeudi · idéal pour les retraites & télétravail.",
+      "price.weNote":"Vendredi → dimanche · pour s'évader entre amis.",
+      "price.tag":"Le plus demandé",
+      "price.aside":"Des réductions peuvent être accordées selon le nombre de nuitées réservées.",
+      "s05.title":"Packs complets",
+      "pack.title":"Vol + bus + logement.<br>Tout est arrangé pour vous.",
+      "pack.sub":"Pour les voyageurs venant de l'extérieur du Togo, nous orchestrons l'itinéraire complet.",
+      "pack.badge":"Devis sur mesure",
+      "pack.flight":"Billet d'avion","pack.bus":"Bus Lomé → Agou","pack.house":"La Maison Bleue",
+      "pack.from":"À partir de","pack.from2":"À partir de","pack.fromNight":"À partir de / nuit",
+      "pack.foot":"Contactez-nous pour un devis personnalisé selon votre ville de départ.",
+      "cta.title":"Prêt à vous évader<br>au Mont Agou ?",
+      "cta.sub":"Réservez votre séjour ou demandez un devis pour un pack complet. Réponse sous quelques heures.",
+      "cta.wa":"Réserver sur WhatsApp",
+      "cta.waLink":"https://wa.me/79961792326?text=Bonjour%20Midzo%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20La%20Maison%20Bleue%20au%20Mont%20Agou",
+      "foot.tag":"728+ compagnies comparées en temps réel. Sofia vous guide du décollage à la chambre d'hôtel.",
+      "foot.nav":"Navigation","foot.search":"Recherche de vols","foot.sofia":"Agent IA Sofia","foot.bot":"Bot Telegram",
+      "foot.info":"Informations","foot.about":"À propos","foot.faq":"FAQ","foot.priv":"Confidentialité","foot.cook":"Cookies",
+      "foot.contact":"Contact",
+      "foot.rights":"© 2026 Midzo Flight · Tous droits réservés.",
+      "foot.made":"Fait avec soin pour les voyageurs curieux."
+    },
+    en: {
+      "nav.flights":"Flights","nav.hotels":"Hotels","nav.ai":"AI Agent","nav.contact":"Contact",
+      "hero.eyebrow":"Signature stay · Togo",
+      "hero.title":'The <em>Blue</em> House<br>on Mount Agou.',
+      "hero.subtitle":"A retreat nestled against the mountain — morning mist and a panoramic deck. Built to slow down, breathe, and unplug.",
+      "hero.chip1":"Mount Agou · Togo","hero.chip2":"Panoramic view","hero.chip3":"2 bedrooms",
+      "hero.from":"From","hero.perNight":"FCFA / night","hero.specs":"2 bedrooms · lounge · panoramic terrace",
+      "hero.book":"Book now",
+      "hero.waLink":"https://wa.me/79961792326?text=Hello%20Midzo%2C%20I%27m%20interested%20in%20La%20Maison%20Bleue%20at%20Mount%20Agou",
+      "hero.slot1":"Main photo (terrace, façade…)","hero.slot2":"Atmosphere shot",
+      "lead":"Perched on the heights of Mount Agou, <strong>La Maison Bleue</strong> welcomes you to a peaceful and refreshing setting — perfect for reconnecting with nature.",
+      "s01.title":"The accommodation",
+      "f1.t":"2 bedrooms","f1.d":"Comfortable and spacious",
+      "f2.t":"1 cozy lounge","f2.d":"Shared chill-out space",
+      "f3.t":"Open kitchen","f3.d":"Fully equipped",
+      "f4.t":"Panoramic terrace","f4.d":"Open view over the mountains",
+      "s02.title":"À-la-carte services",
+      "s1.t":"Bar & refreshments","s1.d":"Coffee, cold drinks, fresh juices",
+      "s2.t":"Breakfast","s2.d":"Served on request",
+      "s3.t":"Chef on demand","s3.d":"Meals prepared on request",
+      "s4.t":"Secure parking","s4.d":"2 minutes on foot",
+      "s03.title":"Gallery",
+      "gallery.note":"Drag and drop your photos into each frame. They'll be saved automatically.",
+      "gal1":"Terrace view — hero shot","gal2":"Lounge","gal3":"Bedroom","gal4":"Detail","gal5":"Exterior","gal6":"Kitchen / bar",
+      "s04.title":"Full night",
+      "price.week":"Weekday","price.weekend":"Weekend","price.unit":"FCFA / night","price.unit2":"FCFA / night",
+      "price.weekNote":"Monday → Thursday · ideal for retreats & remote work.",
+      "price.weNote":"Friday → Sunday · for a getaway with friends.",
+      "price.tag":"Most popular",
+      "price.aside":"Discounts may apply depending on the number of nights booked.",
+      "s05.title":"Full packages",
+      "pack.title":"Flight + bus + stay.<br>Everything taken care of.",
+      "pack.sub":"For travelers coming from outside Togo, we orchestrate the full itinerary.",
+      "pack.badge":"Custom quote",
+      "pack.flight":"Plane ticket","pack.bus":"Bus Lomé → Agou","pack.house":"La Maison Bleue",
+      "pack.from":"From","pack.from2":"From","pack.fromNight":"From / night",
+      "pack.foot":"Contact us for a tailored quote based on your departure city.",
+      "cta.title":"Ready to escape<br>to Mount Agou?",
+      "cta.sub":"Book your stay or request a quote for a full package. Reply within a few hours.",
+      "cta.wa":"Book on WhatsApp",
+      "cta.waLink":"https://wa.me/79961792326?text=Hello%20Midzo%2C%20I%27m%20interested%20in%20La%20Maison%20Bleue%20at%20Mount%20Agou",
+      "foot.tag":"728+ airlines compared in real time. Sofia guides you from takeoff to hotel room.",
+      "foot.nav":"Navigation","foot.search":"Flight search","foot.sofia":"Sofia AI Agent","foot.bot":"Telegram bot",
+      "foot.info":"Information","foot.about":"About","foot.faq":"FAQ","foot.priv":"Privacy","foot.cook":"Cookies",
+      "foot.contact":"Contact",
+      "foot.rights":"© 2026 Midzo Flight · All rights reserved.",
+      "foot.made":"Crafted with care for curious travelers."
+    },
+    ru: {
+      "nav.flights":"Авиабилеты","nav.hotels":"Отели","nav.ai":"AI-агент","nav.contact":"Контакты",
+      "hero.eyebrow":"Авторский отдых · Того",
+      "hero.title":'«Голубой <em>дом</em>»<br>у горы Агу.',
+      "hero.subtitle":"Уединённый уголок у подножия горы — утренний туман и панорамная терраса. Чтобы замедлиться, выдохнуть и отключиться от суеты.",
+      "hero.chip1":"Гора Агу · Того","hero.chip2":"Панорамный вид","hero.chip3":"2 спальни",
+      "hero.from":"От","hero.perNight":"FCFA / ночь","hero.specs":"2 спальни · гостиная · панорамная терраса",
+      "hero.book":"Забронировать",
+      "hero.waLink":"https://wa.me/79961792326?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D0%BC%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20La%20Maison%20Bleue%20%D1%83%20%D0%B3%D0%BE%D1%80%D1%8B%20%D0%90%D0%B3%D1%83",
+      "hero.slot1":"Главное фото (терраса, фасад…)","hero.slot2":"Атмосферный кадр",
+      "lead":"На склонах горы Агу <strong>«Голубой дом»</strong> встречает вас тишиной и природой — идеальное место, чтобы перезагрузиться.",
+      "s01.title":"Размещение",
+      "f1.t":"2 спальни","f1.d":"Уютные и просторные",
+      "f2.t":"Уютная гостиная","f2.d":"Общая зона отдыха",
+      "f3.t":"Открытая кухня","f3.d":"Полностью оборудована",
+      "f4.t":"Панорамная терраса","f4.d":"Открытый вид на горы",
+      "s02.title":"Услуги по запросу",
+      "s1.t":"Бар и напитки","s1.d":"Кофе, прохладительные напитки, свежие соки",
+      "s2.t":"Завтрак","s2.d":"По запросу",
+      "s3.t":"Повар по запросу","s3.d":"Блюда готовятся по заказу",
+      "s4.t":"Охраняемая парковка","s4.d":"2 минуты пешком",
+      "s03.title":"Галерея",
+      "gallery.note":"Перетащите фотографии в каждую рамку — они сохранятся автоматически.",
+      "gal1":"Вид с террасы — главное фото","gal2":"Гостиная","gal3":"Спальня","gal4":"Деталь","gal5":"Снаружи","gal6":"Кухня / бар",
+      "s04.title":"Полная ночь",
+      "price.week":"Будни","price.weekend":"Выходные","price.unit":"FCFA / ночь","price.unit2":"FCFA / ночь",
+      "price.weekNote":"Пн → чт · идеально для ретритов и удалённой работы.",
+      "price.weNote":"Пт → вс · побег с друзьями.",
+      "price.tag":"Самый популярный",
+      "price.aside":"При длительном бронировании возможны скидки.",
+      "s05.title":"Готовые пакеты",
+      "pack.title":"Перелёт + автобус + проживание.<br>Мы берём всё на себя.",
+      "pack.sub":"Для путешественников из-за пределов Того мы продумаем весь маршрут.",
+      "pack.badge":"Индивидуальный расчёт",
+      "pack.flight":"Авиабилет","pack.bus":"Автобус Ломе → Агу","pack.house":"La Maison Bleue",
+      "pack.from":"От","pack.from2":"От","pack.fromNight":"От / ночь",
+      "pack.foot":"Свяжитесь с нами для индивидуального расчёта от вашего города вылета.",
+      "cta.title":"Готовы сбежать<br>к горе Агу?",
+      "cta.sub":"Забронируйте проживание или запросите расчёт пакета. Ответим в течение нескольких часов.",
+      "cta.wa":"Бронь в WhatsApp",
+      "cta.waLink":"https://wa.me/79961792326?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D0%BC%D0%B5%D0%BD%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20La%20Maison%20Bleue%20%D1%83%20%D0%B3%D0%BE%D1%80%D1%8B%20%D0%90%D0%B3%D1%83",
+      "foot.tag":"728+ авиакомпаний сравниваются в реальном времени. Sofia проведёт вас от взлёта до номера в отеле.",
+      "foot.nav":"Навигация","foot.search":"Поиск рейсов","foot.sofia":"AI-агент Sofia","foot.bot":"Telegram-бот",
+      "foot.info":"Информация","foot.about":"О нас","foot.faq":"FAQ","foot.priv":"Конфиденциальность","foot.cook":"Cookies",
+      "foot.contact":"Контакты",
+      "foot.rights":"© 2026 Midzo Flight · Все права защищены.",
+      "foot.made":"Сделано с заботой о любознательных путешественниках."
+    }
+  };
+
+  const slotMap = {
+    "hero-main":"hero.slot1","hero-sub":"hero.slot2",
+    "gal-1":"gal1","gal-2":"gal2","gal-3":"gal3","gal-4":"gal4","gal-5":"gal5","gal-6":"gal6"
+  };
+
+  function applyLang(lang){
+    const d = dict[lang] || dict.fr;
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const k = el.getAttribute('data-i18n');
+      if(d[k] !== undefined) el.textContent = d[k];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+      const k = el.getAttribute('data-i18n-html');
+      if(d[k] !== undefined) el.innerHTML = d[k];
+    });
+    document.querySelectorAll('[data-i18n-attr]').forEach(el=>{
+      el.getAttribute('data-i18n-attr').split(',').forEach(pair=>{
+        const [attr,key] = pair.trim().split(':');
+        if(d[key] !== undefined) el.setAttribute(attr, d[key]);
+      });
+    });
+    // image-slot placeholders
+    Object.entries(slotMap).forEach(([id,key])=>{
+      const el = document.getElementById(id);
+      if(el && d[key]) el.setAttribute('placeholder', d[key]);
+    });
+    // switch active state
+    document.querySelectorAll('.lang-switch button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    try{ localStorage.setItem('lang', lang); }catch(e){}
+  }
+
+  document.addEventListener('click', e=>{
+    const b = e.target.closest('.lang-switch button');
+    if(b) applyLang(b.dataset.lang);
+  });
+
+  let saved = 'fr';
+  try{ saved = localStorage.getItem('lang') || 'fr'; }catch(e){}
+  applyLang(saved);
+})();
+</script>
+</body>
+</html>
